@@ -164,9 +164,8 @@ struct ReservationView: View {
             let reservation = Reservation(
                 id: UUID(),
                 name: name,
-                date: combineDateTime(date: date, time: time),
-                partySize: partySize,
-                contactInfo: email
+                email: email, date: combineDateTime(date: date, time: time),
+                partySize: partySize
             )
             print("Created reservation: \(reservation)")
         }
@@ -205,12 +204,5 @@ extension Date {
         components.hour = 12
         components.minute = 0
         return calendar.date(from: components) ?? self
-    }
-}
-
-// Preview
-struct ReservationView_Previews: PreviewProvider {
-    static var previews: some View {
-        ReservationView()
     }
 }

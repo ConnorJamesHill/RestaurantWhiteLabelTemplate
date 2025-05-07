@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct ContentView: View {
+    @EnvironmentObject private var restaurant: RestaurantConfiguration
+    
     var body: some View {
         TabView {
             HomeView()
@@ -25,9 +27,9 @@ struct ContentView: View {
                     Label("Reserve", systemImage: "calendar")
                 }
             
-            GalleryView()
+            OrderView()
                 .tabItem {
-                    Label("Gallery", systemImage: "photo.on.rectangle")
+                    Label("Order", systemImage: "bag")
                 }
             
             InfoView()
@@ -35,5 +37,6 @@ struct ContentView: View {
                     Label("Info", systemImage: "info.circle")
                 }
         }
+        .navigationTitle(restaurant.name)
     }
 }

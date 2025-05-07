@@ -9,44 +9,17 @@ import SwiftUI
 import MapKit
 
 struct InfoView: View {
-    // Restaurant data - in a real app, you'd load this from a database/API
-    let restaurantName = "Bistro Deluxe"
-    let restaurantLogo = "restaurant_logo" // Add this image to your assets
-    let description = "Established in 2010, Bistro Deluxe offers a modern take on classic cuisine. Our chef-driven menu features locally sourced ingredients and changes seasonally to showcase the freshest flavors."
+    @EnvironmentObject private var restaurant: RestaurantConfiguration
     
-    let phoneNumber = "(555) 123-4567"
-    let emailAddress = "info@bistrodeluxe.com"
-    let websiteURL = "www.bistrodeluxe.com"
+    // Default coordinate - will be updated from restaurant config in onAppear
+    private let defaultCoordinate = CLLocationCoordinate2D(latitude: 37.7749, longitude: -122.4194)
     
-    let address = "123 Main Street, Anytown, CA 94000"
-    let location = CLLocationCoordinate2D(latitude: 37.7749, longitude: -122.4194) // SF coordinates as example
-    
-    let businessHours = [
-        ("Monday", "11:00 AM - 9:00 PM"),
-        ("Tuesday", "11:00 AM - 9:00 PM"),
-        ("Wednesday", "11:00 AM - 9:00 PM"),
-        ("Thursday", "11:00 AM - 10:00 PM"),
-        ("Friday", "11:00 AM - 11:00 PM"),
-        ("Saturday", "10:00 AM - 11:00 PM"),
-        ("Sunday", "10:00 AM - 9:00 PM")
-    ]
-    
-    let socialMedia = [
-        ("Instagram", "instagram", "@bistrodeluxe"),
-        ("Facebook", "facebook", "BistroDeluxe"),
-        ("Twitter", "twitter", "@BistroDeluxe")
-    ]
-    
-    @State private var region: MKCoordinateRegion
+    @State private var region = MKCoordinateRegion(
+        center: CLLocationCoordinate2D(latitude: 37.7749, longitude: -122.4194),
+        span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
+    )
     @State private var showingFullMap = false
-    
-    init() {
-        // Initialize map region
-        _region = State(initialValue: MKCoordinateRegion(
-            center: location,
-            span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
-        ))
-    }
+    @State private var position: MapCameraPosition = .automatic
     
     var body: some View {
         NavigationStack {
@@ -76,6 +49,13 @@ struct InfoView: View {
             .sheet(isPresented: $showingFullMap) {
                 fullMapView
             }
+            .onAppear {
+                // Update position when view appears and restaurant data is available
+                position = .region(MKCoordinateRegion(
+                    center: restaurant.location,
+                    span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
+                ))
+            }
         }
     }
     
@@ -83,7 +63,7 @@ struct InfoView: View {
     
     private var restaurantHeader: some View {
         VStack(alignment: .center, spacing: 16) {
-            Image(restaurantLogo)
+            Image(restaurant.logoImageName)
                 .resizable()
                 .scaledToFit()
                 .frame(width: 120, height: 120)
@@ -92,24 +72,31 @@ struct InfoView: View {
                     Circle()
                         .stroke(Color.primary.opacity(0.2), lineWidth: 2)
                 )
-                .shadow(radius: 5)
+                .shadow(color: Color.black.opacity(0.15), radius: 8, x: 0, y: 4)
             
-            Text(restaurantName)
+            Text(restaurant.name)
                 .font(.title)
                 .fontWeight(.bold)
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical)
+        .background(Color(.systemBackground))
+        .cornerRadius(16)
+        .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
     }
     
     private var aboutSection: some View {
         VStack(alignment: .leading, spacing: 8) {
             sectionHeader("Our Story")
             
-            Text(description)
+            Text(restaurant.description)
                 .font(.body)
                 .foregroundColor(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
+                .padding()
+                .background(Color(.systemBackground))
+                .cornerRadius(12)
+                .shadow(color: Color.black.opacity(0.08), radius: 6, x: 0, y: 3)
         }
     }
     
@@ -118,7 +105,7 @@ struct InfoView: View {
             sectionHeader("Hours")
             
             VStack(alignment: .leading, spacing: 4) {
-                ForEach(businessHours, id: \.0) { day, hours in
+                ForEach(restaurant.businessHours, id: \.0) { day, hours in
                     HStack(alignment: .top) {
                         Text(day)
                             .font(.subheadline)
@@ -132,6 +119,10 @@ struct InfoView: View {
                     .padding(.vertical, 2)
                 }
             }
+            .padding()
+            .background(Color(.systemBackground))
+            .cornerRadius(12)
+            .shadow(color: Color.black.opacity(0.08), radius: 6, x: 0, y: 3)
         }
     }
     
@@ -139,13 +130,15 @@ struct InfoView: View {
         VStack(alignment: .leading, spacing: 8) {
             sectionHeader("Location")
             
-            Text(address)
+            Text(restaurant.address)
                 .font(.subheadline)
                 .foregroundColor(.secondary)
+                .padding(.bottom, 4)
             
-            // Map view
-            Map(coordinateRegion: $region, annotationItems: [MapAnnotation(coordinate: location)]) { annotation in
-                MapMarker(coordinate: annotation.coordinate, tint: .primary)
+            // Updated Map view for iOS 17+
+            Map(position: $position) {
+                Marker(restaurant.name, coordinate: restaurant.location)
+                    .tint(.primary)
             }
             .frame(height: 180)
             .cornerRadius(12)
@@ -153,6 +146,7 @@ struct InfoView: View {
                 RoundedRectangle(cornerRadius: 12)
                     .stroke(Color.gray.opacity(0.2), lineWidth: 1)
             )
+            .shadow(color: Color.black.opacity(0.15), radius: 8, x: 0, y: 4)
             .onTapGesture {
                 showingFullMap = true
             }
@@ -168,6 +162,7 @@ struct InfoView: View {
                     .background(Color.primary.opacity(0.1))
                     .cornerRadius(10)
             }
+            .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
         }
     }
     
@@ -175,51 +170,79 @@ struct InfoView: View {
         VStack(alignment: .leading, spacing: 8) {
             sectionHeader("Contact")
             
-            contactButton(icon: "phone.fill", text: phoneNumber) {
-                callPhoneNumber()
+            VStack(spacing: 12) {
+                contactButton(icon: "phone.fill", text: restaurant.phoneNumber) {
+                    callPhoneNumber()
+                }
+                
+                contactButton(icon: "envelope.fill", text: restaurant.emailAddress) {
+                    sendEmail()
+                }
+                
+                contactButton(icon: "globe", text: restaurant.websiteURL) {
+                    openWebsite()
+                }
             }
-            
-            contactButton(icon: "envelope.fill", text: emailAddress) {
-                sendEmail()
-            }
-            
-            contactButton(icon: "globe", text: websiteURL) {
-                openWebsite()
-            }
+            .padding()
+            .background(Color(.systemBackground))
+            .cornerRadius(12)
+            .shadow(color: Color.black.opacity(0.08), radius: 6, x: 0, y: 3)
         }
     }
-    
+
     private var socialMediaSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 16) {
             sectionHeader("Follow Us")
             
             HStack(spacing: 24) {
-                ForEach(socialMedia, id: \.0) { platform, icon, handle in
-                    VStack(spacing: 6) {
-                        Image(systemName: icon)
-                            .font(.system(size: 24))
-                            .foregroundColor(.primary)
-                        Text(handle)
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                    }
-                    .onTapGesture {
-                        // Would open social media app in a real implementation
+                ForEach(restaurant.socialMedia, id: \.0) { platform, handle in
+                    SocialMediaButton(
+                        platform: platform,
+                        handle: handle
+                    ) {
+                        openSocialMedia(platform: platform, handle: handle)
                     }
                 }
                 Spacer()
             }
-            .padding(.top, 4)
+            .padding()
+            .background(Color(.systemBackground))
+            .cornerRadius(12)
+            .shadow(color: Color.black.opacity(0.08), radius: 6, x: 0, y: 3)
         }
     }
-    
+
+    private func openSocialMedia(platform: String, handle: String) {
+        var urlString = ""
+        
+        switch platform.lowercased() {
+        case "instagram":
+            urlString = "https://instagram.com/\(handle.replacingOccurrences(of: "@", with: ""))"
+        case "facebook":
+            urlString = "https://facebook.com/\(handle)"
+        case "twitter":
+            urlString = "https://twitter.com/\(handle.replacingOccurrences(of: "@", with: ""))"
+        case "tiktok":
+            urlString = "https://tiktok.com/@\(handle.replacingOccurrences(of: "@", with: ""))"
+        case "youtube":
+            urlString = "https://youtube.com/\(handle)"
+        default:
+            return
+        }
+        
+        if let url = URL(string: urlString) {
+            UIApplication.shared.open(url)
+        }
+    }
+
     private var fullMapView: some View {
         NavigationStack {
-            Map(coordinateRegion: $region, annotationItems: [MapAnnotation(coordinate: location)]) { annotation in
-                MapMarker(coordinate: annotation.coordinate, tint: .primary)
+            Map(position: $position) {
+                Marker(restaurant.name, coordinate: restaurant.location)
+                    .tint(.primary)
             }
             .edgesIgnoringSafeArea(.all)
-            .navigationTitle(restaurantName)
+            .navigationTitle(restaurant.name)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
@@ -248,6 +271,7 @@ struct InfoView: View {
         Text(title)
             .font(.headline)
             .padding(.vertical, 4)
+            .shadow(color: Color.black.opacity(0.05), radius: 2, x: 0, y: 1)
     }
     
     private func contactButton(icon: String, text: String, action: @escaping () -> Void) -> some View {
@@ -271,48 +295,74 @@ struct InfoView: View {
             .cornerRadius(10)
         }
         .buttonStyle(PlainButtonStyle())
+        .shadow(color: Color.black.opacity(0.08), radius: 4, x: 0, y: 2)
     }
     
     // MARK: - Actions
     
     private func openMapsApp() {
-        let url = URL(string: "maps://?q=\(address.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "")")
+        let url = URL(string: "maps://?q=\(restaurant.address.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "")")
         if let url = url, UIApplication.shared.canOpenURL(url) {
             UIApplication.shared.open(url)
         }
     }
     
     private func callPhoneNumber() {
-        let formattedNumber = phoneNumber.replacingOccurrences(of: "[^0-9]", with: "", options: .regularExpression)
-        if let url = URL(string: "tel://\(formattedNumber)") {
+        #if targetEnvironment(simulator)
+        // Show a simple print message for simulator
+        print("📱 SIMULATOR: Would call \(restaurant.phoneNumber)")
+        #else
+        // Real device implementation
+        let digits = restaurant.phoneNumber.components(separatedBy: CharacterSet.decimalDigits.inverted).joined()
+        if let url = URL(string: "tel:\(digits)") {
             UIApplication.shared.open(url)
         }
+        #endif
     }
-    
+
     private func sendEmail() {
-        if let url = URL(string: "mailto:\(emailAddress)") {
+        #if targetEnvironment(simulator)
+        // Show a simple print message for simulator
+        print("📧 SIMULATOR: Would email \(restaurant.emailAddress)")
+        #else
+        // Real device implementation
+        if let url = URL(string: "mailto:\(restaurant.emailAddress)") {
             UIApplication.shared.open(url)
         }
+        #endif
     }
     
     private func openWebsite() {
-        if let url = URL(string: "https://\(websiteURL)") {
+        if let url = URL(string: "https://\(restaurant.websiteURL)") {
             UIApplication.shared.open(url)
         }
     }
 }
 
-// MARK: - Models
-
-struct MapAnnotation: Identifiable {
-    let id = UUID()
-    let coordinate: CLLocationCoordinate2D
-}
-
-// MARK: - Preview
-
-struct InfoView_Previews: PreviewProvider {
-    static var previews: some View {
-        InfoView()
+// Add this helper view for social media buttons
+struct SocialMediaButton: View {
+    let platform: String
+    let handle: String
+    let action: () -> Void
+    
+    var body: some View {
+        Button(action: action) {
+            VStack(spacing: 8) {
+                Image(platform.lowercased())
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 24, height: 24)
+                    .frame(width: 44, height: 44)
+                    .background(
+                        Circle()
+                            .fill(Color.primary.opacity(0.1))
+                    )
+                    .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
+                
+                Text(handle)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+        }
     }
 }

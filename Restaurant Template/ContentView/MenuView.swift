@@ -1,6 +1,8 @@
 import SwiftUI
 
 struct MenuView: View {
+    @EnvironmentObject private var restaurant: RestaurantConfiguration
+    
     // Sample data - in a real app, you'd load this from a database/API
     @State private var categories = [
         MenuCategory(id: UUID(), name: "Appetizers", items: [
@@ -20,6 +22,7 @@ struct MenuView: View {
     @State private var selectedCategory: MenuCategory? = nil
     @State private var selectedItem: MenuItem? = nil
     @State private var showingItemDetail = false
+    @State private var showingFullMenu = true  // Set to true by default
     
     // Animation state
     @Namespace private var menuAnimation
@@ -44,11 +47,18 @@ struct MenuView: View {
             
             VStack(spacing: 0) {
                 categoriesScrollView
-                categoryTitle
-                menuItemsGrid
+                
+                if showingFullMenu {
+                    fullMenuList
+                } else {
+                    categoryTitle
+                    menuItemsGrid
+                }
+                
+                viewToggleButton
             }
         }
-        .navigationTitle("Menu")
+        .navigationTitle("\(restaurant.name) Menu")
         .navigationBarTitleDisplayMode(.inline)
         .sheet(isPresented: $showingItemDetail) {
             if let item = selectedItem {
@@ -64,11 +74,12 @@ struct MenuView: View {
                 ForEach(categories) { category in
                     CategoryButton(
                         category: category,
-                        isSelected: selectedCategory?.id == category.id,
+                        isSelected: selectedCategory?.id == category.id && !showingFullMenu,
                         namespace: menuAnimation,
                         action: {
                             withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
                                 selectedCategory = category
+                                showingFullMenu = false
                             }
                         }
                     )
@@ -96,7 +107,7 @@ struct MenuView: View {
     
     private var menuItemsGrid: some View {
         let currentItems = selectedCategory?.items ?? categories.first?.items ?? []
-        let categoryId = selectedCategory?.id  // Use ID instead of category itself
+        let categoryId = selectedCategory?.id
         
         return ScrollView {
             LazyVGrid(
@@ -114,8 +125,83 @@ struct MenuView: View {
                 }
             }
             .padding(16)
-            .animation(.spring(response: 0.35), value: categoryId)  // Use ID here
+            .animation(.spring(response: 0.35), value: categoryId)
         }
+    }
+    
+    private var fullMenuList: some View {
+        List {
+            ForEach(categories) { category in
+                Section(header: Text(category.name).font(.headline)) {
+                    ForEach(category.items) { item in
+                        FullMenuItemRow(item: item)
+                            .onTapGesture {
+                                selectedItem = item
+                                showingItemDetail = true
+                            }
+                    }
+                }
+            }
+        }
+        .listStyle(InsetGroupedListStyle())
+    }
+    
+    private var viewToggleButton: some View {
+        Button {
+            withAnimation(.spring(response: 0.35)) {
+                showingFullMenu.toggle()
+            }
+        } label: {
+            HStack {
+                Image(systemName: showingFullMenu ? "square.grid.2x2" : "list.bullet")
+                Text(showingFullMenu ? "Grid View" : "Full Menu")
+            }
+            .font(.subheadline.bold())
+            .foregroundColor(.white)
+            .padding(.vertical, 12)
+            .padding(.horizontal, 20)
+            .background(
+                Capsule()
+                    .fill(Color.primary)
+                    .shadow(color: Color.black.opacity(0.15), radius: 4, y: 2)
+            )
+        }
+        .padding(.bottom, 16)
+    }
+}
+
+// Full menu item row for the list view
+struct FullMenuItemRow: View {
+    let item: MenuItem
+    
+    var body: some View {
+        HStack(spacing: 16) {
+            // Image
+            Image(item.imageName)
+                .resizable()
+                .scaledToFill()
+                .frame(width: 70, height: 70)
+                .clipShape(RoundedRectangle(cornerRadius: 8))
+            
+            // Item details
+            VStack(alignment: .leading, spacing: 4) {
+                Text(item.name)
+                    .font(.headline)
+                
+                Text(item.description)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                    .lineLimit(2)
+            }
+            
+            Spacer()
+            
+            // Price
+            Text("$\(String(format: "%.2f", item.price))")
+                .font(.subheadline)
+                .fontWeight(.bold)
+        }
+        .padding(.vertical, 6)
     }
 }
 
@@ -375,6 +461,7 @@ struct MenuItemDetailView: View {
     }
 }
 
+// Make MenuCategory conform to Equatable
 extension MenuCategory: Equatable {
     static func == (lhs: MenuCategory, rhs: MenuCategory) -> Bool {
         return lhs.id == rhs.id

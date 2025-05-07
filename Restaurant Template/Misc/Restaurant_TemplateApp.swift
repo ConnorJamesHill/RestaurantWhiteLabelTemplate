@@ -9,9 +9,12 @@ import SwiftUI
 
 @main
 struct Restaurant_TemplateApp: App {
+    @StateObject private var restaurantConfig = RestaurantConfiguration.shared
+    
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .environmentObject(restaurantConfig)
         }
     }
 }

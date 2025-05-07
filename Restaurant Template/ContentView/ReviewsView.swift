@@ -3,10 +3,10 @@ import SwiftUI
 struct ReviewsView: View {
     // Sample reviews data - in a real app, load from backend
     @State private var reviews = [
-        Review(id: UUID(), author: "Sarah T.", rating: 5, comment: "Absolutely amazing food and atmosphere! The chef's special was divine and the service was impeccable. Will definitely be back soon.", date: Date().addingTimeInterval(-60*60*24*2)),
-        Review(id: UUID(), author: "Michael R.", rating: 4, comment: "Great experience overall. The pasta was delicious and the wine selection is excellent. Service was a bit slow but staff were very friendly.", date: Date().addingTimeInterval(-60*60*24*7)),
-        Review(id: UUID(), author: "Jessica L.", rating: 5, comment: "Best restaurant in town! We celebrated our anniversary here and the staff made it so special. The food was outstanding.", date: Date().addingTimeInterval(-60*60*24*14)),
-        Review(id: UUID(), author: "David M.", rating: 3, comment: "Good food but a bit overpriced. The ambiance is nice though. Might come back to try the new menu.", date: Date().addingTimeInterval(-60*60*24*30))
+        Review(id: UUID(), userName: "Sarah T.", rating: 5, comment: "Absolutely amazing food and atmosphere! The chef's special was divine and the service was impeccable. Will definitely be back soon.", date: Date().addingTimeInterval(-60*60*24*2)),
+        Review(id: UUID(), userName: "Michael R.", rating: 4, comment: "Great experience overall. The pasta was delicious and the wine selection is excellent. Service was a bit slow but staff were very friendly.", date: Date().addingTimeInterval(-60*60*24*7)),
+        Review(id: UUID(), userName: "Jessica L.", rating: 5, comment: "Best restaurant in town! We celebrated our anniversary here and the staff made it so special. The food was outstanding.", date: Date().addingTimeInterval(-60*60*24*14)),
+        Review(id: UUID(), userName: "David M.", rating: 3, comment: "Good food but a bit overpriced. The ambiance is nice though. Might come back to try the new menu.", date: Date().addingTimeInterval(-60*60*24*30))
     ]
     
     @State private var newReviewShown = false
@@ -143,7 +143,7 @@ struct ReviewsView: View {
     private func submitReview() {
         let newReview = Review(
             id: UUID(),
-            author: userName,
+            userName: userName,
             rating: userRating,
             comment: userComment,
             date: Date()
@@ -174,7 +174,7 @@ struct ReviewCell: View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
                 VStack(alignment: .leading) {
-                    Text(review.author)
+                    Text(review.userName)
                         .font(.headline)
                     
                     Text(dateFormatter.string(from: review.date))
@@ -199,14 +199,5 @@ struct ReviewCell: View {
                 .fixedSize(horizontal: false, vertical: true)
         }
         .padding(.vertical, 8)
-    }
-}
-
-// REMOVED the redundant Review struct definition
-
-// Preview
-struct ReviewsView_Previews: PreviewProvider {
-    static var previews: some View {
-        ReviewsView()
     }
 }

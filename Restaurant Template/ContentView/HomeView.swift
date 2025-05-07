@@ -1,10 +1,7 @@
 import SwiftUI
 
 struct HomeView: View {
-    // Restaurant information - in a real app, load from a database/API
-    let restaurantName = "Bistro Deluxe"
-    let tagline = "Fine Dining & Culinary Excellence"
-    let welcomeMessage = "Welcome to Bistro Deluxe, where culinary artistry meets exceptional service. Experience our chef-driven menu featuring locally-sourced ingredients and seasonal specialties."
+    @EnvironmentObject private var restaurant: RestaurantConfiguration
     
     let featuredItems = [
         FeaturedItem(
@@ -47,19 +44,6 @@ struct HomeView: View {
         )
     ]
     
-    // Today's business hours
-    var todayHours: String {
-        let weekday = Calendar.current.component(.weekday, from: Date())
-        switch weekday {
-        case 1: return "11:00 AM - 9:00 PM" // Sunday
-        case 2, 3, 4: return "11:00 AM - 9:00 PM" // Mon-Wed
-        case 5: return "11:00 AM - 10:00 PM" // Thursday
-        case 6: return "11:00 AM - 11:00 PM" // Friday
-        case 7: return "10:00 AM - 11:00 PM" // Saturday
-        default: return "Closed"
-        }
-    }
-    
     var body: some View {
         NavigationStack {
             ScrollView {
@@ -89,9 +73,9 @@ struct HomeView: View {
             .toolbar {
                 ToolbarItem(placement: .principal) {
                     VStack {
-                        Text(restaurantName)
+                        Text(restaurant.name)
                             .font(.headline)
-                        Text(tagline)
+                        Text(restaurant.tagline)
                             .font(.caption)
                             .foregroundColor(.secondary)
                     }
@@ -118,19 +102,6 @@ struct HomeView: View {
                 endPoint: .bottom
             )
             .frame(height: 120)
-            
-//            // Restaurant name overlay
-//            VStack(spacing: 4) {
-//                Text(restaurantName)
-//                    .font(.title)
-//                    .fontWeight(.bold)
-//                    .foregroundColor(.white)
-//                
-//                Text(tagline)
-//                    .font(.subheadline)
-//                    .foregroundColor(.white.opacity(0.9))
-//            }
-//            .padding(.bottom, 16)
         }
         .ignoresSafeArea(edges: .top)
     }
@@ -138,8 +109,8 @@ struct HomeView: View {
     private var actionButtonsSection: some View {
         HStack(spacing: 12) {
             ActionButton(title: "Menu", iconName: "menucard", destination: AnyView(MenuView()))
+            ActionButton(title: "Order", iconName: "bag", destination: AnyView(OrderView()))
             ActionButton(title: "Reserve", iconName: "calendar", destination: AnyView(ReservationView()))
-            ActionButton(title: "Gallery", iconName: "photo.on.rectangle", destination: AnyView(GalleryView()))
         }
         .padding(.horizontal)
     }
@@ -183,15 +154,13 @@ struct HomeView: View {
         VStack(alignment: .leading, spacing: 12) {
             SectionTitle(title: "About Us")
             
-            Text(welcomeMessage)
+            Text(restaurant.welcomeMessage)
                 .font(.body)
                 .foregroundColor(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
                 .padding(.horizontal)
             
-            Button {
-                // Link to InfoView
-            } label: {
+            NavigationLink(destination: InfoView()) {
                 Text("Learn More")
                     .font(.subheadline)
                     .foregroundColor(.primary)
@@ -212,7 +181,7 @@ struct HomeView: View {
                 Image(systemName: "clock")
                     .foregroundColor(.primary)
                 
-                Text("Open today: \(todayHours)")
+                Text("Open today: \(restaurant.todayHours)")
                     .font(.subheadline)
                     .foregroundColor(.secondary)
                 
@@ -353,27 +322,4 @@ struct EventCard: View {
     }
 }
 
-// MARK: - Models
 
-struct FeaturedItem: Identifiable {
-    let id: UUID
-    let name: String
-    let description: String
-    let price: Double
-    let imageName: String
-}
-
-struct Event: Identifiable {
-    let id: UUID
-    let title: String
-    let description: String
-    let date: Date
-    let imageName: String
-}
-
-// Preview
-struct HomeView_Previews: PreviewProvider {
-    static var previews: some View {
-        HomeView()
-    }
-}
