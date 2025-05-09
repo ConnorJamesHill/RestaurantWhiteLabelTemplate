@@ -89,11 +89,12 @@ struct HomeView: View {
     private var heroSection: some View {
         ZStack(alignment: .bottom) {
             // Hero image
-            Image("restaurant_logo") // Add this to your assets
+            Image("restaurant_logo")
                 .resizable()
                 .scaledToFill()
                 .frame(height: 280)
                 .clipped()
+                .shadow(color: Color.black.opacity(0.15), radius: 8, x: 0, y: 4)
             
             // Gradient overlay
             LinearGradient(
@@ -104,6 +105,7 @@ struct HomeView: View {
             .frame(height: 120)
         }
         .ignoresSafeArea(edges: .top)
+        .shadow(color: Color.black.opacity(0.1), radius: 6, x: 0, y: 4)
     }
     
     private var actionButtonsSection: some View {
@@ -158,16 +160,20 @@ struct HomeView: View {
                 .font(.body)
                 .foregroundColor(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
-                .padding(.horizontal)
+                .padding()
+                .background(Color(.systemBackground))
+                .cornerRadius(12)
+                .shadow(color: Color.black.opacity(0.08), radius: 6, x: 0, y: 3)
             
             NavigationLink(destination: InfoView()) {
                 Text("Learn More")
                     .font(.subheadline)
-                    .foregroundColor(.primary)
+                    .foregroundColor(.white)
                     .padding(.vertical, 8)
                     .padding(.horizontal, 16)
-                    .background(Color.primary.opacity(0.1))
+                    .background(Color.primary)
                     .cornerRadius(8)
+                    .shadow(color: Color.black.opacity(0.15), radius: 8, x: 0, y: 4)
             }
             .padding(.leading)
         }
@@ -193,7 +199,10 @@ struct HomeView: View {
                         .foregroundColor(.primary)
                 }
             }
-            .padding(.horizontal)
+            .padding()
+            .background(Color(.systemBackground))
+            .cornerRadius(12)
+            .shadow(color: Color.black.opacity(0.08), radius: 6, x: 0, y: 3)
         }
     }
 }
@@ -229,8 +238,9 @@ struct ActionButton: View {
             }
             .frame(maxWidth: .infinity)
             .padding(.vertical, 16)
-            .background(Color.primary.opacity(0.05))
+            .background(Color(.systemBackground))
             .cornerRadius(12)
+            .shadow(color: Color.black.opacity(0.12), radius: 8, x: 0, y: 4)
         }
     }
 }
@@ -251,6 +261,7 @@ struct FeaturedItemCard: View {
                     RoundedRectangle(cornerRadius: 12)
                         .stroke(Color.gray.opacity(0.2), lineWidth: 1)
                 )
+                .shadow(color: Color.black.opacity(0.1), radius: 6, x: 0, y: 3)
             
             // Title and description
             Text(item.name)
@@ -269,6 +280,10 @@ struct FeaturedItemCard: View {
                 .fontWeight(.semibold)
         }
         .frame(width: 200)
+        .padding(12)
+        .background(Color(.systemBackground))
+        .cornerRadius(12)
+        .shadow(color: Color.black.opacity(0.08), radius: 5, x: 0, y: 2)
     }
 }
 
@@ -294,6 +309,7 @@ struct EventCard: View {
                         RoundedRectangle(cornerRadius: 12)
                             .stroke(Color.gray.opacity(0.2), lineWidth: 1)
                     )
+                    .shadow(color: Color.black.opacity(0.1), radius: 6, x: 0, y: 3)
                 
                 // Date bubble
                 Text(dateFormatter.string(from: event.date))
@@ -305,6 +321,7 @@ struct EventCard: View {
                     .foregroundColor(.white)
                     .cornerRadius(16)
                     .padding(12)
+                    .shadow(color: Color.black.opacity(0.15), radius: 4, x: 0, y: 2)
             }
             
             // Title and description
@@ -319,7 +336,9 @@ struct EventCard: View {
                 .frame(height: 36)
         }
         .frame(width: 260)
+        .padding(12)
+        .background(Color(.systemBackground))
+        .cornerRadius(12)
+        .shadow(color: Color.black.opacity(0.08), radius: 5, x: 0, y: 2)
     }
 }
-
-

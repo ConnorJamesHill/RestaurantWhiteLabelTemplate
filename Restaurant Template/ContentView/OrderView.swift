@@ -467,89 +467,138 @@ struct CheckoutView: View {
         NavigationStack {
             Form {
                 Section("Contact Information") {
-                    TextField("Name", text: $customerName)
-                    TextField("Phone", text: $customerPhone)
-                        .keyboardType(.phonePad)
-                    TextField("Email", text: $customerEmail)
-                        .keyboardType(.emailAddress)
-                        .textContentType(.emailAddress)
+                    VStack(spacing: 12) {
+                        TextField("Name", text: $customerName)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                            .shadow(color: Color.black.opacity(0.05), radius: 2, x: 0, y: 1)
+                        
+                        TextField("Phone", text: $customerPhone)
+                            .keyboardType(.phonePad)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                            .shadow(color: Color.black.opacity(0.05), radius: 2, x: 0, y: 1)
+                        
+                        TextField("Email", text: $customerEmail)
+                            .keyboardType(.emailAddress)
+                            .textContentType(.emailAddress)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                            .shadow(color: Color.black.opacity(0.05), radius: 2, x: 0, y: 1)
+                    }
+                    .padding(.vertical, 8)
                 }
+                .listRowBackground(Color(.systemBackground))
+                .shadow(color: Color.black.opacity(0.08), radius: 6, x: 0, y: 3)
                 
                 Section("Order Type") {
-                    Picker("Delivery Method", selection: $orderType) {
-                        Text("Pickup").tag(OrderType.pickup)
-                        Text("Delivery").tag(OrderType.delivery)
-                    }
-                    .pickerStyle(.segmented)
-                    
-                    if orderType == .delivery {
-                        TextField("Delivery Address", text: $deliveryAddress, axis: .vertical)
-                            .lineLimit(3...6)
+                    VStack(spacing: 16) {
+                        Picker("Delivery Method", selection: $orderType) {
+                            Text("Pickup").tag(OrderType.pickup)
+                            Text("Delivery").tag(OrderType.delivery)
+                        }
+                        .pickerStyle(.segmented)
+                        .shadow(color: Color.black.opacity(0.05), radius: 2, x: 0, y: 1)
                         
-                        TextField("Delivery Instructions (Optional)", text: $deliveryInstructions, axis: .vertical)
-                            .lineLimit(2...4)
-                    } else {
-                        DatePicker(
-                            "Pickup Time",
-                            selection: $selectedPickupTime,
-                            in: Date()...,
-                            displayedComponents: [.hourAndMinute]
-                        )
+                        if orderType == .delivery {
+                            VStack(spacing: 12) {
+                                TextField("Delivery Address", text: $deliveryAddress, axis: .vertical)
+                                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                                    .lineLimit(3...6)
+                                    .shadow(color: Color.black.opacity(0.05), radius: 2, x: 0, y: 1)
+                                
+                                TextField("Delivery Instructions (Optional)", text: $deliveryInstructions, axis: .vertical)
+                                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                                    .lineLimit(2...4)
+                                    .shadow(color: Color.black.opacity(0.05), radius: 2, x: 0, y: 1)
+                            }
+                        } else {
+                            DatePicker(
+                                "Pickup Time",
+                                selection: $selectedPickupTime,
+                                in: Date()...,
+                                displayedComponents: [.hourAndMinute]
+                            )
+                            .shadow(color: Color.black.opacity(0.05), radius: 2, x: 0, y: 1)
+                        }
                     }
+                    .padding(.vertical, 8)
                 }
+                .listRowBackground(Color(.systemBackground))
+                .shadow(color: Color.black.opacity(0.08), radius: 6, x: 0, y: 3)
                 
                 Section("Order Summary (\(totalItems) \(totalItems == 1 ? "item" : "items"))") {
-                    ForEach(cart) { item in
-                        OrderItemRow(item: item) {
-                            if let index = cart.firstIndex(where: { $0.id == item.id }) {
-                                cart.remove(at: index)
+                    VStack(spacing: 16) {
+                        ForEach(cart) { item in
+                            OrderItemRow(item: item) {
+                                if let index = cart.firstIndex(where: { $0.id == item.id }) {
+                                    cart.remove(at: index)
+                                }
+                            }
+                            .background(Color(.systemBackground))
+                            .cornerRadius(10)
+                            .shadow(color: Color.black.opacity(0.08), radius: 4, x: 0, y: 2)
+                        }
+                        
+                        VStack(spacing: 12) {
+                            HStack {
+                                Text("Subtotal")
+                                Spacer()
+                                Text("$\(String(format: "%.2f", subtotal))")
+                            }
+                            
+                            HStack {
+                                Text("Tax")
+                                Spacer()
+                                Text("$\(String(format: "%.2f", tax))")
+                            }
+                            
+                            if orderType == .delivery {
+                                HStack {
+                                    Text("Delivery Fee")
+                                    Spacer()
+                                    Text("$\(String(format: "%.2f", deliveryFee))")
+                                }
+                            }
+                            
+                            Divider()
+                                .padding(.vertical, 4)
+                            
+                            HStack {
+                                Text("Total")
+                                    .font(.headline)
+                                Spacer()
+                                Text("$\(String(format: "%.2f", total))")
+                                    .font(.headline)
                             }
                         }
+                        .padding()
+                        .background(Color(.systemBackground))
+                        .cornerRadius(12)
+                        .shadow(color: Color.black.opacity(0.08), radius: 6, x: 0, y: 3)
                     }
-                    
-                    HStack {
-                        Text("Subtotal")
-                        Spacer()
-                        Text("$\(String(format: "%.2f", subtotal))")
-                    }
-                    
-                    HStack {
-                        Text("Tax")
-                        Spacer()
-                        Text("$\(String(format: "%.2f", tax))")
-                    }
-                    
-                    if orderType == .delivery {
-                        HStack {
-                            Text("Delivery Fee")
-                            Spacer()
-                            Text("$\(String(format: "%.2f", deliveryFee))")
-                        }
-                    }
-                    
-                    Divider()
-                    
-                    HStack {
-                        Text("Total")
-                            .fontWeight(.bold)
-                        Spacer()
-                        Text("$\(String(format: "%.2f", total))")
-                            .fontWeight(.bold)
-                    }
+                    .padding(.vertical, 8)
                 }
+                .listRowBackground(Color(.systemBackground))
+                .shadow(color: Color.black.opacity(0.08), radius: 6, x: 0, y: 3)
                 
                 Section {
                     Button(action: onPayment) {
                         HStack {
                             Image(systemName: "applelogo")
                             Text("Pay with Apple Pay")
+                                .font(.headline)
                         }
                         .frame(maxWidth: .infinity)
-                        .padding(.vertical, 8)
+                        .padding(.vertical, 12)
+                        .background(isFormValid ? Color.primary : Color.gray.opacity(0.3))
+                        .foregroundColor(.white)
+                        .cornerRadius(12)
+                        .shadow(color: Color.black.opacity(isFormValid ? 0.15 : 0.05), radius: 6, x: 0, y: 3)
                     }
                     .disabled(!isFormValid)
                 }
+                .listRowBackground(Color.clear)
             }
+            .scrollContentBackground(.hidden)
+            .background(Color(.systemGroupedBackground))
             .navigationTitle("Checkout")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

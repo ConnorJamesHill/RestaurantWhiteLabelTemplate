@@ -88,11 +88,8 @@ struct MenuView: View {
             .padding(.horizontal)
             .padding(.vertical, 12)
         }
-        .background(
-            Rectangle()
-                .fill(Color(.systemBackground))
-                .shadow(color: Color.black.opacity(0.1), radius: 6, y: 3)
-        )
+        .background(Color(.systemBackground))
+        .shadow(radius: 5)
     }
     
     private var categoryTitle: some View {
@@ -158,15 +155,13 @@ struct MenuView: View {
             }
             .font(.subheadline.bold())
             .foregroundColor(.white)
-            .padding(.vertical, 12)
-            .padding(.horizontal, 20)
-            .background(
-                Capsule()
-                    .fill(Color.primary)
-                    .shadow(color: Color.black.opacity(0.15), radius: 4, y: 2)
-            )
+            .padding(.vertical, 4)
+            .padding(.horizontal, 4)
+            .background(Color.primary)
+            .cornerRadius(12)
+            .shadow(radius: 5)
         }
-        .padding(.bottom, 16)
+        .padding(.bottom, 4)
     }
 }
 
@@ -175,13 +170,14 @@ struct FullMenuItemRow: View {
     let item: MenuItem
     
     var body: some View {
-        HStack(spacing: 16) {
+        HStack(spacing: 24) {
             // Image
             Image(item.imageName)
                 .resizable()
                 .scaledToFill()
                 .frame(width: 70, height: 70)
                 .clipShape(RoundedRectangle(cornerRadius: 8))
+                .shadow(radius: 3)
             
             // Item details
             VStack(alignment: .leading, spacing: 4) {
@@ -192,6 +188,7 @@ struct FullMenuItemRow: View {
                     .font(.caption)
                     .foregroundColor(.secondary)
                     .lineLimit(2)
+                    .fixedSize(horizontal: false, vertical: true)
             }
             
             Spacer()
@@ -200,8 +197,15 @@ struct FullMenuItemRow: View {
             Text("$\(String(format: "%.2f", item.price))")
                 .font(.subheadline)
                 .fontWeight(.bold)
+                .padding(.leading, 4)
         }
-        .padding(.vertical, 6)
+        .padding(.horizontal, 4)
+        .padding(.vertical, 4)
+        .background(Color(.systemBackground))
+        .cornerRadius(12)
+        .shadow(radius: 5)
+        .padding(.horizontal, 4)
+        .padding(.vertical, 4)
     }
 }
 
@@ -250,9 +254,8 @@ struct MenuItemCard: View {
             itemInfo
         }
         .background(Color(.systemBackground))
-        .cornerRadius(18)
-        .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 3)
-        .shadow(color: Color.black.opacity(0.05), radius: 3, x: 0, y: 1)
+        .cornerRadius(16)
+        .shadow(radius: 5)
     }
     
     private var imageWithPriceTag: some View {
@@ -278,7 +281,7 @@ struct MenuItemCard: View {
             .background(
                 Capsule()
                     .fill(Color.white)
-                    .shadow(color: Color.black.opacity(0.15), radius: 3, x: 0, y: 2)
+                    .shadow(radius: 3)
             )
             .padding(10)
         }
@@ -313,10 +316,101 @@ struct MenuItemDetailView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
                     // Hero image
-                    heroImage
+                    Image(item.imageName)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(height: 250)
+                        .clipped()
+                        .overlay(
+                            LinearGradient(
+                                gradient: Gradient(colors: [.clear, .black.opacity(0.4)]),
+                                startPoint: .top,
+                                endPoint: .bottom
+                            )
+                        )
+                        .overlay(
+                            HStack {
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text(item.name)
+                                        .font(.title2)
+                                        .fontWeight(.bold)
+                                        .foregroundColor(.white)
+                                    
+                                    Text("$\(String(format: "%.2f", item.price))")
+                                        .font(.headline)
+                                        .foregroundColor(.white.opacity(0.9))
+                                }
+                                
+                                Spacer()
+                            }
+                            .padding(),
+                            alignment: .bottomLeading
+                        )
+                        .shadow(radius: 5)
                     
                     // Content
-                    detailContent
+                    VStack(alignment: .leading, spacing: 16) {
+                        Text("Description")
+                            .font(.headline)
+                        
+                        Text(item.description)
+                            .font(.body)
+                            .foregroundColor(.secondary)
+                            .fixedSize(horizontal: false, vertical: true)
+                        
+                        Divider()
+                        
+                        HStack {
+                            Text("Quantity")
+                                .font(.headline)
+                            
+                            Spacer()
+                            
+                            HStack(spacing: 18) {
+                                Button {
+                                    if quantity > 1 {
+                                        quantity -= 1
+                                    }
+                                } label: {
+                                    Image(systemName: "minus.circle.fill")
+                                        .font(.title3)
+                                        .foregroundColor(quantity > 1 ? .primary : .gray)
+                                }
+                                .shadow(radius: 2)
+                                
+                                Text("\(quantity)")
+                                    .font(.title3)
+                                    .fontWeight(.semibold)
+                                    .frame(minWidth: 30)
+                                
+                                Button {
+                                    if quantity < 10 {
+                                        quantity += 1
+                                    }
+                                } label: {
+                                    Image(systemName: "plus.circle.fill")
+                                        .font(.title3)
+                                        .foregroundColor(.primary)
+                                }
+                                .shadow(radius: 2)
+                            }
+                        }
+                        
+                        Button {
+                            dismiss()
+                        } label: {
+                            Text("Add to Order - $\(String(format: "%.2f", item.price * Double(quantity)))")
+                                .font(.headline)
+                                .foregroundColor(.white)
+                                .frame(maxWidth: .infinity)
+                                .padding()
+                                .background(Color.primary)
+                                .cornerRadius(12)
+                                .shadow(radius: 5)
+                        }
+                        .padding(.top, 16)
+                    }
+                    .padding()
                 }
             }
             .ignoresSafeArea(edges: .top)
@@ -327,137 +421,11 @@ struct MenuItemDetailView: View {
                         Image(systemName: "xmark.circle.fill")
                             .font(.title3)
                             .foregroundColor(.white)
-                            .shadow(radius: 1)
+                            .shadow(radius: 2)
                     }
                 }
             }
         }
-    }
-    
-    private var heroImage: some View {
-        Image(item.imageName)
-            .resizable()
-            .scaledToFill()
-            .frame(height: 250)
-            .clipped()
-            .overlay(
-                LinearGradient(
-                    gradient: Gradient(colors: [.clear, .black.opacity(0.4)]),
-                    startPoint: .top,
-                    endPoint: .bottom
-                )
-            )
-            .overlay(
-                HStack {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(item.name)
-                            .font(.title2)
-                            .fontWeight(.bold)
-                            .foregroundColor(.white)
-                        
-                        Text("$\(String(format: "%.2f", item.price))")
-                            .font(.headline)
-                            .foregroundColor(.white.opacity(0.9))
-                    }
-                    
-                    Spacer()
-                }
-                .padding(),
-                alignment: .bottomLeading
-            )
-    }
-    
-    private var detailContent: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Text("Description")
-                .font(.headline)
-            
-            Text(item.description)
-                .font(.body)
-                .foregroundColor(.secondary)
-                .fixedSize(horizontal: false, vertical: true)
-            
-            Divider()
-            
-            quantitySelector
-            
-            Divider()
-            
-            specialRequests
-            
-            addToCartButton
-        }
-        .padding()
-    }
-    
-    private var quantitySelector: some View {
-        HStack {
-            Text("Quantity")
-                .font(.headline)
-            
-            Spacer()
-            
-            HStack(spacing: 18) {
-                Button {
-                    if quantity > 1 {
-                        quantity -= 1
-                    }
-                } label: {
-                    Image(systemName: "minus.circle.fill")
-                        .font(.title3)
-                        .foregroundColor(quantity > 1 ? .primary : .gray)
-                }
-                
-                Text("\(quantity)")
-                    .font(.title3)
-                    .fontWeight(.semibold)
-                    .frame(minWidth: 30)
-                
-                Button {
-                    if quantity < 10 {
-                        quantity += 1
-                    }
-                } label: {
-                    Image(systemName: "plus.circle.fill")
-                        .font(.title3)
-                        .foregroundColor(.primary)
-                }
-            }
-        }
-    }
-    
-    private var specialRequests: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Text("Special Requests")
-                .font(.headline)
-            
-            TextField("Add a note (e.g. no onions)", text: .constant(""))
-                .padding()
-                .background(Color(.systemGray6))
-                .cornerRadius(8)
-        }
-    }
-    
-    private var addToCartButton: some View {
-        Button {
-            // Add to cart functionality would go here
-            dismiss()
-        } label: {
-            HStack {
-                Text("Add to Order")
-                    .font(.headline)
-                
-                Spacer()
-                
-                Text("$\(String(format: "%.2f", item.price * Double(quantity)))")
-                    .font(.headline)
-            }
-            .foregroundColor(.white)
-            .padding()
-            .background(Color.primary)
-            .cornerRadius(12)
-        }
-        .padding(.top, 8)
     }
 }
 

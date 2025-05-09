@@ -1,15 +1,9 @@
-//
-//  InfoView.swift
-//  Restaurant Template
-//
-//  Created by Connor Hill on 5/4/25.
-//
-
 import SwiftUI
 import MapKit
 
 struct InfoView: View {
     @EnvironmentObject private var restaurant: RestaurantConfiguration
+    @StateObject private var authViewModel = MainViewModel.shared
     
     // Default coordinate - will be updated from restaurant config in onAppear
     private let defaultCoordinate = CLLocationCoordinate2D(latitude: 37.7749, longitude: -122.4194)
@@ -42,6 +36,9 @@ struct InfoView: View {
                     
                     // Social media
                     socialMediaSection
+                    
+                    // Logout section
+                    logoutSection
                 }
                 .padding()
             }
@@ -211,27 +208,36 @@ struct InfoView: View {
             .shadow(color: Color.black.opacity(0.08), radius: 6, x: 0, y: 3)
         }
     }
-
-    private func openSocialMedia(platform: String, handle: String) {
-        var urlString = ""
-        
-        switch platform.lowercased() {
-        case "instagram":
-            urlString = "https://instagram.com/\(handle.replacingOccurrences(of: "@", with: ""))"
-        case "facebook":
-            urlString = "https://facebook.com/\(handle)"
-        case "twitter":
-            urlString = "https://twitter.com/\(handle.replacingOccurrences(of: "@", with: ""))"
-        case "tiktok":
-            urlString = "https://tiktok.com/@\(handle.replacingOccurrences(of: "@", with: ""))"
-        case "youtube":
-            urlString = "https://youtube.com/\(handle)"
-        default:
-            return
-        }
-        
-        if let url = URL(string: urlString) {
-            UIApplication.shared.open(url)
+    
+    private var logoutSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            sectionHeader("Account")
+            
+            Button(action: {
+                print("Sign out button tapped")
+                authViewModel.signOut()
+                print("Sign out completed, isAuthenticated: \(authViewModel.isAuthenticated)")
+            }) {
+                HStack {
+                    Image(systemName: "rectangle.portrait.and.arrow.right")
+                        .font(.system(size: 16))
+                        .frame(width: 24, height: 24)
+                    
+                    Text("Sign Out")
+                        .font(.subheadline)
+                    
+                    Spacer()
+                    
+                    Image(systemName: "chevron.right")
+                        .font(.caption)
+                        .foregroundColor(.gray)
+                }
+                .padding()
+                .background(Color.primary.opacity(0.05))
+                .cornerRadius(10)
+            }
+            .buttonStyle(PlainButtonStyle())
+            .shadow(color: Color.black.opacity(0.08), radius: 4, x: 0, y: 2)
         }
     }
 
@@ -334,6 +340,29 @@ struct InfoView: View {
     
     private func openWebsite() {
         if let url = URL(string: "https://\(restaurant.websiteURL)") {
+            UIApplication.shared.open(url)
+        }
+    }
+    
+    private func openSocialMedia(platform: String, handle: String) {
+        var urlString = ""
+        
+        switch platform.lowercased() {
+        case "instagram":
+            urlString = "https://instagram.com/\(handle.replacingOccurrences(of: "@", with: ""))"
+        case "facebook":
+            urlString = "https://facebook.com/\(handle)"
+        case "twitter":
+            urlString = "https://twitter.com/\(handle.replacingOccurrences(of: "@", with: ""))"
+        case "tiktok":
+            urlString = "https://tiktok.com/@\(handle.replacingOccurrences(of: "@", with: ""))"
+        case "youtube":
+            urlString = "https://youtube.com/\(handle)"
+        default:
+            return
+        }
+        
+        if let url = URL(string: urlString) {
             UIApplication.shared.open(url)
         }
     }
