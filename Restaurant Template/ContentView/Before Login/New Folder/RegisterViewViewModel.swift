@@ -7,6 +7,7 @@
 
 import FirebaseAuth
 import Foundation
+import SwiftUI
 
 class RegisterViewViewModel: ObservableObject {
     @Published var name = ""
@@ -44,9 +45,9 @@ class RegisterViewViewModel: ObservableObject {
                     }
                 }
                 
-                // Check if registering as owner
+                // All registered users through normal flow are customers
                 DispatchQueue.main.async {
-                    self.isOwner = self.email.contains("@restaurant.com")
+                    self.isOwner = false
                 }
             }
         }
@@ -106,5 +107,37 @@ class RegisterViewViewModel: ObservableObject {
         }
         
         return true
+    }
+}
+
+struct InitialSetupView: View {
+    @State private var ownerEmail = ""
+    @State private var ownerPassword = ""
+    @State private var restaurantName = ""
+    @State private var setupCode = "" // Provided to the restaurant
+    
+    var body: some View {
+        Form {
+            Section(header: Text("Restaurant Information")) {
+                TextField("Restaurant Name", text: $restaurantName)
+            }
+            
+            Section(header: Text("Owner Account")) {
+                TextField("Owner Email", text: $ownerEmail)
+                SecureField("Owner Password", text: $ownerPassword)
+                TextField("Setup Code", text: $setupCode)
+            }
+            
+            Button("Complete Setup") {
+                createOwnerAccount()
+            }
+        }
+    }
+    
+    private func createOwnerAccount() {
+        // 1. Verify setup code
+        // 2. Create owner account
+        // 3. Set custom claims through Cloud Function
+        // 4. Initialize restaurant configuration
     }
 }

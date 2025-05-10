@@ -5,7 +5,7 @@ import FirebaseAppCheck
 @main
 struct Restaurant_TemplateApp: App {
     @StateObject private var restaurantConfig = RestaurantConfiguration.shared
-    @StateObject private var authViewModel = MainViewModel.shared
+    @StateObject private var authViewModel = MainViewViewModel.shared
     
     init() {
         // Configure App Check for development

@@ -3,7 +3,7 @@ import MapKit
 
 struct InfoView: View {
     @EnvironmentObject private var restaurant: RestaurantConfiguration
-    @StateObject private var authViewModel = MainViewModel.shared
+    @StateObject private var authViewModel = MainViewViewModel.shared
     
     // Default coordinate - will be updated from restaurant config in onAppear
     private let defaultCoordinate = CLLocationCoordinate2D(latitude: 37.7749, longitude: -122.4194)

@@ -2,19 +2,22 @@ import SwiftUI
 import FirebaseAuth
 
 struct MainView: View {
-    @StateObject private var authViewModel = MainViewModel.shared
+    @StateObject private var authViewModel = MainViewViewModel.shared
+    @StateObject var viewModel = MainViewViewModel()
     
     var body: some View {
         Group {
-            if authViewModel.isAuthenticated {
-                if authViewModel.isOwner {
+            if viewModel.isAuthenticated {
+                if viewModel.isOwner {
                     OwnerDashboardView()
+                        .environmentObject(viewModel)
                 } else {
-                    ContentView()
+                    ContentView() // Regular customer view
+                        .environmentObject(viewModel)
                 }
             } else {
                 LoginView()
+                    .environmentObject(viewModel)
             }
-        }
-    }
+        }    }
 }

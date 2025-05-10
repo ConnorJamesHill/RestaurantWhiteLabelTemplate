@@ -130,3 +130,45 @@ enum ReservationStatus: String {
     case cancelled = "Cancelled"
     case completed = "Completed"
 }
+
+// MARK: - Models
+
+struct RevenueData: Identifiable {
+    let id = UUID()
+    let date: Date
+    let amount: Double
+}
+
+struct PopularItem: Identifiable {
+    let id: Int
+    let name: String
+    let orderCount: Int
+}
+
+struct Order: Identifiable {
+    let id: Int
+    let number: String
+    let total: Double
+    let status: OrderStatus
+    
+    enum OrderStatus: String {
+        case pending = "Pending"
+        case inProgress = "In Progress"
+        case completed = "Completed"
+        
+        var color: Color {
+            switch self {
+            case .pending: return .orange
+            case .inProgress: return .blue
+            case .completed: return .green
+            }
+        }
+    }
+}
+
+struct Staff: Identifiable {
+    let id: Int
+    let name: String
+    let role: String
+    let isActive: Bool
+}

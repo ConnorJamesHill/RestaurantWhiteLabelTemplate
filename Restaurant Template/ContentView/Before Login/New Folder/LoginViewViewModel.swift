@@ -29,13 +29,15 @@ class LoginViewViewModel: ObservableObject {
                 return
             }
             
-            // Check if user is an owner
-            if let email = result?.user.email {
-                DispatchQueue.main.async {
-                    // For now, we'll use a simple domain check
-                    // In a real app, you'd want to check a custom claim or database field
-                    self?.isOwner = email.contains("@restaurant.com")
+            // Force token refresh to get latest claims
+            result?.user.getIDTokenForcingRefresh(true) { _, error in
+                if let error = error {
+                    print("Error refreshing token: \(error.localizedDescription)")
+                    return
                 }
+                
+                // MainViewModel's auth listener will handle the owner check
+                print("Login successful, token refreshed")
             }
         }
     }
