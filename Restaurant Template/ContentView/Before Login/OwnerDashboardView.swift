@@ -1,17 +1,108 @@
-//
-//  OwnerDashboardView.swift
-//  Restaurant Template
-//
-//  Created by Connor Hill on 5/7/25.
-//
-
 import SwiftUI
-import Charts
+import Charts // Add this import for chart components
 
 struct OwnerDashboardView: View {
     @EnvironmentObject private var restaurant: RestaurantConfiguration
     @StateObject private var viewModel = OwnerDashboardViewViewModel()
-    @Environment(\.dismiss) private var dismiss
+    
+    var body: some View {
+        TabView {
+            // Dashboard Tab - Analytics
+            OwnerAnalyticsView()
+                .tabItem {
+                    Label("Analytics", systemImage: "chart.bar.fill")
+                }
+            
+            // Menu Management Tab
+            OwnerMenuView()
+                .tabItem {
+                    Label("Menu", systemImage: "doc.text.fill")
+                }
+            
+            // Orders Management Tab
+            OwnerOrdersView()
+                .tabItem {
+                    Label("Orders", systemImage: "bag.fill")
+                }
+            
+            // Reservations Management Tab
+            OwnerReservationsView()
+                .tabItem {
+                    Label("Tables", systemImage: "calendar")
+                }
+            
+            // Marketing & Promotions Tab
+            OwnerMarketingView()
+                .tabItem {
+                    Label("Marketing", systemImage: "megaphone.fill")
+                }
+            
+            // Settings & Account Tab
+            OwnerSettingsView()
+                .tabItem {
+                    Label("Settings", systemImage: "gear")
+                }
+        }
+        .navigationTitle("Restaurant Manager")
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button {
+                    viewModel.signOut()
+                } label: {
+                    Image(systemName: "rectangle.portrait.and.arrow.right")
+                }
+            }
+        }
+    }
+}
+
+// MARK: - Supporting Views
+
+// StatCard view definition
+struct StatCard: View {
+    let title: String
+    let value: String
+    let trend: Double?
+    let icon: String
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Image(systemName: icon)
+                    .foregroundColor(.primary)
+                
+                Spacer()
+                
+                if let trend = trend {
+                    HStack(spacing: 4) {
+                        Image(systemName: trend >= 0 ? "arrow.up.right" : "arrow.down.right")
+                        Text("\(abs(trend), specifier: "%.1f")%")
+                    }
+                    .font(.caption2)
+                    .foregroundColor(trend >= 0 ? .green : .red)
+                }
+            }
+            
+            Text(title)
+                .font(.caption)
+                .foregroundColor(.secondary)
+            
+            Text(value)
+                .font(.title2)
+                .fontWeight(.bold)
+        }
+        .padding()
+        .background(Color(.systemBackground))
+        .cornerRadius(12)
+        .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
+    }
+}
+
+// MARK: - Tab Views
+
+// Analytics View - Keeps most of the content from original dashboard
+struct OwnerAnalyticsView: View {
+    @StateObject private var viewModel = OwnerDashboardViewViewModel()
     
     var body: some View {
         NavigationStack {
@@ -28,27 +119,14 @@ struct OwnerDashboardView: View {
                     
                     // Recent Orders
                     recentOrdersSection
-                    
-                    // Staff Management
-                    staffManagementSection
                 }
                 .padding()
             }
-            .navigationTitle("Dashboard")
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button {
-                        viewModel.signOut()
-                    } label: {
-                        Image(systemName: "rectangle.portrait.and.arrow.right")
-                    }
-                }
-            }
+            .navigationTitle("Analytics Dashboard")
         }
     }
     
-    // MARK: - Dashboard Sections
-    
+    // Include all the original sections from the OwnerDashboardView
     private var quickStatsSection: some View {
         LazyVGrid(columns: [
             GridItem(.flexible()),
@@ -89,23 +167,28 @@ struct OwnerDashboardView: View {
             Text("Revenue Overview")
                 .font(.headline)
             
-            Chart(viewModel.revenueData) { data in
-                LineMark(
-                    x: .value("Day", data.date),
-                    y: .value("Revenue", data.amount)
-                )
-                .foregroundStyle(Color.primary)
-                
-                AreaMark(
-                    x: .value("Day", data.date),
-                    y: .value("Revenue", data.amount)
-                )
-                .foregroundStyle(Color.primary.opacity(0.1))
+            // Simple alternative without Charts if needed
+            VStack(alignment: .leading, spacing: 8) {
+                ForEach(Array(viewModel.revenueData.prefix(7).enumerated()), id: \.element.id) { index, data in
+                    HStack {
+                        Text(data.date, style: .date)
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                        
+                        Spacer()
+                        
+                        Text("$\(data.amount, specifier: "%.2f")")
+                            .font(.subheadline)
+                    }
+                    
+                    if index < viewModel.revenueData.prefix(7).count - 1 {
+                        Divider()
+                    }
+                }
             }
-            .frame(height: 200)
-            .chartYAxis {
-                AxisMarks(position: .leading)
-            }
+            .padding()
+            .background(Color(.systemBackground))
+            .cornerRadius(8)
         }
         .padding()
         .background(Color(.systemBackground))
@@ -118,7 +201,7 @@ struct OwnerDashboardView: View {
             Text("Popular Items")
                 .font(.headline)
             
-            ForEach(viewModel.popularItems) { item in
+            ForEach(Array(viewModel.popularItems.enumerated()), id: \.element.id) { index, item in
                 HStack {
                     Text(item.name)
                         .font(.subheadline)
@@ -131,7 +214,7 @@ struct OwnerDashboardView: View {
                 }
                 .padding(.vertical, 8)
                 
-                if item.id != viewModel.popularItems.last?.id {
+                if index < viewModel.popularItems.count - 1 {
                     Divider()
                 }
             }
@@ -179,79 +262,325 @@ struct OwnerDashboardView: View {
         .cornerRadius(12)
         .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
     }
-    
-    private var staffManagementSection: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Text("Staff Management")
-                .font(.headline)
-            
-            ForEach(viewModel.activeStaff) { staff in
-                HStack {
-                    Circle()
-                        .fill(staff.isActive ? Color.green : Color.gray)
-                        .frame(width: 8, height: 8)
+}
+
+// Menu Management View
+struct OwnerMenuView: View {
+    var body: some View {
+        NavigationStack {
+            List {
+                Section(header: Text("Menu Categories")) {
+                    ForEach(1...5, id: \.self) { _ in
+                        NavigationLink(destination: Text("Category Items")) {
+                            HStack {
+                                Image(systemName: "fork.knife")
+                                    .foregroundColor(.primary)
+                                Text("Category Name")
+                            }
+                        }
+                    }
+                    .onDelete { _ in }
                     
-                    Text(staff.name)
-                        .font(.subheadline)
-                    
-                    Spacer()
-                    
-                    Text(staff.role)
-                        .font(.caption)
-                        .foregroundColor(.secondary)
+                    Button {
+                        // Add new category
+                    } label: {
+                        Label("Add Category", systemImage: "plus.circle")
+                    }
                 }
-                .padding(.vertical, 8)
                 
-                if staff.id != viewModel.activeStaff.last?.id {
-                    Divider()
+                Section(header: Text("Featured Items")) {
+                    ForEach(1...3, id: \.self) { _ in
+                        NavigationLink(destination: Text("Edit Featured Item")) {
+                            HStack {
+                                Image(systemName: "star.fill")
+                                    .foregroundColor(.yellow)
+                                Text("Featured Item Name")
+                            }
+                        }
+                    }
+                    .onDelete { _ in }
+                    
+                    Button {
+                        // Add new featured item
+                    } label: {
+                        Label("Add Featured Item", systemImage: "plus.circle")
+                    }
+                }
+                
+                Section(header: Text("Special Dietary Options")) {
+                    Button {
+                        // Manage dietary options
+                    } label: {
+                        Label("Manage Dietary Labels", systemImage: "tag")
+                    }
+                }
+            }
+            .navigationTitle("Menu Management")
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button {
+                        // Publish menu changes
+                    } label: {
+                        Text("Publish")
+                            .bold()
+                    }
                 }
             }
         }
-        .padding()
-        .background(Color(.systemBackground))
-        .cornerRadius(12)
-        .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
     }
 }
 
-// MARK: - Supporting Views
+// Orders Management View
+struct OwnerOrdersView: View {
+    @State private var selectedOrderType = 0
+    private let orderTypes = ["Active", "Completed", "All"]
 
-struct StatCard: View {
-    let title: String
-    let value: String
-    let trend: Double?
-    let icon: String
+    var body: some View {
+        NavigationStack {
+            VStack {
+                Picker("Order Type", selection: $selectedOrderType) {
+                    ForEach(0..<orderTypes.count, id: \.self) { index in
+                        Text(orderTypes[index])
+                    }
+                }
+                .pickerStyle(SegmentedPickerStyle())
+                .padding()
+                
+                List {
+                    ForEach(1...10, id: \.self) { index in
+                        NavigationLink(destination: Text("Order Details")) {
+                            VStack(alignment: .leading, spacing: 6) {
+                                HStack {
+                                    Text("Order #\(1000 + index)")
+                                        .font(.headline)
+                                    Spacer()
+                                    Text("$\(Double.random(in: 25...150), specifier: "%.2f")")
+                                        .fontWeight(.semibold)
+                                }
+                                
+                                HStack {
+                                    Text("Customer: John Doe")
+                                        .font(.subheadline)
+                                    Spacer()
+                                    Text(Date(), style: .time)
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                }
+                                
+                                HStack {
+                                    Text(["Pending", "Preparing", "Ready", "Delivered"].randomElement()!)
+                                        .font(.caption)
+                                        .padding(.horizontal, 8)
+                                        .padding(.vertical, 3)
+                                        .background(Color.blue.opacity(0.2))
+                                        .foregroundColor(.blue)
+                                        .cornerRadius(4)
+                                    
+                                    Spacer()
+                                    
+                                    Text("\(Int.random(in: 1...6)) items")
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                }
+                            }
+                            .padding(.vertical, 4)
+                        }
+                    }
+                }
+            }
+            .navigationTitle("Orders")
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button {
+                        // Refresh orders
+                    } label: {
+                        Image(systemName: "arrow.clockwise")
+                    }
+                }
+            }
+        }
+    }
+}
+
+// Reservations Management View
+struct OwnerReservationsView: View {
+    @State private var selectedDate = Date()
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack {
-                Image(systemName: icon)
-                    .foregroundColor(.primary)
+        NavigationStack {
+            VStack {
+                DatePicker("", selection: $selectedDate, displayedComponents: .date)
+                    .datePickerStyle(GraphicalDatePickerStyle())
+                    .padding()
                 
-                Spacer()
-                
-                if let trend = trend {
-                    HStack(spacing: 4) {
-                        Image(systemName: trend >= 0 ? "arrow.up.right" : "arrow.down.right")
-                        Text("\(abs(trend), specifier: "%.1f")%")
+                List {
+                    Section(header: Text("Today's Reservations")) {
+                        ForEach(1...8, id: \.self) { _ in
+                            NavigationLink(destination: Text("Reservation Details")) {
+                                HStack {
+                                    VStack(alignment: .leading) {
+                                        Text("Smith Party")
+                                            .font(.headline)
+                                        Text("\(Int.random(in: 2...8)) people")
+                                            .font(.subheadline)
+                                            .foregroundColor(.secondary)
+                                    }
+                                    
+                                    Spacer()
+                                    
+                                    Text("\(Calendar.current.date(bySettingHour: Int.random(in: 17...21), minute: [00, 15, 30, 45].randomElement()!, second: 0, of: Date())!, style: .time)")
+                                        .font(.system(.subheadline, design: .monospaced))
+                                }
+                            }
+                        }
                     }
-                    .font(.caption2)
-                    .foregroundColor(trend >= 0 ? .green : .red)
+                    
+                    Section(header: Text("Table Status")) {
+                        ForEach(1...12, id: \.self) { tableNumber in
+                            HStack {
+                                Text("Table \(tableNumber)")
+                                Spacer()
+                                Text(["Available", "Reserved", "Occupied", "Maintenance"].randomElement()!)
+                                    .foregroundColor([.green, .orange, .red, .gray].randomElement()!)
+                            }
+                        }
+                    }
                 }
             }
-            
-            Text(title)
-                .font(.caption)
-                .foregroundColor(.secondary)
-            
-            Text(value)
-                .font(.title2)
-                .fontWeight(.bold)
+            .navigationTitle("Table Management")
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button {
+                        // Add new reservation
+                    } label: {
+                        Image(systemName: "plus")
+                    }
+                }
+            }
         }
-        .padding()
-        .background(Color(.systemBackground))
-        .cornerRadius(12)
-        .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
     }
 }
 
+// Marketing View
+struct OwnerMarketingView: View {
+    var body: some View {
+        NavigationStack {
+            List {
+                Section(header: Text("Active Promotions")) {
+                    ForEach(1...3, id: \.self) { _ in
+                        NavigationLink(destination: Text("Edit Promotion")) {
+                            VStack(alignment: .leading, spacing: 6) {
+                                Text("Happy Hour Special")
+                                    .font(.headline)
+                                Text("50% off appetizers")
+                                    .font(.subheadline)
+                                    .foregroundColor(.secondary)
+                                Text("Active until Jun 30")
+                                    .font(.caption)
+                                    .foregroundColor(.green)
+                            }
+                            .padding(.vertical, 4)
+                        }
+                    }
+                }
+                
+                Section(header: Text("Customer Engagement")) {
+                    NavigationLink(destination: Text("Loyalty Program")) {
+                        Label("Loyalty Program", systemImage: "star.circle")
+                    }
+                    
+                    NavigationLink(destination: Text("Push Notifications")) {
+                        Label("Send Notification", systemImage: "bell")
+                    }
+                    
+                    NavigationLink(destination: Text("Email Campaign")) {
+                        Label("Email Campaign", systemImage: "envelope")
+                    }
+                }
+                
+                Section(header: Text("Analytics")) {
+                    NavigationLink(destination: Text("Promotion Impact")) {
+                        Label("Promotion Impact", systemImage: "chart.line.uptrend.xyaxis")
+                    }
+                    
+                    NavigationLink(destination: Text("Customer Retention")) {
+                        Label("Customer Retention", systemImage: "person.2")
+                    }
+                }
+            }
+            .navigationTitle("Marketing")
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button {
+                        // Create new promotion
+                    } label: {
+                        Text("New")
+                    }
+                }
+            }
+        }
+    }
+}
+
+// Settings View
+struct OwnerSettingsView: View {
+    @StateObject private var viewModel = OwnerDashboardViewViewModel()
+    
+    var body: some View {
+        NavigationStack {
+            List {
+                Section(header: Text("Restaurant Profile")) {
+                    NavigationLink(destination: Text("Edit Restaurant Info")) {
+                        Label("Restaurant Information", systemImage: "building.2")
+                    }
+                    
+                    NavigationLink(destination: Text("Hours & Availability")) {
+                        Label("Business Hours", systemImage: "clock")
+                    }
+                    
+                    NavigationLink(destination: Text("Location Settings")) {
+                        Label("Location", systemImage: "mappin.and.ellipse")
+                    }
+                }
+                
+                Section(header: Text("Staff Management")) {
+                    NavigationLink(destination: Text("Staff Accounts")) {
+                        Label("Staff Accounts", systemImage: "person.3")
+                    }
+                    
+                    NavigationLink(destination: Text("Permissions")) {
+                        Label("Permissions", systemImage: "lock.shield")
+                    }
+                }
+                
+                Section(header: Text("System")) {
+                    NavigationLink(destination: Text("Payment Methods")) {
+                        Label("Payment Settings", systemImage: "creditcard")
+                    }
+                    
+                    NavigationLink(destination: Text("Notifications")) {
+                        Label("Notification Settings", systemImage: "bell.badge")
+                    }
+                    
+                    NavigationLink(destination: Text("App Settings")) {
+                        Label("App Settings", systemImage: "gear")
+                    }
+                }
+                
+                Section {
+                    Button(action: {
+                        viewModel.signOut()
+                    }) {
+                        HStack {
+                            Spacer()
+                            Text("Sign Out")
+                                .foregroundColor(.red)
+                            Spacer()
+                        }
+                    }
+                }
+            }
+            .navigationTitle("Settings")
+        }
+    }
+}
