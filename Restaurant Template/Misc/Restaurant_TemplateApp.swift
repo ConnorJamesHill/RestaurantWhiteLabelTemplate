@@ -25,7 +25,7 @@ struct Restaurant_TemplateApp: App {
                     if authViewModel.isOwner {
                         OwnerDashboardView()
                     } else {
-                        ContentView()
+                        CustomerView()
                     }
                 } else {
                     LoginView()

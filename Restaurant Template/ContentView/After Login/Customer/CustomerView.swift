@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct ContentView: View {
+struct CustomerView: View {
     @EnvironmentObject private var restaurant: RestaurantConfiguration
     
     var body: some View {

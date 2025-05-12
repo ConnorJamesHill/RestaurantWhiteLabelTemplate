@@ -12,7 +12,7 @@ struct MainView: View {
                     OwnerDashboardView()
                         .environmentObject(viewModel)
                 } else {
-                    ContentView() // Regular customer view
+                    CustomerView() // Regular customer view
                         .environmentObject(viewModel)
                 }
             } else {
