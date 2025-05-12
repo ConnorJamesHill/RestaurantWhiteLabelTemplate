@@ -32,15 +32,15 @@ struct OwnerAnalyticsView: View {
                 backgroundGradient
                     .ignoresSafeArea()
                 
-                // Decorative elements
+                // Decorative elements - using black instead of white
                 Circle()
-                    .fill(Color.white.opacity(0.05))
+                    .fill(Color.black.opacity(0.05))
                     .frame(width: 300, height: 300)
                     .blur(radius: 30)
                     .offset(x: -150, y: -100)
                 
                 Circle()
-                    .fill(Color.white.opacity(0.08))
+                    .fill(Color.black.opacity(0.08))
                     .frame(width: 250, height: 250)
                     .blur(radius: 20)
                     .offset(x: 180, y: 400)
@@ -143,7 +143,7 @@ struct OwnerAnalyticsView: View {
                     
                     if index < viewModel.revenueData.prefix(7).count - 1 {
                         Divider()
-                            .background(Color.white.opacity(0.3))
+                            .background(Color.black.opacity(0.3))
                     }
                 }
             }
@@ -158,14 +158,14 @@ struct OwnerAnalyticsView: View {
             RoundedRectangle(cornerRadius: 16)
                 .stroke(
                     LinearGradient(
-                        colors: [.white.opacity(0.7), .clear, .white.opacity(0.3)],
+                        colors: [.black.opacity(0.7), .clear, .black.opacity(0.3)],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     ),
-                    lineWidth: 1
+                    lineWidth: 0.15
                 )
         )
-        .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 5)
+        .shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: 5)
     }
     
     private var popularItemsSection: some View {
@@ -192,7 +192,7 @@ struct OwnerAnalyticsView: View {
                 
                 if index < viewModel.popularItems.count - 1 {
                     Divider()
-                        .background(Color.white.opacity(0.3))
+                        .background(Color.black.opacity(0.3))
                         .padding(.horizontal)
                 }
             }
@@ -204,14 +204,14 @@ struct OwnerAnalyticsView: View {
             RoundedRectangle(cornerRadius: 16)
                 .stroke(
                     LinearGradient(
-                        colors: [.white.opacity(0.7), .clear, .white.opacity(0.3)],
+                        colors: [.black.opacity(0.7), .clear, .black.opacity(0.3)],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     ),
-                    lineWidth: 1
+                    lineWidth: 0.15
                 )
         )
-        .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 5)
+        .shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: 5)
     }
     
     private var recentOrdersSection: some View {
@@ -246,14 +246,14 @@ struct OwnerAnalyticsView: View {
                     RoundedRectangle(cornerRadius: 12)
                         .stroke(
                             LinearGradient(
-                                colors: [.white.opacity(0.6), .clear],
+                                colors: [.black.opacity(0.6), .clear],
                                 startPoint: .topLeading,
                                 endPoint: .bottomTrailing
                             ),
-                            lineWidth: 0.5
+                            lineWidth: 0.15
                         )
                 )
-                .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
+                .shadow(color: Color.black.opacity(0.15), radius: 5, x: 0, y: 2)
             }
         }
         .padding()
@@ -263,14 +263,14 @@ struct OwnerAnalyticsView: View {
             RoundedRectangle(cornerRadius: 16)
                 .stroke(
                     LinearGradient(
-                        colors: [.white.opacity(0.7), .clear, .white.opacity(0.3)],
+                        colors: [.black.opacity(0.7), .clear, .black.opacity(0.3)],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     ),
-                    lineWidth: 1
+                    lineWidth: 0.15
                 )
         )
-        .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 5)
+        .shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: 5)
     }
 }
 
@@ -331,14 +331,14 @@ struct GlassStatCard: View {
             RoundedRectangle(cornerRadius: 16)
                 .stroke(
                     LinearGradient(
-                        colors: [.white.opacity(0.7), .clear],
+                        colors: [.black.opacity(0.7), .clear],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     ),
-                    lineWidth: 1
+                    lineWidth: 0.15
                 )
         )
-        .shadow(color: tint.opacity(0.3), radius: 8, x: 0, y: 4)
+        .shadow(color: Color.black.opacity(0.2), radius: 8, x: 0, y: 4)
     }
 }
 
@@ -354,6 +354,7 @@ struct StatusPill: View {
             .padding(.vertical, 5)
             .background(statusColor)
             .cornerRadius(20)
+            .shadow(color: Color.black.opacity(0.15), radius: 2, x: 0, y: 1)
     }
     
     private var statusColor: Color {

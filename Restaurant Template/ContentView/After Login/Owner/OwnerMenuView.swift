@@ -139,7 +139,7 @@ struct OwnerMenuView: View {
                         .padding(.vertical, 10)
                     Spacer()
                 }
-                .background(.thinMaterial)
+                .background(.ultraThinMaterial)
                 .cornerRadius(10)
                 .overlay(
                     RoundedRectangle(cornerRadius: 10)
@@ -158,7 +158,7 @@ struct OwnerMenuView: View {
             .padding(.horizontal, 16)
             .padding(.bottom, 16)
         }
-        .background(.thinMaterial)
+        .background(.ultraThinMaterial)
         .clipShape(RoundedRectangle(cornerRadius: 16))
         .overlay(
             RoundedRectangle(cornerRadius: 16)
@@ -240,7 +240,7 @@ struct OwnerMenuView: View {
                         .padding(.vertical, 10)
                     Spacer()
                 }
-                .background(.thinMaterial)
+                .background(.ultraThinMaterial)
                 .cornerRadius(10)
                 .overlay(
                     RoundedRectangle(cornerRadius: 10)
@@ -259,7 +259,7 @@ struct OwnerMenuView: View {
             .padding(.horizontal, 16)
             .padding(.bottom, 16)
         }
-        .background(.thinMaterial)
+        .background(.ultraThinMaterial)
         .clipShape(RoundedRectangle(cornerRadius: 16))
         .overlay(
             RoundedRectangle(cornerRadius: 16)
@@ -345,7 +345,7 @@ struct OwnerMenuView: View {
             .padding(.horizontal, 16)
             .padding(.bottom, 16)
         }
-        .background(.thinMaterial)
+        .background(.ultraThinMaterial)
         .clipShape(RoundedRectangle(cornerRadius: 16))
         .overlay(
             RoundedRectangle(cornerRadius: 16)

@@ -9,25 +9,63 @@ import Foundation
 import SwiftUI
 
 struct OwnerMarketingView: View {
+    @Environment(\.colorScheme) private var colorScheme
+    
+    // Blue gradient background - matching other owner views
+    private var backgroundGradient: LinearGradient {
+        LinearGradient(
+            gradient: Gradient(colors: [
+                Color(hex: "1a73e8"), // Vibrant blue
+                Color(hex: "0d47a1"), // Deep blue
+                Color(hex: "002171"), // Dark blue
+                Color(hex: "002984")  // Navy blue
+            ]),
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+    }
+    
     var body: some View {
         NavigationStack {
-            ScrollView {
-                VStack(spacing: 20) {
-                    // Marketing Overview
-                    marketingOverviewSection
-                    
-                    // Active Promotions
-                    activePromotionsSection
-                    
-                    // Customer Engagement
-                    customerEngagementSection
-                    
-                    // Analytics
-                    analyticsSection
+            ZStack {
+                // Background gradient
+                backgroundGradient
+                    .ignoresSafeArea()
+                
+                // Decorative elements
+                Circle()
+                    .fill(Color.white.opacity(0.05))
+                    .frame(width: 300, height: 300)
+                    .blur(radius: 30)
+                    .offset(x: -150, y: -100)
+                
+                Circle()
+                    .fill(Color.white.opacity(0.08))
+                    .frame(width: 250, height: 250)
+                    .blur(radius: 20)
+                    .offset(x: 180, y: 400)
+                
+                ScrollView {
+                    VStack(spacing: 20) {
+                        // Marketing Overview
+                        marketingOverviewSection
+                        
+                        // Active Promotions
+                        activePromotionsSection
+                        
+                        // Customer Engagement
+                        customerEngagementSection
+                        
+                        // Analytics
+                        analyticsSection
+                    }
+                    .padding()
                 }
-                .padding()
             }
             .navigationTitle("Marketing")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbarBackground(.visible, for: .navigationBar)
+            .toolbarBackground(.ultraThinMaterial, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button {
@@ -35,13 +73,22 @@ struct OwnerMarketingView: View {
                     } label: {
                         Text("New")
                             .fontWeight(.medium)
+                            .foregroundColor(.white)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 6)
+                            .background(.regularMaterial)
+                            .cornerRadius(8)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 8)
+                                    .stroke(Color.white.opacity(0.3), lineWidth: 1)
+                            )
                     }
                 }
             }
         }
     }
     
-    // MARK: - Sections
+    // MARK: - Glassmorphism Sections
     
     private var marketingOverviewSection: some View {
         HStack(spacing: 15) {
@@ -54,25 +101,41 @@ struct OwnerMarketingView: View {
     private func marketingStatView(count: String, title: String, iconName: String, color: Color) -> some View {
         VStack(spacing: 8) {
             Image(systemName: iconName)
-                .foregroundColor(color)
+                .foregroundColor(.white)
                 .font(.system(size: 20))
+                .padding(8)
+                .background(color.opacity(0.3))
+                .clipShape(Circle())
             
             Text(count)
                 .font(.title3)
                 .fontWeight(.bold)
+                .foregroundColor(.white)
             
             Text(title)
                 .font(.caption)
-                .foregroundColor(.secondary)
+                .foregroundColor(.white.opacity(0.7))
                 .multilineTextAlignment(.center)
                 .lineLimit(2)
                 .fixedSize(horizontal: false, vertical: true)
         }
         .frame(maxWidth: .infinity)
-        .padding()
-        .background(Color(.systemBackground))
-        .cornerRadius(10)
-        .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
+        .padding(.vertical, 16)
+        .padding(.horizontal, 8)
+        .background(.ultraThinMaterial)
+        .cornerRadius(16)
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .stroke(
+                    LinearGradient(
+                        colors: [.white.opacity(0.6), .clear],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    lineWidth: 0.5
+                )
+        )
+        .shadow(color: color.opacity(0.2), radius: 8, x: 0, y: 4)
     }
     
     private var activePromotionsSection: some View {
@@ -115,20 +178,35 @@ struct OwnerMarketingView: View {
                 HStack {
                     Spacer()
                     Label("Add New Promotion", systemImage: "plus.circle")
-                        .foregroundColor(.primary)
+                        .foregroundColor(.white)
                         .padding(.vertical, 10)
                     Spacer()
                 }
-                .background(Color.primary.opacity(0.05))
+                .background(.ultraThinMaterial)
                 .cornerRadius(10)
-                .shadow(color: Color.black.opacity(0.05), radius: 2, x: 0, y: 1)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 10)
+                        .stroke(Color.white.opacity(0.3), lineWidth: 0.5)
+                )
+                .shadow(color: Color.white.opacity(0.1), radius: 2, x: 0, y: 1)
             }
             .padding(.top, 8)
         }
         .padding()
-        .background(Color(.systemBackground))
-        .cornerRadius(12)
-        .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 3)
+        .background(.ultraThinMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .stroke(
+                    LinearGradient(
+                        colors: [.white.opacity(0.7), .clear, .white.opacity(0.3)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    lineWidth: 1
+                )
+        )
+        .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 5)
     }
     
     private var customerEngagementSection: some View {
@@ -160,9 +238,20 @@ struct OwnerMarketingView: View {
             )
         }
         .padding()
-        .background(Color(.systemBackground))
-        .cornerRadius(12)
-        .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 3)
+        .background(.ultraThinMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .stroke(
+                    LinearGradient(
+                        colors: [.white.opacity(0.7), .clear, .white.opacity(0.3)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    lineWidth: 1
+                )
+        )
+        .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 5)
     }
     
     private var analyticsSection: some View {
@@ -190,9 +279,20 @@ struct OwnerMarketingView: View {
             )
         }
         .padding()
-        .background(Color(.systemBackground))
-        .cornerRadius(12)
-        .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 3)
+        .background(.ultraThinMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .stroke(
+                    LinearGradient(
+                        colors: [.white.opacity(0.7), .clear, .white.opacity(0.3)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    lineWidth: 1
+                )
+        )
+        .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 5)
     }
     
     // MARK: - Helper Views
@@ -200,6 +300,7 @@ struct OwnerMarketingView: View {
     private func sectionHeader(_ title: String) -> some View {
         Text(title)
             .font(.headline)
+            .foregroundColor(.white)
             .padding(.bottom, 8)
     }
     
@@ -210,16 +311,17 @@ struct OwnerMarketingView: View {
                     .foregroundColor(.white)
                     .font(.system(size: 16))
                     .padding(10)
-                    .background(color)
+                    .background(color.opacity(0.3))
                     .clipShape(Circle())
                 
                 VStack(alignment: .leading, spacing: 6) {
                     Text(title)
                         .font(.headline)
+                        .foregroundColor(.white)
                     
                     Text(description)
                         .font(.subheadline)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(.white.opacity(0.7))
                     
                     HStack {
                         Text(dates)
@@ -233,8 +335,12 @@ struct OwnerMarketingView: View {
                             .foregroundColor(.white)
                             .padding(.horizontal, 8)
                             .padding(.vertical, 3)
-                            .background(Color.green)
+                            .background(Color.green.opacity(0.3))
                             .cornerRadius(4)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 4)
+                                    .stroke(Color.green.opacity(0.5), lineWidth: 0.5)
+                            )
                     }
                 }
                 
@@ -242,12 +348,23 @@ struct OwnerMarketingView: View {
                 
                 Image(systemName: "chevron.right")
                     .font(.caption)
-                    .foregroundColor(.gray)
+                    .foregroundColor(.white.opacity(0.7))
             }
             .padding()
-            .background(Color(.systemBackground))
-            .cornerRadius(10)
-            .shadow(color: Color.black.opacity(0.08), radius: 3, x: 0, y: 2)
+            .background(.ultraThinMaterial)
+            .cornerRadius(12)
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(
+                        LinearGradient(
+                            colors: [.white.opacity(0.6), .clear],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        ),
+                        lineWidth: 0.5
+                    )
+            )
+            .shadow(color: color.opacity(0.2), radius: 5, x: 0, y: 3)
         }
         .buttonStyle(PlainButtonStyle())
     }
@@ -256,31 +373,43 @@ struct OwnerMarketingView: View {
         NavigationLink(destination: Text(title)) {
             HStack(spacing: 12) {
                 Image(systemName: iconName)
-                    .foregroundColor(color)
+                    .foregroundColor(.white)
                     .font(.system(size: 20))
-                    .frame(width: 36, height: 36)
-                    .background(color.opacity(0.1))
+                    .padding(8)
+                    .background(color.opacity(0.3))
                     .clipShape(Circle())
                 
                 VStack(alignment: .leading, spacing: 2) {
                     Text(title)
                         .font(.headline)
+                        .foregroundColor(.white)
                     
                     Text(description)
                         .font(.subheadline)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(.white.opacity(0.7))
                 }
                 
                 Spacer()
                 
                 Image(systemName: "chevron.right")
                     .font(.caption)
-                    .foregroundColor(.gray)
+                    .foregroundColor(.white.opacity(0.7))
             }
             .padding()
-            .background(Color(.systemBackground))
-            .cornerRadius(10)
-            .shadow(color: Color.black.opacity(0.08), radius: 3, x: 0, y: 2)
+            .background(.ultraThinMaterial)
+            .cornerRadius(12)
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(
+                        LinearGradient(
+                            colors: [.white.opacity(0.6), .clear],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        ),
+                        lineWidth: 0.5
+                    )
+            )
+            .shadow(color: color.opacity(0.2), radius: 5, x: 0, y: 3)
         }
         .buttonStyle(PlainButtonStyle())
     }
@@ -291,19 +420,20 @@ struct OwnerMarketingView: View {
                 VStack(alignment: .leading, spacing: 8) {
                     HStack(spacing: 12) {
                         Image(systemName: iconName)
-                            .foregroundColor(color)
+                            .foregroundColor(.white)
                             .font(.system(size: 16))
-                            .frame(width: 32, height: 32)
-                            .background(color.opacity(0.1))
+                            .padding(8)
+                            .background(color.opacity(0.3))
                             .clipShape(Circle())
                         
                         Text(title)
                             .font(.headline)
+                            .foregroundColor(.white)
                     }
                     
                     Text(description)
                         .font(.subheadline)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(.white.opacity(0.7))
                 }
                 
                 Spacer()
@@ -312,17 +442,28 @@ struct OwnerMarketingView: View {
                     Text(value)
                         .font(.title3)
                         .fontWeight(.bold)
-                        .foregroundColor(color)
+                        .foregroundColor(.white)
                     
                     Text(valueLabel)
                         .font(.caption)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(.white.opacity(0.7))
                 }
             }
             .padding()
-            .background(Color(.systemBackground))
-            .cornerRadius(10)
-            .shadow(color: Color.black.opacity(0.08), radius: 3, x: 0, y: 2)
+            .background(.ultraThinMaterial)
+            .cornerRadius(12)
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(
+                        LinearGradient(
+                            colors: [.white.opacity(0.6), .clear],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        ),
+                        lineWidth: 0.5
+                    )
+            )
+            .shadow(color: color.opacity(0.2), radius: 5, x: 0, y: 3)
         }
         .buttonStyle(PlainButtonStyle())
     }

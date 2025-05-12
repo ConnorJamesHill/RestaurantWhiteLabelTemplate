@@ -10,53 +10,112 @@ import SwiftUI
 
 struct OwnerReservationsView: View {
     @State private var selectedDate = Date()
+    @Environment(\.colorScheme) private var colorScheme
+    
+    // Blue gradient background - matching other owner views
+    private var backgroundGradient: LinearGradient {
+        LinearGradient(
+            gradient: Gradient(colors: [
+                Color(hex: "1a73e8"), // Vibrant blue
+                Color(hex: "0d47a1"), // Deep blue
+                Color(hex: "002171"), // Dark blue
+                Color(hex: "002984")  // Navy blue
+            ]),
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+    }
     
     var body: some View {
         NavigationStack {
-            ScrollView {
-                VStack(spacing: 20) {
-                    // Calendar Section
-                    calendarSection
-                    
-                    // Reservations Summary
-                    reservationSummarySection
-                    
-                    // Today's Reservations
-                    todaysReservationsSection
-                    
-                    // Table Status
-                    tableStatusSection
+            ZStack {
+                // Background gradient
+                backgroundGradient
+                    .ignoresSafeArea()
+                
+                // Decorative elements
+                Circle()
+                    .fill(Color.white.opacity(0.05))
+                    .frame(width: 300, height: 300)
+                    .blur(radius: 30)
+                    .offset(x: -150, y: -100)
+                
+                Circle()
+                    .fill(Color.white.opacity(0.08))
+                    .frame(width: 250, height: 250)
+                    .blur(radius: 20)
+                    .offset(x: 180, y: 400)
+                
+                ScrollView {
+                    VStack(spacing: 20) {
+                        // Calendar Section
+                        calendarSection
+                        
+                        // Reservations Summary
+                        reservationSummarySection
+                        
+                        // Today's Reservations
+                        todaysReservationsSection
+                        
+                        // Table Status
+                        tableStatusSection
+                    }
+                    .padding()
                 }
-                .padding()
             }
             .navigationTitle("Table Management")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbarBackground(.visible, for: .navigationBar)
+            .toolbarBackground(.ultraThinMaterial, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button {
                         // Add new reservation
                     } label: {
                         Image(systemName: "plus")
+                            .foregroundColor(.white)
+                            .padding(8)
+                            .background(.regularMaterial)
+                            .clipShape(Circle())
+                            .overlay(
+                                Circle()
+                                    .stroke(Color.white.opacity(0.3), lineWidth: 1)
+                            )
                     }
                 }
             }
         }
     }
     
-    // MARK: - Sections
+    // MARK: - Glassmorphism Sections
     
     private var calendarSection: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text("Select Date")
                 .font(.headline)
+                .foregroundColor(.white)
                 .padding(.leading, 4)
             
             DatePicker("", selection: $selectedDate, displayedComponents: .date)
                 .datePickerStyle(GraphicalDatePickerStyle())
                 .padding()
+                .colorScheme(.dark) // Better visualization on dark background
+                .accentColor(.white)
         }
-        .background(Color(.systemBackground))
-        .cornerRadius(12)
-        .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
+        .background(.ultraThinMaterial)
+        .cornerRadius(16)
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .stroke(
+                    LinearGradient(
+                        colors: [.white.opacity(0.7), .clear, .white.opacity(0.3)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    lineWidth: 1
+                )
+        )
+        .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 5)
     }
     
     private var reservationSummarySection: some View {
@@ -70,29 +129,46 @@ struct OwnerReservationsView: View {
     private func reservationStatView(count: String, title: String, iconName: String, color: Color) -> some View {
         VStack(spacing: 8) {
             Image(systemName: iconName)
-                .foregroundColor(color)
+                .foregroundColor(.white)
                 .font(.system(size: 20))
+                .padding(8)
+                .background(color.opacity(0.3))
+                .clipShape(Circle())
             
             Text(count)
                 .font(.title3)
                 .fontWeight(.bold)
+                .foregroundColor(.white)
             
             Text(title)
                 .font(.caption)
-                .foregroundColor(.secondary)
+                .foregroundColor(.white.opacity(0.7))
                 .multilineTextAlignment(.center)
         }
         .frame(maxWidth: .infinity)
-        .padding()
-        .background(Color(.systemBackground))
-        .cornerRadius(10)
-        .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
+        .padding(.vertical, 16)
+        .padding(.horizontal, 8)
+        .background(.ultraThinMaterial)
+        .cornerRadius(16)
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .stroke(
+                    LinearGradient(
+                        colors: [.white.opacity(0.6), .clear],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    lineWidth: 0.5
+                )
+        )
+        .shadow(color: color.opacity(0.2), radius: 8, x: 0, y: 4)
     }
     
     private var todaysReservationsSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Today's Reservations")
                 .font(.headline)
+                .foregroundColor(.white)
                 .padding(.leading, 4)
             
             ForEach(1...8, id: \.self) { index in
@@ -114,22 +190,24 @@ struct OwnerReservationsView: View {
                 HStack {
                     Text("\(lastName) Party")
                         .font(.headline)
+                        .foregroundColor(.white)
                     
                     Spacer()
                     
                     Text("\(time, style: .time)")
                         .font(.system(.subheadline, design: .monospaced))
                         .fontWeight(.semibold)
+                        .foregroundColor(.white)
                 }
                 
                 HStack(spacing: 12) {
                     Label("\(people) people", systemImage: "person.2.fill")
                         .font(.caption)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(.white.opacity(0.7))
                     
                     Label("Table \(Int.random(in: 1...12))", systemImage: "tablecells")
                         .font(.caption)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(.white.opacity(0.7))
                     
                     Spacer()
                     
@@ -138,9 +216,13 @@ struct OwnerReservationsView: View {
                             .font(.caption)
                             .padding(.horizontal, 8)
                             .padding(.vertical, 3)
-                            .background(Color.orange.opacity(0.2))
-                            .foregroundColor(.orange)
+                            .background(Color.orange.opacity(0.3))
+                            .foregroundColor(.white)
                             .cornerRadius(4)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 4)
+                                    .stroke(Color.orange.opacity(0.5), lineWidth: 1)
+                            )
                     }
                 }
             }
@@ -149,18 +231,30 @@ struct OwnerReservationsView: View {
             
             Image(systemName: "chevron.right")
                 .font(.caption)
-                .foregroundColor(.gray)
+                .foregroundColor(.white.opacity(0.7))
         }
         .padding()
-        .background(Color(.systemBackground))
-        .cornerRadius(10)
-        .shadow(color: Color.black.opacity(0.08), radius: 3, x: 0, y: 2)
+        .background(.ultraThinMaterial)
+        .cornerRadius(16)
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .stroke(
+                    LinearGradient(
+                        colors: [.white.opacity(0.6), .clear],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    lineWidth: 0.5
+                )
+        )
+        .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 5)
     }
     
     private var tableStatusSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Table Status")
                 .font(.headline)
+                .foregroundColor(.white)
                 .padding(.leading, 4)
             
             LazyVGrid(columns: [
@@ -173,9 +267,20 @@ struct OwnerReservationsView: View {
             }
         }
         .padding()
-        .background(Color(.systemBackground))
-        .cornerRadius(12)
-        .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
+        .background(.ultraThinMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .stroke(
+                    LinearGradient(
+                        colors: [.white.opacity(0.7), .clear, .white.opacity(0.3)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    lineWidth: 1
+                )
+        )
+        .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 5)
     }
     
     private func tableStatusView(tableNumber: Int) -> some View {
@@ -192,13 +297,16 @@ struct OwnerReservationsView: View {
         
         return HStack {
             Image(systemName: "tablecells")
-                .foregroundColor(statusColor)
-                .frame(width: 30)
+                .foregroundColor(.white)
+                .padding(8)
+                .background(statusColor.opacity(0.3))
+                .clipShape(Circle())
             
             VStack(alignment: .leading, spacing: 2) {
                 Text("Table \(tableNumber)")
                     .font(.subheadline)
                     .fontWeight(.medium)
+                    .foregroundColor(.white)
                 
                 Text(status)
                     .font(.caption)
@@ -207,8 +315,19 @@ struct OwnerReservationsView: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding()
-        .background(statusColor.opacity(0.05))
-        .cornerRadius(8)
-        .shadow(color: Color.black.opacity(0.05), radius: 2, x: 0, y: 1)
+        .background(.ultraThinMaterial)
+        .cornerRadius(12)
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(
+                    LinearGradient(
+                        colors: [.white.opacity(0.5), .clear],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    lineWidth: 0.5
+                )
+        )
+        .shadow(color: statusColor.opacity(0.2), radius: 5, x: 0, y: 2)
     }
 }

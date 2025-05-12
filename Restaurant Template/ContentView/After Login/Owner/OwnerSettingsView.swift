@@ -11,35 +11,72 @@ import SwiftUI
 struct OwnerSettingsView: View {
     @StateObject private var viewModel = OwnerDashboardViewViewModel()
     @State private var appVersion = "1.0.0"
+    @Environment(\.colorScheme) private var colorScheme
+    
+    // Blue gradient background - matching other owner views
+    private var backgroundGradient: LinearGradient {
+        LinearGradient(
+            gradient: Gradient(colors: [
+                Color(hex: "1a73e8"), // Vibrant blue
+                Color(hex: "0d47a1"), // Deep blue
+                Color(hex: "002171"), // Dark blue
+                Color(hex: "002984")  // Navy blue
+            ]),
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+    }
     
     var body: some View {
         NavigationStack {
-            ScrollView {
-                VStack(spacing: 20) {
-                    profileHeader
-                    
-                    // Restaurant Profile
-                    restaurantProfileSection
-                    
-                    // Staff Management
-                    staffManagementSection
-                    
-                    // System Settings
-                    systemSection
-                    
-                    // Account Actions
-                    accountActionsSection
-                    
-                    // App Info
-                    appInfoSection
+            ZStack {
+                // Background gradient
+                backgroundGradient
+                    .ignoresSafeArea()
+                
+                // Decorative elements
+                Circle()
+                    .fill(Color.white.opacity(0.05))
+                    .frame(width: 300, height: 300)
+                    .blur(radius: 30)
+                    .offset(x: -150, y: -100)
+                
+                Circle()
+                    .fill(Color.white.opacity(0.08))
+                    .frame(width: 250, height: 250)
+                    .blur(radius: 20)
+                    .offset(x: 180, y: 400)
+                
+                ScrollView {
+                    VStack(spacing: 20) {
+                        profileHeader
+                        
+                        // Restaurant Profile
+                        restaurantProfileSection
+                        
+                        // Staff Management
+                        staffManagementSection
+                        
+                        // System Settings
+                        systemSection
+                        
+                        // Account Actions
+                        accountActionsSection
+                        
+                        // App Info
+                        appInfoSection
+                    }
+                    .padding()
                 }
-                .padding()
             }
             .navigationTitle("Settings")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbarBackground(.visible, for: .navigationBar)
+            .toolbarBackground(.ultraThinMaterial, for: .navigationBar)
         }
     }
     
-    // MARK: - Header
+    // MARK: - Glassmorphism Sections
     
     private var profileHeader: some View {
         VStack(spacing: 16) {
@@ -50,25 +87,36 @@ struct OwnerSettingsView: View {
                 .clipShape(Circle())
                 .overlay(
                     Circle()
-                        .stroke(Color.primary.opacity(0.2), lineWidth: 2)
+                        .stroke(Color.black.opacity(0.3), lineWidth: 2)
                 )
-                .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 3)
+                .shadow(color: Color.black.opacity(0.2), radius: 8, x: 0, y: 4)
             
             Text("Owner Account")
                 .font(.headline)
+                .foregroundColor(.white)
             
             Text("admin@restaurant.com")
                 .font(.subheadline)
-                .foregroundColor(.secondary)
+                .foregroundColor(.white.opacity(0.7))
         }
         .frame(maxWidth: .infinity)
-        .padding()
-        .background(Color(.systemBackground))
-        .cornerRadius(12)
-        .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 3)
+        .padding(.vertical, 24)
+        .padding(.horizontal)
+        .background(.ultraThinMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .stroke(
+                    LinearGradient(
+                        colors: [.black.opacity(0.7), .clear, .black.opacity(0.3)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    lineWidth: 1
+                )
+        )
+        .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 5)
     }
-    
-    // MARK: - Sections
     
     private var restaurantProfileSection: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -96,9 +144,20 @@ struct OwnerSettingsView: View {
             )
         }
         .padding()
-        .background(Color(.systemBackground))
-        .cornerRadius(12)
-        .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 3)
+        .background(.ultraThinMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .stroke(
+                    LinearGradient(
+                        colors: [.black.opacity(0.7), .clear, .black.opacity(0.3)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    lineWidth: 1
+                )
+        )
+        .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 5)
     }
     
     private var staffManagementSection: some View {
@@ -125,20 +184,35 @@ struct OwnerSettingsView: View {
                 HStack {
                     Spacer()
                     Label("Add Staff Member", systemImage: "person.badge.plus")
-                        .foregroundColor(.primary)
+                        .foregroundColor(.white)
                         .padding(.vertical, 10)
                     Spacer()
                 }
-                .background(Color.primary.opacity(0.05))
+                .background(.ultraThinMaterial)
                 .cornerRadius(10)
-                .shadow(color: Color.black.opacity(0.05), radius: 2, x: 0, y: 1)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 10)
+                        .stroke(Color.black.opacity(0.3), lineWidth: 0.5)
+                )
+                .shadow(color: Color.black.opacity(0.1), radius: 2, x: 0, y: 1)
             }
             .padding(.top, 8)
         }
         .padding()
-        .background(Color(.systemBackground))
-        .cornerRadius(12)
-        .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 3)
+        .background(.ultraThinMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .stroke(
+                    LinearGradient(
+                        colors: [.black.opacity(0.7), .clear, .black.opacity(0.3)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    lineWidth: 1
+                )
+        )
+        .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 5)
     }
     
     private var systemSection: some View {
@@ -167,9 +241,20 @@ struct OwnerSettingsView: View {
             )
         }
         .padding()
-        .background(Color(.systemBackground))
-        .cornerRadius(12)
-        .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 3)
+        .background(.ultraThinMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .stroke(
+                    LinearGradient(
+                        colors: [.black.opacity(0.7), .clear, .black.opacity(0.3)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    lineWidth: 1
+                )
+        )
+        .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 5)
     }
     
     private var accountActionsSection: some View {
@@ -181,62 +266,95 @@ struct OwnerSettingsView: View {
             }) {
                 HStack {
                     Image(systemName: "rectangle.portrait.and.arrow.right")
-                        .foregroundColor(.red)
+                        .foregroundColor(.white)
                         .font(.system(size: 20))
-                        .frame(width: 36, height: 36)
-                        .background(Color.red.opacity(0.1))
+                        .padding(8)
+                        .background(Color.red.opacity(0.3))
                         .clipShape(Circle())
                     
                     Text("Sign Out")
-                        .foregroundColor(.red)
+                        .foregroundColor(.white)
                         .font(.headline)
                     
                     Spacer()
                 }
                 .padding()
-                .background(Color(.systemBackground))
-                .cornerRadius(10)
-                .shadow(color: Color.black.opacity(0.08), radius: 3, x: 0, y: 2)
+                .background(.ultraThinMaterial)
+                .cornerRadius(12)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(
+                            LinearGradient(
+                                colors: [.black.opacity(0.6), .clear],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            ),
+                            lineWidth: 0.5
+                        )
+                )
+                .shadow(color: Color.red.opacity(0.2), radius: 5, x: 0, y: 3)
             }
             .buttonStyle(PlainButtonStyle())
         }
         .padding()
-        .background(Color(.systemBackground))
-        .cornerRadius(12)
-        .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 3)
+        .background(.ultraThinMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .stroke(
+                    LinearGradient(
+                        colors: [.black.opacity(0.7), .clear, .black.opacity(0.3)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    lineWidth: 1
+                )
+        )
+        .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 5)
     }
     
     private var appInfoSection: some View {
         VStack(alignment: .center, spacing: 12) {
             Text("Restaurant Manager App")
                 .font(.caption)
-                .foregroundColor(.secondary)
+                .foregroundColor(.white)
             
             Text("Version \(appVersion)")
                 .font(.caption2)
-                .foregroundColor(.secondary)
+                .foregroundColor(.white.opacity(0.7))
             
             HStack(spacing: 16) {
                 Link(destination: URL(string: "https://terms.example.com")!) {
                     Text("Terms of Service")
                         .font(.caption)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(.white.opacity(0.9))
                         .underline()
                 }
                 
                 Link(destination: URL(string: "https://privacy.example.com")!) {
                     Text("Privacy Policy")
                         .font(.caption)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(.white.opacity(0.9))
                         .underline()
                 }
             }
         }
         .frame(maxWidth: .infinity)
         .padding()
-        .background(Color(.systemBackground))
-        .cornerRadius(12)
-        .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 3)
+        .background(.ultraThinMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .stroke(
+                    LinearGradient(
+                        colors: [.black.opacity(0.7), .clear, .black.opacity(0.3)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    lineWidth: 1
+                )
+        )
+        .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 5)
     }
     
     // MARK: - Helper Views
@@ -244,6 +362,7 @@ struct OwnerSettingsView: View {
     private func sectionHeader(_ title: String) -> some View {
         Text(title)
             .font(.headline)
+            .foregroundColor(.white)
             .padding(.bottom, 8)
     }
     
@@ -251,32 +370,44 @@ struct OwnerSettingsView: View {
         NavigationLink(destination: Text(title)) {
             HStack(spacing: 12) {
                 Image(systemName: iconName)
-                    .foregroundColor(iconColor)
+                    .foregroundColor(.white)
                     .font(.system(size: 20))
-                    .frame(width: 36, height: 36)
-                    .background(iconColor.opacity(0.1))
+                    .padding(8)
+                    .background(iconColor.opacity(0.3))
                     .clipShape(Circle())
                 
                 VStack(alignment: .leading, spacing: 2) {
                     Text(title)
                         .font(.subheadline)
                         .fontWeight(.medium)
+                        .foregroundColor(.white)
                     
                     Text(description)
                         .font(.caption)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(.white.opacity(0.7))
                 }
                 
                 Spacer()
                 
                 Image(systemName: "chevron.right")
                     .font(.caption)
-                    .foregroundColor(.gray)
+                    .foregroundColor(.white.opacity(0.7))
             }
             .padding()
-            .background(Color(.systemBackground))
-            .cornerRadius(10)
-            .shadow(color: Color.black.opacity(0.08), radius: 3, x: 0, y: 2)
+            .background(.ultraThinMaterial)
+            .cornerRadius(12)
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(
+                        LinearGradient(
+                            colors: [.black.opacity(0.6), .clear],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        ),
+                        lineWidth: 0.5
+                    )
+            )
+            .shadow(color: iconColor.opacity(0.2), radius: 5, x: 0, y: 3)
         }
         .buttonStyle(PlainButtonStyle())
     }
