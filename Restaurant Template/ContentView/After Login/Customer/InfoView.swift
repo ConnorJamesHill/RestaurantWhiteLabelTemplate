@@ -15,34 +15,70 @@ struct InfoView: View {
     @State private var showingFullMap = false
     @State private var position: MapCameraPosition = .automatic
     
+    // Blue gradient background - matching other views
+    private var backgroundGradient: LinearGradient {
+        LinearGradient(
+            gradient: Gradient(colors: [
+                Color(hex: "1a73e8"), // Vibrant blue
+                Color(hex: "0d47a1"), // Deep blue
+                Color(hex: "002171"), // Dark blue
+                Color(hex: "002984")  // Navy blue
+            ]),
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+    }
+    
     var body: some View {
         NavigationStack {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 24) {
-                    // Restaurant header
-                    restaurantHeader
-                    
-                    // About section
-                    aboutSection
-                    
-                    // Hours section
-                    hoursSection
-                    
-                    // Location section
-                    locationSection
-                    
-                    // Contact section
-                    contactSection
-                    
-                    // Social media
-                    socialMediaSection
-                    
-                    // Logout section
-                    logoutSection
+            ZStack {
+                // Background gradient
+                backgroundGradient
+                    .ignoresSafeArea()
+                
+                // Decorative elements
+                Circle()
+                    .fill(Color.black.opacity(0.05))
+                    .frame(width: 300, height: 300)
+                    .blur(radius: 30)
+                    .offset(x: -150, y: -100)
+                
+                Circle()
+                    .fill(Color.black.opacity(0.08))
+                    .frame(width: 250, height: 250)
+                    .blur(radius: 20)
+                    .offset(x: 180, y: 400)
+                
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 24) {
+                        // Restaurant header
+                        restaurantHeader
+                        
+                        // About section
+                        aboutSection
+                        
+                        // Hours section
+                        hoursSection
+                        
+                        // Location section
+                        locationSection
+                        
+                        // Contact section
+                        contactSection
+                        
+                        // Social media
+                        socialMediaSection
+                        
+                        // Logout section
+                        logoutSection
+                    }
+                    .padding()
                 }
-                .padding()
             }
             .navigationTitle("About Us")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbarBackground(.visible, for: .navigationBar)
+            .toolbarBackground(.ultraThinMaterial, for: .navigationBar)
             .sheet(isPresented: $showingFullMap) {
                 fullMapView
             }
@@ -67,38 +103,61 @@ struct InfoView: View {
                 .clipShape(Circle())
                 .overlay(
                     Circle()
-                        .stroke(Color.primary.opacity(0.2), lineWidth: 2)
+                        .stroke(Color.white.opacity(0.3), lineWidth: 2)
                 )
-                .shadow(color: Color.black.opacity(0.15), radius: 8, x: 0, y: 4)
+                .shadow(color: Color.black.opacity(0.2), radius: 8, x: 0, y: 4)
             
             Text(restaurant.name)
                 .font(.title)
                 .fontWeight(.bold)
+                .foregroundColor(.white)
         }
         .frame(maxWidth: .infinity)
-        .padding(.vertical)
-        .background(Color(.systemBackground))
+        .padding(.vertical, 24)
+        .background(.ultraThinMaterial)
         .cornerRadius(16)
-        .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .stroke(
+                    LinearGradient(
+                        colors: [.black.opacity(0.7), .clear, .black.opacity(0.3)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    lineWidth: 0.15
+                )
+        )
+        .shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: 5)
     }
     
     private var aboutSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 12) {
             sectionHeader("Our Story")
             
             Text(restaurant.description)
                 .font(.body)
-                .foregroundColor(.secondary)
+                .foregroundColor(.white.opacity(0.9))
                 .fixedSize(horizontal: false, vertical: true)
                 .padding()
-                .background(Color(.systemBackground))
-                .cornerRadius(12)
-                .shadow(color: Color.black.opacity(0.08), radius: 6, x: 0, y: 3)
+                .background(.ultraThinMaterial)
+                .cornerRadius(16)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 16)
+                        .stroke(
+                            LinearGradient(
+                                colors: [.black.opacity(0.7), .clear, .black.opacity(0.3)],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            ),
+                            lineWidth: 0.15
+                        )
+                )
+                .shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: 5)
         }
     }
     
     private var hoursSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 12) {
             sectionHeader("Hours")
             
             VStack(alignment: .leading, spacing: 4) {
@@ -107,43 +166,55 @@ struct InfoView: View {
                         Text(day)
                             .font(.subheadline)
                             .fontWeight(.medium)
+                            .foregroundColor(.white)
                             .frame(width: 100, alignment: .leading)
                         
                         Text(hours)
                             .font(.subheadline)
-                            .foregroundColor(.secondary)
+                            .foregroundColor(.white.opacity(0.7))
                     }
-                    .padding(.vertical, 2)
+                    .padding(.vertical, 6)
                 }
             }
             .padding()
-            .background(Color(.systemBackground))
-            .cornerRadius(12)
-            .shadow(color: Color.black.opacity(0.08), radius: 6, x: 0, y: 3)
+            .background(.ultraThinMaterial)
+            .cornerRadius(16)
+            .overlay(
+                RoundedRectangle(cornerRadius: 16)
+                    .stroke(
+                        LinearGradient(
+                            colors: [.black.opacity(0.7), .clear, .black.opacity(0.3)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        ),
+                        lineWidth: 0.15
+                    )
+            )
+            .shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: 5)
         }
     }
     
     private var locationSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 12) {
             sectionHeader("Location")
             
             Text(restaurant.address)
                 .font(.subheadline)
-                .foregroundColor(.secondary)
+                .foregroundColor(.white.opacity(0.9))
                 .padding(.bottom, 4)
             
-            // Updated Map view for iOS 17+
+            // Map view with glass effect
             Map(position: $position) {
                 Marker(restaurant.name, coordinate: restaurant.location)
                     .tint(.primary)
             }
             .frame(height: 180)
-            .cornerRadius(12)
+            .clipShape(RoundedRectangle(cornerRadius: 12))
             .overlay(
                 RoundedRectangle(cornerRadius: 12)
-                    .stroke(Color.gray.opacity(0.2), lineWidth: 1)
+                    .stroke(Color.white.opacity(0.3), lineWidth: 1)
             )
-            .shadow(color: Color.black.opacity(0.15), radius: 8, x: 0, y: 4)
+            .shadow(color: Color.black.opacity(0.2), radius: 8, x: 0, y: 4)
             .onTapGesture {
                 showingFullMap = true
             }
@@ -154,17 +225,29 @@ struct InfoView: View {
             } label: {
                 Label("Get Directions", systemImage: "location.fill")
                     .font(.subheadline)
+                    .foregroundColor(.white)
                     .frame(maxWidth: .infinity)
                     .padding()
-                    .background(Color.primary.opacity(0.1))
-                    .cornerRadius(10)
+                    .background(.ultraThinMaterial)
+                    .cornerRadius(12)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12)
+                            .stroke(
+                                LinearGradient(
+                                    colors: [.black.opacity(0.7), .clear, .black.opacity(0.3)],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                ),
+                                lineWidth: 0.15
+                            )
+                    )
             }
-            .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
+            .shadow(color: Color.black.opacity(0.2), radius: 8, x: 0, y: 4)
         }
     }
     
     private var contactSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 12) {
             sectionHeader("Contact")
             
             VStack(spacing: 12) {
@@ -181,12 +264,23 @@ struct InfoView: View {
                 }
             }
             .padding()
-            .background(Color(.systemBackground))
-            .cornerRadius(12)
-            .shadow(color: Color.black.opacity(0.08), radius: 6, x: 0, y: 3)
+            .background(.ultraThinMaterial)
+            .cornerRadius(16)
+            .overlay(
+                RoundedRectangle(cornerRadius: 16)
+                    .stroke(
+                        LinearGradient(
+                            colors: [.black.opacity(0.7), .clear, .black.opacity(0.3)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        ),
+                        lineWidth: 0.15
+                    )
+            )
+            .shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: 5)
         }
     }
-
+    
     private var socialMediaSection: some View {
         VStack(alignment: .leading, spacing: 16) {
             sectionHeader("Follow Us")
@@ -203,14 +297,25 @@ struct InfoView: View {
                 Spacer()
             }
             .padding()
-            .background(Color(.systemBackground))
-            .cornerRadius(12)
-            .shadow(color: Color.black.opacity(0.08), radius: 6, x: 0, y: 3)
+            .background(.ultraThinMaterial)
+            .cornerRadius(16)
+            .overlay(
+                RoundedRectangle(cornerRadius: 16)
+                    .stroke(
+                        LinearGradient(
+                            colors: [.black.opacity(0.7), .clear, .black.opacity(0.3)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        ),
+                        lineWidth: 0.15
+                    )
+            )
+            .shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: 5)
         }
     }
     
     private var logoutSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 12) {
             sectionHeader("Account")
             
             Button(action: {
@@ -221,40 +326,62 @@ struct InfoView: View {
                 HStack {
                     Image(systemName: "rectangle.portrait.and.arrow.right")
                         .font(.system(size: 16))
-                        .frame(width: 24, height: 24)
+                        .foregroundColor(.white)
+                        .frame(width: 32, height: 32)
+                        .background(Color.red.opacity(0.2))
+                        .clipShape(Circle())
                     
                     Text("Sign Out")
                         .font(.subheadline)
+                        .foregroundColor(.white)
                     
                     Spacer()
                     
                     Image(systemName: "chevron.right")
                         .font(.caption)
-                        .foregroundColor(.gray)
+                        .foregroundColor(.white.opacity(0.7))
                 }
                 .padding()
-                .background(Color.primary.opacity(0.05))
-                .cornerRadius(10)
+                .background(.ultraThinMaterial)
+                .cornerRadius(12)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(
+                            LinearGradient(
+                                colors: [.black.opacity(0.7), .clear, .black.opacity(0.3)],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            ),
+                            lineWidth: 0.15
+                        )
+                )
             }
-            .buttonStyle(PlainButtonStyle())
-            .shadow(color: Color.black.opacity(0.08), radius: 4, x: 0, y: 2)
+            .shadow(color: Color.black.opacity(0.2), radius: 8, x: 0, y: 4)
         }
     }
-
+    
     private var fullMapView: some View {
         NavigationStack {
-            Map(position: $position) {
-                Marker(restaurant.name, coordinate: restaurant.location)
-                    .tint(.primary)
+            ZStack {
+                // Background gradient for the map view too
+                backgroundGradient.ignoresSafeArea()
+                
+                Map(position: $position) {
+                    Marker(restaurant.name, coordinate: restaurant.location)
+                        .tint(.primary)
+                }
             }
             .edgesIgnoringSafeArea(.all)
             .navigationTitle(restaurant.name)
             .navigationBarTitleDisplayMode(.inline)
+            .toolbarBackground(.visible, for: .navigationBar)
+            .toolbarBackground(.ultraThinMaterial, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Done") {
                         showingFullMap = false
                     }
+                    .foregroundColor(.white)
                 }
                 
                 ToolbarItem(placement: .bottomBar) {
@@ -263,9 +390,24 @@ struct InfoView: View {
                     } label: {
                         Label("Get Directions", systemImage: "location.fill")
                             .frame(maxWidth: .infinity)
+                            .foregroundColor(.white)
+                            .padding()
+                            .background(.ultraThinMaterial)
+                            .cornerRadius(12)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .stroke(
+                                        LinearGradient(
+                                            colors: [.black.opacity(0.7), .clear, .black.opacity(0.3)],
+                                            startPoint: .topLeading,
+                                            endPoint: .bottomTrailing
+                                        ),
+                                        lineWidth: 0.15
+                                    )
+                            )
+                            .shadow(color: Color.black.opacity(0.2), radius: 8, x: 0, y: 4)
                     }
-                    .buttonStyle(.borderedProminent)
-                    .padding()
+                    .padding(.horizontal)
                 }
             }
         }
@@ -276,8 +418,9 @@ struct InfoView: View {
     private func sectionHeader(_ title: String) -> some View {
         Text(title)
             .font(.headline)
+            .foregroundColor(.white)
             .padding(.vertical, 4)
-            .shadow(color: Color.black.opacity(0.05), radius: 2, x: 0, y: 1)
+            .shadow(color: Color.black.opacity(0.2), radius: 2, x: 0, y: 1)
     }
     
     private func contactButton(icon: String, text: String, action: @escaping () -> Void) -> some View {
@@ -285,23 +428,30 @@ struct InfoView: View {
             HStack {
                 Image(systemName: icon)
                     .font(.system(size: 16))
-                    .frame(width: 24, height: 24)
+                    .foregroundColor(.white)
+                    .frame(width: 32, height: 32)
+                    .background(Color.primary.opacity(0.2))
+                    .clipShape(Circle())
                 
                 Text(text)
                     .font(.subheadline)
+                    .foregroundColor(.white)
                 
                 Spacer()
                 
                 Image(systemName: "chevron.right")
                     .font(.caption)
-                    .foregroundColor(.gray)
+                    .foregroundColor(.white.opacity(0.7))
             }
             .padding()
-            .background(Color.primary.opacity(0.05))
-            .cornerRadius(10)
+            .background(.ultraThinMaterial)
+            .cornerRadius(12)
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(Color.white.opacity(0.2), lineWidth: 0.5)
+            )
         }
-        .buttonStyle(PlainButtonStyle())
-        .shadow(color: Color.black.opacity(0.08), radius: 4, x: 0, y: 2)
+        .shadow(color: Color.black.opacity(0.2), radius: 6, x: 0, y: 3)
     }
     
     // MARK: - Actions
@@ -384,13 +534,17 @@ struct SocialMediaButton: View {
                     .frame(width: 44, height: 44)
                     .background(
                         Circle()
-                            .fill(Color.primary.opacity(0.1))
+                            .fill(.ultraThinMaterial)
                     )
-                    .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
+                    .overlay(
+                        Circle()
+                            .stroke(Color.white.opacity(0.3), lineWidth: 0.5)
+                    )
+                    .shadow(color: Color.black.opacity(0.2), radius: 4, x: 0, y: 2)
                 
                 Text(handle)
                     .font(.caption)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(.white.opacity(0.8))
             }
         }
     }

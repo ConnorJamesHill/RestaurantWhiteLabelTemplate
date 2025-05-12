@@ -2,8 +2,21 @@ import SwiftUI
 
 struct MenuView: View {
     @EnvironmentObject private var restaurant: RestaurantConfiguration
-    
-    // Sample data - in a real app, you'd load this from a database/API
+
+    // Blue gradient background
+    private var backgroundGradient: LinearGradient {
+        LinearGradient(
+            gradient: Gradient(colors: [
+                Color(hex: "1a73e8"),
+                Color(hex: "0d47a1"),
+                Color(hex: "002171"),
+                Color(hex: "002984")
+            ]),
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+    }
+
     @State private var categories = [
         MenuCategory(id: UUID(), name: "Appetizers", items: [
             MenuItem(id: UUID(), name: "Mozzarella Sticks", description: "Crispy, golden-brown mozzarella sticks served with marinara sauce.", price: 8.99, imageName: "mozzarella_sticks"),
@@ -18,18 +31,56 @@ struct MenuView: View {
             MenuItem(id: UUID(), name: "Cheesecake", description: "Creamy New York-style cheesecake with a graham cracker crust.", price: 7.99, imageName: "cheesecake")
         ])
     ]
-    
+
     @State private var selectedCategory: MenuCategory? = nil
     @State private var selectedItem: MenuItem? = nil
     @State private var showingItemDetail = false
-    @State private var showingFullMenu = true  // Set to true by default
-    
-    // Animation state
+    @State private var showingFullMenu = true
+
     @Namespace private var menuAnimation
-    
+
     var body: some View {
         NavigationStack {
-            menuContent
+            ZStack {
+                // Gradient background
+                backgroundGradient.ignoresSafeArea()
+
+                // Decorative blurred circles
+                Circle()
+                    .fill(Color.black.opacity(0.05))
+                    .frame(width: 300, height: 300)
+                    .blur(radius: 30)
+                    .offset(x: -150, y: -100)
+                Circle()
+                    .fill(Color.black.opacity(0.08))
+                    .frame(width: 250, height: 250)
+                    .blur(radius: 20)
+                    .offset(x: 180, y: 400)
+
+                VStack(spacing: 0) {
+                    categoriesScrollView
+                    if showingFullMenu {
+                        fullMenuList
+                    } else {
+                        categoryTitle
+                        menuItemsGrid
+                    }
+                    viewToggleButton
+                }
+                .padding(.top, 8)
+                .padding(.bottom, 8)
+            }
+            .navigationTitle("\(restaurant.name) Menu")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbarBackground(.visible, for: .navigationBar)
+            .toolbarBackground(.ultraThinMaterial, for: .navigationBar)
+            .sheet(isPresented: $showingItemDetail) {
+                if let item = selectedItem {
+                    MenuItemDetailView(item: item)
+                        .background(backgroundGradient.ignoresSafeArea())
+                        .presentationDetents([.medium, .large])
+                }
+            }
         }
         .onAppear {
             if selectedCategory == nil {
@@ -37,37 +88,9 @@ struct MenuView: View {
             }
         }
     }
-    
+
     // MARK: - Content Views
-    
-    private var menuContent: some View {
-        ZStack(alignment: .top) {
-            // Background
-            Color(.systemGroupedBackground).ignoresSafeArea()
-            
-            VStack(spacing: 0) {
-                categoriesScrollView
-                
-                if showingFullMenu {
-                    fullMenuList
-                } else {
-                    categoryTitle
-                    menuItemsGrid
-                }
-                
-                viewToggleButton
-            }
-        }
-        .navigationTitle("\(restaurant.name) Menu")
-        .navigationBarTitleDisplayMode(.inline)
-        .sheet(isPresented: $showingItemDetail) {
-            if let item = selectedItem {
-                MenuItemDetailView(item: item)
-                    .presentationDetents([.medium, .large])
-            }
-        }
-    }
-    
+
     private var categoriesScrollView: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 16) {
@@ -88,24 +111,39 @@ struct MenuView: View {
             .padding(.horizontal)
             .padding(.vertical, 12)
         }
-        .background(Color(.systemBackground))
-        .shadow(radius: 5)
+        .background(.ultraThinMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .stroke(
+                    LinearGradient(
+                        colors: [.black.opacity(0.7), .clear, .black.opacity(0.3)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    lineWidth: 0.15
+                )
+        )
+        .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 5)
+        .padding(.horizontal)
+        .padding(.top, 8)
     }
-    
+
     private var categoryTitle: some View {
         Text(selectedCategory?.name ?? categories.first?.name ?? "Menu")
             .font(.title2)
             .fontWeight(.bold)
+            .foregroundColor(.white)
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.horizontal)
             .padding(.top, 24)
             .padding(.bottom, 8)
     }
-    
+
     private var menuItemsGrid: some View {
         let currentItems = selectedCategory?.items ?? categories.first?.items ?? []
         let categoryId = selectedCategory?.id
-        
+
         return ScrollView {
             LazyVGrid(
                 columns: [GridItem(.adaptive(minimum: 160, maximum: 180), spacing: 16)],
@@ -125,24 +163,50 @@ struct MenuView: View {
             .animation(.spring(response: 0.35), value: categoryId)
         }
     }
-    
+
     private var fullMenuList: some View {
-        List {
-            ForEach(categories) { category in
-                Section(header: Text(category.name).font(.headline)) {
-                    ForEach(category.items) { item in
-                        FullMenuItemRow(item: item)
-                            .onTapGesture {
-                                selectedItem = item
-                                showingItemDetail = true
+        ScrollView {
+            VStack(spacing: 20) {
+                ForEach(categories) { category in
+                    VStack(alignment: .leading, spacing: 0) {
+                        Text(category.name)
+                            .font(.headline)
+                            .foregroundColor(.white)
+                            .padding(.horizontal)
+                            .padding(.top, 8)
+                        VStack(spacing: 12) {
+                            ForEach(category.items) { item in
+                                FullMenuItemRow(item: item)
+                                    .onTapGesture {
+                                        selectedItem = item
+                                        showingItemDetail = true
+                                    }
                             }
+                        }
+                        .padding(.bottom, 8)
                     }
+                    .background(.ultraThinMaterial)
+                    .clipShape(RoundedRectangle(cornerRadius: 16))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 16)
+                            .stroke(
+                                LinearGradient(
+                                    colors: [.black.opacity(0.7), .clear, .black.opacity(0.3)],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                ),
+                                lineWidth: 0.15
+                            )
+                    )
+                    .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 5)
+                    .padding(.horizontal)
                 }
             }
+            .padding(.top, 8)
+            .padding(.bottom, 8)
         }
-        .listStyle(InsetGroupedListStyle())
     }
-    
+
     private var viewToggleButton: some View {
         Button {
             withAnimation(.spring(response: 0.35)) {
@@ -155,78 +219,95 @@ struct MenuView: View {
             }
             .font(.subheadline.bold())
             .foregroundColor(.white)
-            .padding(.vertical, 4)
-            .padding(.horizontal, 4)
-            .background(Color.primary)
+            .padding(.vertical, 8)
+            .padding(.horizontal, 16)
+            .background(.ultraThinMaterial)
             .cornerRadius(12)
-            .shadow(radius: 5)
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(
+                        LinearGradient(
+                            colors: [.black.opacity(0.7), .clear, .black.opacity(0.3)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        ),
+                        lineWidth: 0.15
+                    )
+            )
+            .shadow(color: Color.black.opacity(0.15), radius: 6, x: 0, y: 3)
         }
-        .padding(.bottom, 4)
+        .padding(.bottom, 8)
     }
 }
 
-// Full menu item row for the list view
+// MARK: - Supporting Views
+
 struct FullMenuItemRow: View {
     let item: MenuItem
-    
+
     var body: some View {
         HStack(spacing: 24) {
-            // Image
             Image(item.imageName)
                 .resizable()
                 .scaledToFill()
                 .frame(width: 70, height: 70)
                 .clipShape(RoundedRectangle(cornerRadius: 8))
-                .shadow(radius: 3)
-            
-            // Item details
+                .shadow(color: Color.black.opacity(0.15), radius: 4, x: 0, y: 2)
+
             VStack(alignment: .leading, spacing: 4) {
                 Text(item.name)
                     .font(.headline)
-                
+                    .foregroundColor(.white)
                 Text(item.description)
                     .font(.caption)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(.white.opacity(0.7))
                     .lineLimit(2)
                     .fixedSize(horizontal: false, vertical: true)
             }
-            
+
             Spacer()
-            
-            // Price
+
             Text("$\(String(format: "%.2f", item.price))")
                 .font(.subheadline)
                 .fontWeight(.bold)
+                .foregroundColor(.white)
                 .padding(.leading, 4)
         }
         .padding(.horizontal, 4)
-        .padding(.vertical, 4)
-        .background(Color(.systemBackground))
+        .padding(.vertical, 8)
+        .background(.ultraThinMaterial)
         .cornerRadius(12)
-        .shadow(radius: 5)
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(
+                    LinearGradient(
+                        colors: [.black.opacity(0.7), .clear, .black.opacity(0.3)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    lineWidth: 0.15
+                )
+        )
+        .shadow(color: Color.black.opacity(0.15), radius: 6, x: 0, y: 3)
         .padding(.horizontal, 4)
-        .padding(.vertical, 4)
     }
 }
 
-// Component for category selection buttons
 struct CategoryButton: View {
     let category: MenuCategory
     let isSelected: Bool
     let namespace: Namespace.ID
     let action: () -> Void
-    
+
     var body: some View {
         Button(action: action) {
             VStack(spacing: 6) {
                 Text(category.name)
                     .fontWeight(isSelected ? .bold : .medium)
-                    .foregroundColor(isSelected ? .primary : .secondary)
-                
-                // Indicator line
+                    .foregroundColor(isSelected ? .white : .white.opacity(0.7))
                 if isSelected {
                     Rectangle()
-                        .fill(Color.primary)
+                        .fill(Color.white)
                         .frame(height: 3)
                         .matchedGeometryEffect(id: "categoryIndicator", in: namespace)
                 } else {
@@ -238,26 +319,36 @@ struct CategoryButton: View {
             .padding(.vertical, 8)
             .padding(.horizontal, 2)
         }
+        .background(.ultraThinMaterial)
+        .cornerRadius(8)
+        .shadow(color: Color.black.opacity(0.10), radius: 4, x: 0, y: 2)
     }
 }
 
-// Card view for displaying a menu item
 struct MenuItemCard: View {
     let item: MenuItem
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
-            // Image
             imageWithPriceTag
-            
-            // Info
             itemInfo
         }
-        .background(Color(.systemBackground))
+        .background(.ultraThinMaterial)
         .cornerRadius(16)
-        .shadow(radius: 5)
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .stroke(
+                    LinearGradient(
+                        colors: [.black.opacity(0.7), .clear, .black.opacity(0.3)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    lineWidth: 0.15
+                )
+        )
+        .shadow(color: Color.black.opacity(0.15), radius: 8, x: 0, y: 4)
     }
-    
+
     private var imageWithPriceTag: some View {
         ZStack(alignment: .topTrailing) {
             Image(item.imageName)
@@ -266,37 +357,37 @@ struct MenuItemCard: View {
                 .frame(height: 140)
                 .clipped()
                 .cornerRadius(16)
-            
-            // Price tag
+
             HStack(spacing: 2) {
                 Text("$")
                     .font(.caption.bold())
-                    .foregroundColor(.primary.opacity(0.7))
-                
+                    .foregroundColor(.white.opacity(0.7))
                 Text(String(format: "%.2f", item.price))
                     .font(.system(.body, design: .rounded).bold())
+                    .foregroundColor(.white)
             }
             .padding(.horizontal, 10)
             .padding(.vertical, 6)
-            .background(
-                Capsule()
-                    .fill(Color.white)
-                    .shadow(radius: 3)
+            .background(.ultraThinMaterial)
+            .cornerRadius(16)
+            .overlay(
+                RoundedRectangle(cornerRadius: 16)
+                    .stroke(Color.white.opacity(0.3), lineWidth: 0.5)
             )
             .padding(10)
+            .shadow(color: Color.black.opacity(0.15), radius: 4, x: 0, y: 2)
         }
     }
-    
+
     private var itemInfo: some View {
         VStack(alignment: .leading, spacing: 4) {
             Text(item.name)
                 .font(.headline)
-                .foregroundColor(.primary)
+                .foregroundColor(.white)
                 .lineLimit(1)
-            
             Text(item.description)
                 .font(.caption)
-                .foregroundColor(.secondary)
+                .foregroundColor(.white.opacity(0.7))
                 .lineLimit(2)
                 .fixedSize(horizontal: false, vertical: true)
         }
@@ -305,115 +396,143 @@ struct MenuItemCard: View {
     }
 }
 
-// Detail view for a menu item
 struct MenuItemDetailView: View {
     let item: MenuItem
     @Environment(\.dismiss) private var dismiss
     @State private var quantity = 1
-    
+
+    // Use the same gradient as the main view
+    private var backgroundGradient: LinearGradient {
+        LinearGradient(
+            gradient: Gradient(colors: [
+                Color(hex: "1a73e8"),
+                Color(hex: "0d47a1"),
+                Color(hex: "002171"),
+                Color(hex: "002984")
+            ]),
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+    }
+
     var body: some View {
         NavigationStack {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 20) {
-                    // Hero image
-                    Image(item.imageName)
-                        .resizable()
-                        .scaledToFill()
-                        .frame(height: 250)
-                        .clipped()
-                        .overlay(
-                            LinearGradient(
-                                gradient: Gradient(colors: [.clear, .black.opacity(0.4)]),
-                                startPoint: .top,
-                                endPoint: .bottom
+            ZStack {
+                backgroundGradient.ignoresSafeArea()
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 20) {
+                        Image(item.imageName)
+                            .resizable()
+                            .scaledToFill()
+                            .frame(height: 250)
+                            .clipped()
+                            .overlay(
+                                LinearGradient(
+                                    gradient: Gradient(colors: [.clear, .black.opacity(0.4)]),
+                                    startPoint: .top,
+                                    endPoint: .bottom
+                                )
                             )
-                        )
-                        .overlay(
-                            HStack {
-                                VStack(alignment: .leading, spacing: 4) {
-                                    Text(item.name)
-                                        .font(.title2)
-                                        .fontWeight(.bold)
-                                        .foregroundColor(.white)
-                                    
-                                    Text("$\(String(format: "%.2f", item.price))")
-                                        .font(.headline)
-                                        .foregroundColor(.white.opacity(0.9))
-                                }
-                                
-                                Spacer()
-                            }
-                            .padding(),
-                            alignment: .bottomLeading
-                        )
-                        .shadow(radius: 5)
-                    
-                    // Content
-                    VStack(alignment: .leading, spacing: 16) {
-                        Text("Description")
-                            .font(.headline)
-                        
-                        Text(item.description)
-                            .font(.body)
-                            .foregroundColor(.secondary)
-                            .fixedSize(horizontal: false, vertical: true)
-                        
-                        Divider()
-                        
-                        HStack {
-                            Text("Quantity")
-                                .font(.headline)
-                            
-                            Spacer()
-                            
-                            HStack(spacing: 18) {
-                                Button {
-                                    if quantity > 1 {
-                                        quantity -= 1
+                            .cornerRadius(16)
+                            .shadow(color: Color.black.opacity(0.15), radius: 8, x: 0, y: 4)
+                            .overlay(
+                                HStack {
+                                    VStack(alignment: .leading, spacing: 4) {
+                                        Text(item.name)
+                                            .font(.title2)
+                                            .fontWeight(.bold)
+                                            .foregroundColor(.white)
+                                        Text("$\(String(format: "%.2f", item.price))")
+                                            .font(.headline)
+                                            .foregroundColor(.white.opacity(0.9))
                                     }
-                                } label: {
-                                    Image(systemName: "minus.circle.fill")
-                                        .font(.title3)
-                                        .foregroundColor(quantity > 1 ? .primary : .gray)
+                                    Spacer()
                                 }
-                                .shadow(radius: 2)
-                                
-                                Text("\(quantity)")
-                                    .font(.title3)
-                                    .fontWeight(.semibold)
-                                    .frame(minWidth: 30)
-                                
-                                Button {
-                                    if quantity < 10 {
-                                        quantity += 1
-                                    }
-                                } label: {
-                                    Image(systemName: "plus.circle.fill")
-                                        .font(.title3)
-                                        .foregroundColor(.primary)
-                                }
-                                .shadow(radius: 2)
-                            }
-                        }
-                        
-                        Button {
-                            dismiss()
-                        } label: {
-                            Text("Add to Order - $\(String(format: "%.2f", item.price * Double(quantity)))")
+                                .padding(),
+                                alignment: .bottomLeading
+                            )
+
+                        VStack(alignment: .leading, spacing: 16) {
+                            Text("Description")
                                 .font(.headline)
                                 .foregroundColor(.white)
-                                .frame(maxWidth: .infinity)
-                                .padding()
-                                .background(Color.primary)
-                                .cornerRadius(12)
-                                .shadow(radius: 5)
+                            Text(item.description)
+                                .font(.body)
+                                .foregroundColor(.white.opacity(0.8))
+                                .fixedSize(horizontal: false, vertical: true)
+                            Divider().background(Color.white.opacity(0.2))
+                            HStack {
+                                Text("Quantity")
+                                    .font(.headline)
+                                    .foregroundColor(.white)
+                                Spacer()
+                                HStack(spacing: 18) {
+                                    Button {
+                                        if quantity > 1 { quantity -= 1 }
+                                    } label: {
+                                        Image(systemName: "minus.circle.fill")
+                                            .font(.title3)
+                                            .foregroundColor(quantity > 1 ? .white : .gray)
+                                    }
+                                    .shadow(color: Color.black.opacity(0.1), radius: 2, x: 0, y: 1)
+                                    Text("\(quantity)")
+                                        .font(.title3)
+                                        .fontWeight(.semibold)
+                                        .foregroundColor(.white)
+                                        .frame(minWidth: 30)
+                                    Button {
+                                        if quantity < 10 { quantity += 1 }
+                                    } label: {
+                                        Image(systemName: "plus.circle.fill")
+                                            .font(.title3)
+                                            .foregroundColor(.white)
+                                    }
+                                    .shadow(color: Color.black.opacity(0.1), radius: 2, x: 0, y: 1)
+                                }
+                            }
+                            Button {
+                                dismiss()
+                            } label: {
+                                Text("Add to Order - $\(String(format: "%.2f", item.price * Double(quantity)))")
+                                    .font(.headline)
+                                    .foregroundColor(.white)
+                                    .frame(maxWidth: .infinity)
+                                    .padding()
+                                    .background(.ultraThinMaterial)
+                                    .cornerRadius(12)
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 12)
+                                            .stroke(
+                                                LinearGradient(
+                                                    colors: [.black.opacity(0.7), .clear, .black.opacity(0.3)],
+                                                    startPoint: .topLeading,
+                                                    endPoint: .bottomTrailing
+                                                ),
+                                                lineWidth: 0.15
+                                            )
+                                    )
+                                    .shadow(color: Color.black.opacity(0.15), radius: 6, x: 0, y: 3)
+                            }
+                            .padding(.top, 16)
                         }
-                        .padding(.top, 16)
+                        .padding()
+                        .background(.ultraThinMaterial)
+                        .cornerRadius(16)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 16)
+                                .stroke(
+                                    LinearGradient(
+                                        colors: [.black.opacity(0.7), .clear, .black.opacity(0.3)],
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing
+                                    ),
+                                    lineWidth: 0.15
+                                )
+                        )
+                        .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 5)
                     }
-                    .padding()
                 }
             }
-            .ignoresSafeArea(edges: .top)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
@@ -421,17 +540,10 @@ struct MenuItemDetailView: View {
                         Image(systemName: "xmark.circle.fill")
                             .font(.title3)
                             .foregroundColor(.white)
-                            .shadow(radius: 2)
+                            .shadow(color: Color.black.opacity(0.2), radius: 2, x: 0, y: 1)
                     }
                 }
             }
         }
-    }
-}
-
-// Make MenuCategory conform to Equatable
-extension MenuCategory: Equatable {
-    static func == (lhs: MenuCategory, rhs: MenuCategory) -> Bool {
-        return lhs.id == rhs.id
     }
 }

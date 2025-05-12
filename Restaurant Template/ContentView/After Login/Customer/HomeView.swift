@@ -3,6 +3,20 @@ import SwiftUI
 struct HomeView: View {
     @EnvironmentObject private var restaurant: RestaurantConfiguration
     
+    // Enhanced blue gradient background
+    private var backgroundGradient: LinearGradient {
+        LinearGradient(
+            gradient: Gradient(colors: [
+                Color(hex: "1a73e8"), // Vibrant blue
+                Color(hex: "0d47a1"), // Deep blue
+                Color(hex: "002171"), // Dark blue
+                Color(hex: "002984")  // Navy blue
+            ]),
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+    }
+    
     let featuredItems = [
         FeaturedItem(
             id: UUID(),
@@ -46,27 +60,46 @@ struct HomeView: View {
     
     var body: some View {
         NavigationStack {
-            ScrollView {
-                VStack(spacing: 24) {
-                    // Hero image and restaurant info
-                    heroSection
-                    
-                    // Quick action buttons
-                    actionButtonsSection
-                    
-                    // Featured items
-                    featuredItemsSection
-                    
-                    // Events
-                    eventsSection
-                    
-                    // Welcome message
-                    welcomeSection
-                    
-                    // Today's hours
-                    todayHoursSection
+            ZStack {
+                // Background gradient
+                backgroundGradient
+                    .ignoresSafeArea()
+                
+                // Decorative elements
+                Circle()
+                    .fill(Color.black.opacity(0.05))
+                    .frame(width: 300, height: 300)
+                    .blur(radius: 30)
+                    .offset(x: -150, y: -100)
+                
+                Circle()
+                    .fill(Color.black.opacity(0.08))
+                    .frame(width: 250, height: 250)
+                    .blur(radius: 20)
+                    .offset(x: 180, y: 400)
+                
+                ScrollView {
+                    VStack(spacing: 24) {
+                        // Hero image and restaurant info
+                        heroSection
+                        
+                        // Quick action buttons
+                        actionButtonsSection
+                        
+                        // Featured items
+                        featuredItemsSection
+                        
+                        // Events
+                        eventsSection
+                        
+                        // Welcome message
+                        welcomeSection
+                        
+                        // Today's hours
+                        todayHoursSection
+                    }
+                    .padding()
                 }
-                .padding(.bottom, 16)
             }
             .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
@@ -75,12 +108,15 @@ struct HomeView: View {
                     VStack {
                         Text(restaurant.name)
                             .font(.headline)
+                            .foregroundColor(.white)
                         Text(restaurant.tagline)
                             .font(.caption)
-                            .foregroundColor(.secondary)
+                            .foregroundColor(.white.opacity(0.7))
                     }
                 }
             }
+            .toolbarBackground(.visible, for: .navigationBar)
+            .toolbarBackground(.ultraThinMaterial, for: .navigationBar)
         }
     }
     
@@ -94,18 +130,17 @@ struct HomeView: View {
                 .scaledToFill()
                 .frame(height: 280)
                 .clipped()
-                .shadow(color: Color.black.opacity(0.15), radius: 8, x: 0, y: 4)
-            
-            // Gradient overlay
-            LinearGradient(
-                gradient: Gradient(colors: [.clear, .black.opacity(0.7)]),
-                startPoint: .top,
-                endPoint: .bottom
-            )
-            .frame(height: 120)
+                .overlay(
+                    LinearGradient(
+                        gradient: Gradient(colors: [.clear, .black.opacity(0.7)]),
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                )
+                .cornerRadius(16)
+                .shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: 5)
         }
-        .ignoresSafeArea(edges: .top)
-        .shadow(color: Color.black.opacity(0.1), radius: 6, x: 0, y: 4)
+        .padding(.horizontal)
     }
     
     private var actionButtonsSection: some View {
@@ -118,8 +153,11 @@ struct HomeView: View {
     }
     
     private var featuredItemsSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            SectionTitle(title: "Featured Items")
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Featured Items")
+                .font(.headline)
+                .foregroundColor(.white)
+                .padding(.horizontal)
             
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 16) {
@@ -131,14 +169,16 @@ struct HomeView: View {
                     }
                 }
                 .padding(.horizontal)
-                .padding(.bottom, 4)
             }
         }
     }
     
     private var eventsSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            SectionTitle(title: "Upcoming Events")
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Upcoming Events")
+                .font(.headline)
+                .foregroundColor(.white)
+                .padding(.horizontal)
             
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 16) {
@@ -147,78 +187,94 @@ struct HomeView: View {
                     }
                 }
                 .padding(.horizontal)
-                .padding(.bottom, 4)
             }
         }
     }
     
     private var welcomeSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            SectionTitle(title: "About Us")
+        VStack(alignment: .leading, spacing: 16) {
+            Text("About Us")
+                .font(.headline)
+                .foregroundColor(.white)
+                .padding(.horizontal)
             
             Text(restaurant.welcomeMessage)
                 .font(.body)
-                .foregroundColor(.secondary)
+                .foregroundColor(.white.opacity(0.9))
                 .fixedSize(horizontal: false, vertical: true)
                 .padding()
-                .background(Color(.systemBackground))
-                .cornerRadius(12)
-                .shadow(color: Color.black.opacity(0.08), radius: 6, x: 0, y: 3)
+                .background(.ultraThinMaterial)
+                .cornerRadius(16)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 16)
+                        .stroke(
+                            LinearGradient(
+                                colors: [.black.opacity(0.7), .clear, .black.opacity(0.3)],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            ),
+                            lineWidth: 0.15
+                        )
+                )
+                .shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: 5)
             
             NavigationLink(destination: InfoView()) {
                 Text("Learn More")
                     .font(.subheadline)
                     .foregroundColor(.white)
-                    .padding(.vertical, 8)
-                    .padding(.horizontal, 16)
+                    .padding(.vertical, 12)
+                    .padding(.horizontal, 24)
                     .background(Color.primary)
-                    .cornerRadius(8)
-                    .shadow(color: Color.black.opacity(0.15), radius: 8, x: 0, y: 4)
+                    .cornerRadius(12)
+                    .shadow(color: Color.black.opacity(0.2), radius: 8, x: 0, y: 4)
             }
             .padding(.leading)
         }
     }
     
     private var todayHoursSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            SectionTitle(title: "Today's Hours")
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Today's Hours")
+                .font(.headline)
+                .foregroundColor(.white)
+                .padding(.horizontal)
             
             HStack {
                 Image(systemName: "clock")
-                    .foregroundColor(.primary)
+                    .foregroundColor(.white)
                 
                 Text("Open today: \(restaurant.todayHours)")
                     .font(.subheadline)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(.white.opacity(0.9))
                 
                 Spacer()
                 
                 NavigationLink(destination: InfoView()) {
                     Text("Full Hours")
                         .font(.subheadline)
-                        .foregroundColor(.primary)
+                        .foregroundColor(.white)
                 }
             }
             .padding()
-            .background(Color(.systemBackground))
-            .cornerRadius(12)
-            .shadow(color: Color.black.opacity(0.08), radius: 6, x: 0, y: 3)
+            .background(.ultraThinMaterial)
+            .cornerRadius(16)
+            .overlay(
+                RoundedRectangle(cornerRadius: 16)
+                    .stroke(
+                        LinearGradient(
+                            colors: [.black.opacity(0.7), .clear, .black.opacity(0.3)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        ),
+                        lineWidth: 0.15
+                    )
+            )
+            .shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: 5)
         }
     }
 }
 
 // MARK: - Supporting Views
-
-struct SectionTitle: View {
-    let title: String
-    
-    var body: some View {
-        Text(title)
-            .font(.title3)
-            .fontWeight(.bold)
-            .padding(.horizontal)
-    }
-}
 
 struct ActionButton: View {
     let title: String
@@ -230,17 +286,28 @@ struct ActionButton: View {
             VStack(spacing: 8) {
                 Image(systemName: iconName)
                     .font(.system(size: 24))
-                    .foregroundColor(.primary)
+                    .foregroundColor(.white)
                 
                 Text(title)
                     .font(.callout)
-                    .foregroundColor(.primary)
+                    .foregroundColor(.white)
             }
             .frame(maxWidth: .infinity)
             .padding(.vertical, 16)
-            .background(Color(.systemBackground))
-            .cornerRadius(12)
-            .shadow(color: Color.black.opacity(0.12), radius: 8, x: 0, y: 4)
+            .background(.ultraThinMaterial)
+            .cornerRadius(16)
+            .overlay(
+                RoundedRectangle(cornerRadius: 16)
+                    .stroke(
+                        LinearGradient(
+                            colors: [.black.opacity(0.7), .clear, .black.opacity(0.3)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        ),
+                        lineWidth: 0.15
+                    )
+            )
+            .shadow(color: Color.black.opacity(0.2), radius: 8, x: 0, y: 4)
         }
     }
 }
@@ -259,18 +326,19 @@ struct FeaturedItemCard: View {
                 .cornerRadius(12)
                 .overlay(
                     RoundedRectangle(cornerRadius: 12)
-                        .stroke(Color.gray.opacity(0.2), lineWidth: 1)
+                        .stroke(Color.white.opacity(0.2), lineWidth: 1)
                 )
-                .shadow(color: Color.black.opacity(0.1), radius: 6, x: 0, y: 3)
+                .shadow(color: Color.black.opacity(0.2), radius: 6, x: 0, y: 3)
             
             // Title and description
             Text(item.name)
                 .font(.headline)
+                .foregroundColor(.white)
                 .lineLimit(1)
             
             Text(item.description)
                 .font(.caption)
-                .foregroundColor(.secondary)
+                .foregroundColor(.white.opacity(0.7))
                 .lineLimit(2)
                 .frame(height: 36)
             
@@ -278,12 +346,24 @@ struct FeaturedItemCard: View {
             Text("$\(String(format: "%.2f", item.price))")
                 .font(.subheadline)
                 .fontWeight(.semibold)
+                .foregroundColor(.white)
         }
         .frame(width: 200)
         .padding(12)
-        .background(Color(.systemBackground))
-        .cornerRadius(12)
-        .shadow(color: Color.black.opacity(0.08), radius: 5, x: 0, y: 2)
+        .background(.ultraThinMaterial)
+        .cornerRadius(16)
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .stroke(
+                    LinearGradient(
+                        colors: [.black.opacity(0.7), .clear, .black.opacity(0.3)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    lineWidth: 0.15
+                )
+        )
+        .shadow(color: Color.black.opacity(0.2), radius: 8, x: 0, y: 4)
     }
 }
 
@@ -307,38 +387,54 @@ struct EventCard: View {
                     .cornerRadius(12)
                     .overlay(
                         RoundedRectangle(cornerRadius: 12)
-                            .stroke(Color.gray.opacity(0.2), lineWidth: 1)
+                            .stroke(Color.white.opacity(0.2), lineWidth: 1)
                     )
-                    .shadow(color: Color.black.opacity(0.1), radius: 6, x: 0, y: 3)
+                    .shadow(color: Color.black.opacity(0.2), radius: 6, x: 0, y: 3)
                 
                 // Date bubble
                 Text(dateFormatter.string(from: event.date))
                     .font(.caption)
                     .fontWeight(.bold)
+                    .foregroundColor(.white)
                     .padding(.horizontal, 12)
                     .padding(.vertical, 6)
-                    .background(Color.primary)
-                    .foregroundColor(.white)
+                    .background(.ultraThinMaterial)
                     .cornerRadius(16)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 16)
+                            .stroke(Color.white.opacity(0.3), lineWidth: 0.5)
+                    )
                     .padding(12)
-                    .shadow(color: Color.black.opacity(0.15), radius: 4, x: 0, y: 2)
+                    .shadow(color: Color.black.opacity(0.2), radius: 4, x: 0, y: 2)
             }
             
             // Title and description
             Text(event.title)
                 .font(.headline)
+                .foregroundColor(.white)
                 .lineLimit(1)
             
             Text(event.description)
                 .font(.caption)
-                .foregroundColor(.secondary)
+                .foregroundColor(.white.opacity(0.7))
                 .lineLimit(2)
                 .frame(height: 36)
         }
         .frame(width: 260)
         .padding(12)
-        .background(Color(.systemBackground))
-        .cornerRadius(12)
-        .shadow(color: Color.black.opacity(0.08), radius: 5, x: 0, y: 2)
+        .background(.ultraThinMaterial)
+        .cornerRadius(16)
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .stroke(
+                    LinearGradient(
+                        colors: [.black.opacity(0.7), .clear, .black.opacity(0.3)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    lineWidth: 0.15
+                )
+        )
+        .shadow(color: Color.black.opacity(0.2), radius: 8, x: 0, y: 4)
     }
 }
