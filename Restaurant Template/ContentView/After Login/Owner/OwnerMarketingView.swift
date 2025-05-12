@@ -80,7 +80,7 @@ struct OwnerMarketingView: View {
                             .cornerRadius(8)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 8)
-                                    .stroke(Color.white.opacity(0.3), lineWidth: 0.15)
+                                    .stroke(Color.black.opacity(0.3), lineWidth: 0.15)
                             )
                     }
                 }
@@ -128,7 +128,7 @@ struct OwnerMarketingView: View {
             RoundedRectangle(cornerRadius: 16)
                 .stroke(
                     LinearGradient(
-                        colors: [.white.opacity(0.6), .clear],
+                        colors: [.black.opacity(0.6), .clear],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     ),
@@ -186,9 +186,9 @@ struct OwnerMarketingView: View {
                 .cornerRadius(10)
                 .overlay(
                     RoundedRectangle(cornerRadius: 10)
-                        .stroke(Color.white.opacity(0.3), lineWidth: 0.15)
+                        .stroke(Color.black.opacity(0.3), lineWidth: 0.15)
                 )
-                .shadow(color: Color.white.opacity(0.1), radius: 2, x: 0, y: 1)
+                .shadow(color: Color.black.opacity(0.1), radius: 2, x: 0, y: 1)
             }
             .padding(.top, 8)
         }
@@ -199,7 +199,7 @@ struct OwnerMarketingView: View {
             RoundedRectangle(cornerRadius: 16)
                 .stroke(
                     LinearGradient(
-                        colors: [.white.opacity(0.7), .clear, .white.opacity(0.3)],
+                        colors: [.black.opacity(0.7), .clear, .black.opacity(0.3)],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     ),
@@ -244,7 +244,7 @@ struct OwnerMarketingView: View {
             RoundedRectangle(cornerRadius: 16)
                 .stroke(
                     LinearGradient(
-                        colors: [.white.opacity(0.7), .clear, .white.opacity(0.3)],
+                        colors: [.black.opacity(0.7), .clear, .black.opacity(0.3)],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     ),
@@ -285,7 +285,7 @@ struct OwnerMarketingView: View {
             RoundedRectangle(cornerRadius: 16)
                 .stroke(
                     LinearGradient(
-                        colors: [.white.opacity(0.7), .clear, .white.opacity(0.3)],
+                        colors: [.black.opacity(0.7), .clear, .black.opacity(0.3)],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     ),
@@ -357,7 +357,7 @@ struct OwnerMarketingView: View {
                 RoundedRectangle(cornerRadius: 12)
                     .stroke(
                         LinearGradient(
-                            colors: [.white.opacity(0.6), .clear],
+                            colors: [.black.opacity(0.6), .clear],
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
                         ),
@@ -402,7 +402,7 @@ struct OwnerMarketingView: View {
                 RoundedRectangle(cornerRadius: 12)
                     .stroke(
                         LinearGradient(
-                            colors: [.white.opacity(0.6), .clear],
+                            colors: [.black.opacity(0.6), .clear],
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
                         ),
@@ -456,7 +456,7 @@ struct OwnerMarketingView: View {
                 RoundedRectangle(cornerRadius: 12)
                     .stroke(
                         LinearGradient(
-                            colors: [.white.opacity(0.6), .clear],
+                            colors: [.black.opacity(0.6), .clear],
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
                         ),

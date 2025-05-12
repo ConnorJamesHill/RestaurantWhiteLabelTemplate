@@ -69,7 +69,7 @@ struct OwnerMenuView: View {
                             .cornerRadius(8)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 8)
-                                    .stroke(Color.white.opacity(0.3), lineWidth: 0.15)
+                                    .stroke(Color.black.opacity(0.3), lineWidth: 0.15)
                             )
                     }
                 }
@@ -116,7 +116,7 @@ struct OwnerMenuView: View {
                         RoundedRectangle(cornerRadius: 10)
                             .stroke(
                                 LinearGradient(
-                                    colors: [.white.opacity(0.6), .clear],
+                                    colors: [.black.opacity(0.6), .clear],
                                     startPoint: .topLeading,
                                     endPoint: .bottomTrailing
                                 ),
@@ -145,7 +145,7 @@ struct OwnerMenuView: View {
                     RoundedRectangle(cornerRadius: 10)
                         .stroke(
                             LinearGradient(
-                                colors: [.white.opacity(0.6), .clear],
+                                colors: [.black.opacity(0.6), .clear],
                                 startPoint: .topLeading,
                                 endPoint: .bottomTrailing
                             ),
@@ -164,7 +164,7 @@ struct OwnerMenuView: View {
             RoundedRectangle(cornerRadius: 16)
                 .stroke(
                     LinearGradient(
-                        colors: [.white.opacity(0.7), .clear, .white.opacity(0.3)],
+                        colors: [.black.opacity(0.7), .clear, .black.opacity(0.3)],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     ),
@@ -217,7 +217,7 @@ struct OwnerMenuView: View {
                         RoundedRectangle(cornerRadius: 10)
                             .stroke(
                                 LinearGradient(
-                                    colors: [.white.opacity(0.6), .clear],
+                                    colors: [.black.opacity(0.6), .clear],
                                     startPoint: .topLeading,
                                     endPoint: .bottomTrailing
                                 ),
@@ -246,7 +246,7 @@ struct OwnerMenuView: View {
                     RoundedRectangle(cornerRadius: 10)
                         .stroke(
                             LinearGradient(
-                                colors: [.white.opacity(0.6), .clear],
+                                colors: [.black.opacity(0.6), .clear],
                                 startPoint: .topLeading,
                                 endPoint: .bottomTrailing
                             ),
@@ -265,7 +265,7 @@ struct OwnerMenuView: View {
             RoundedRectangle(cornerRadius: 16)
                 .stroke(
                     LinearGradient(
-                        colors: [.white.opacity(0.7), .clear, .white.opacity(0.3)],
+                        colors: [.black.opacity(0.7), .clear, .black.opacity(0.3)],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     ),
@@ -317,7 +317,7 @@ struct OwnerMenuView: View {
                     RoundedRectangle(cornerRadius: 10)
                         .stroke(
                             LinearGradient(
-                                colors: [.white.opacity(0.6), .clear],
+                                colors: [.black.opacity(0.6), .clear],
                                 startPoint: .topLeading,
                                 endPoint: .bottomTrailing
                             ),
@@ -351,7 +351,7 @@ struct OwnerMenuView: View {
             RoundedRectangle(cornerRadius: 16)
                 .stroke(
                     LinearGradient(
-                        colors: [.white.opacity(0.7), .clear, .white.opacity(0.3)],
+                        colors: [.black.opacity(0.7), .clear, .black.opacity(0.3)],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     ),
