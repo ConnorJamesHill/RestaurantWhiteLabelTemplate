@@ -76,7 +76,7 @@ struct OwnerMarketingView: View {
                             .foregroundColor(.white)
                             .padding(.horizontal, 12)
                             .padding(.vertical, 6)
-                            .background(.regularMaterial)
+                            .background(.ultraThinMaterial)
                             .cornerRadius(8)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 8)

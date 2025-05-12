@@ -103,7 +103,7 @@ struct InfoView: View {
                 .clipShape(Circle())
                 .overlay(
                     Circle()
-                        .stroke(Color.white.opacity(0.3), lineWidth: 2)
+                        .stroke(Color.black.opacity(0.3), lineWidth: 2)
                 )
                 .shadow(color: Color.black.opacity(0.2), radius: 8, x: 0, y: 4)
             
@@ -212,7 +212,7 @@ struct InfoView: View {
             .clipShape(RoundedRectangle(cornerRadius: 12))
             .overlay(
                 RoundedRectangle(cornerRadius: 12)
-                    .stroke(Color.white.opacity(0.3), lineWidth: 1)
+                    .stroke(Color.white.opacity(0.3), lineWidth: 0.15)
             )
             .shadow(color: Color.black.opacity(0.2), radius: 8, x: 0, y: 4)
             .onTapGesture {
@@ -448,7 +448,7 @@ struct InfoView: View {
             .cornerRadius(12)
             .overlay(
                 RoundedRectangle(cornerRadius: 12)
-                    .stroke(Color.white.opacity(0.2), lineWidth: 0.5)
+                    .stroke(Color.white.opacity(0.2), lineWidth: 0.15)
             )
         }
         .shadow(color: Color.black.opacity(0.2), radius: 6, x: 0, y: 3)
@@ -538,7 +538,7 @@ struct SocialMediaButton: View {
                     )
                     .overlay(
                         Circle()
-                            .stroke(Color.white.opacity(0.3), lineWidth: 0.5)
+                            .stroke(Color.white.opacity(0.3), lineWidth: 0.15)
                     )
                     .shadow(color: Color.black.opacity(0.2), radius: 4, x: 0, y: 2)
                 

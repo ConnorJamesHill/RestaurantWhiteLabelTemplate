@@ -13,6 +13,21 @@ struct ReservationView: View {
     // UI state
     @State private var showingConfirmation = false
     @State private var isSubmitting = false
+    @Environment(\.colorScheme) private var colorScheme
+    
+    // Enhanced blue gradient background - same as OwnerAnalyticsView
+    private var backgroundGradient: LinearGradient {
+        LinearGradient(
+            gradient: Gradient(colors: [
+                Color(hex: "1a73e8"), // Vibrant blue
+                Color(hex: "0d47a1"), // Deep blue
+                Color(hex: "002171"), // Dark blue
+                Color(hex: "002984")  // Navy blue
+            ]),
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+    }
     
     // Available time slots
     let availableTimes = stride(from: 11, to: 22, by: 0.5).map { hour -> Date in
@@ -22,102 +37,174 @@ struct ReservationView: View {
     
     var body: some View {
         NavigationStack {
-            ScrollView {
-                VStack(spacing: 24) {
-                    // Date & Time Section
-                    VStack(alignment: .leading, spacing: 16) {
-                        sectionHeader("Date & Time")
-                        
-                        DatePicker("Date", selection: $date, in: Date()..., displayedComponents: .date)
-                            .datePickerStyle(.graphical)
-                        
-                        HStack {
-                            Text("Time")
-                            Spacer()
-                            Picker("Time", selection: $time) {
-                                ForEach(availableTimes, id: \.self) { time in
-                                    Text(time, style: .time)
+            ZStack {
+                // Background gradient
+                backgroundGradient
+                    .ignoresSafeArea()
+                
+                // Decorative elements - using black instead of white
+                Circle()
+                    .fill(Color.black.opacity(0.05))
+                    .frame(width: 300, height: 300)
+                    .blur(radius: 30)
+                    .offset(x: -150, y: -100)
+                
+                Circle()
+                    .fill(Color.black.opacity(0.08))
+                    .frame(width: 250, height: 250)
+                    .blur(radius: 20)
+                    .offset(x: 180, y: 400)
+                
+                ScrollView {
+                    VStack(spacing: 24) {
+                        // Date & Time Section
+                        VStack(alignment: .leading, spacing: 16) {
+                            sectionHeader("Date & Time")
+                            
+                            DatePicker("Date", selection: $date, in: Date()..., displayedComponents: .date)
+                                .datePickerStyle(GraphicalDatePickerStyle())
+                                .padding()
+                                .colorScheme(.dark) // Better visualization on dark background
+                                .accentColor(.white)
+                            
+                            HStack {
+                                Text("Time")
+                                    .foregroundColor(.white)
+                                Spacer()
+                                Picker("Time", selection: $time) {
+                                    ForEach(availableTimes, id: \.self) { time in
+                                        Text(time, style: .time)
+                                    }
                                 }
+                                .pickerStyle(.menu)
+                                .accentColor(.white)
+                                .foregroundColor(.white)
                             }
-                            .pickerStyle(.menu)
-                            .shadow(radius: 3)
+                            
+                            HStack {
+                                Text("Party Size: \(partySize) \(partySize == 1 ? "person" : "people")")
+                                    .foregroundColor(.white)
+                                Spacer()
+                                Stepper("", value: $partySize, in: 1...20)
+                                    .colorScheme(.dark)
+                                    .accentColor(.white)
+                                    .foregroundColor(.white)
+                            }
                         }
+                        .padding()
+                        .background(.ultraThinMaterial)
+                        .clipShape(RoundedRectangle(cornerRadius: 16))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 16)
+                                .stroke(
+                                    LinearGradient(
+                                        colors: [.black.opacity(0.7), .clear, .black.opacity(0.3)],
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing
+                                    ),
+                                    lineWidth: 0.15
+                                )
+                        )
+                        .shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: 5)
                         
-                        HStack {
-                            Text("Party Size: \(partySize) \(partySize == 1 ? "person" : "people")")
-                            Spacer()
-                            Stepper("", value: $partySize, in: 1...20)
-                                .shadow(radius: 3)
+                        // Contact Information Section
+                        VStack(alignment: .leading, spacing: 16) {
+                            sectionHeader("Contact Information")
+                            
+                            TextField("Name", text: $name)
+                                .textContentType(.name)
+                                .textFieldStyle(RoundedBorderTextFieldStyle())
+                            
+                            TextField("Email", text: $email)
+                                .textContentType(.emailAddress)
+                                .keyboardType(.emailAddress)
+                                .autocapitalization(.none)
+                                .textFieldStyle(RoundedBorderTextFieldStyle())
+                            
+                            TextField("Phone Number", text: $phoneNumber)
+                                .textContentType(.telephoneNumber)
+                                .keyboardType(.phonePad)
+                                .textFieldStyle(RoundedBorderTextFieldStyle())
                         }
-                    }
-                    .padding()
-                    .background(Color(.systemBackground))
-                    .cornerRadius(16)
-                    .shadow(radius: 5)
-                    
-                    // Contact Information Section
-                    VStack(alignment: .leading, spacing: 16) {
-                        sectionHeader("Contact Information")
+                        .padding()
+                        .background(.ultraThinMaterial)
+                        .clipShape(RoundedRectangle(cornerRadius: 16))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 16)
+                                .stroke(
+                                    LinearGradient(
+                                        colors: [.black.opacity(0.7), .clear, .black.opacity(0.3)],
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing
+                                    ),
+                                    lineWidth: 0.15
+                                )
+                        )
+                        .shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: 5)
                         
-                        TextField("Name", text: $name)
-                            .textContentType(.name)
-                            .textFieldStyle(RoundedBorderTextFieldStyle())
-                            .shadow(radius: 2)
-                        
-                        TextField("Email", text: $email)
-                            .textContentType(.emailAddress)
-                            .keyboardType(.emailAddress)
-                            .autocapitalization(.none)
-                            .textFieldStyle(RoundedBorderTextFieldStyle())
-                            .shadow(radius: 2)
-                        
-                        TextField("Phone Number", text: $phoneNumber)
-                            .textContentType(.telephoneNumber)
-                            .keyboardType(.phonePad)
-                            .textFieldStyle(RoundedBorderTextFieldStyle())
-                            .shadow(radius: 2)
-                    }
-                    .padding()
-                    .background(Color(.systemBackground))
-                    .cornerRadius(16)
-                    .shadow(radius: 5)
-                    
-                    // Special Requests Section
-                    VStack(alignment: .leading, spacing: 16) {
-                        sectionHeader("Special Requests (Optional)")
-                        
-                        TextEditor(text: $specialRequests)
-                            .frame(minHeight: 100)
-                    }
-                    .padding()
-                    .background(Color(.systemBackground))
-                    .cornerRadius(16)
-                    .shadow(radius: 5)
-                    
-                    // Reserve Button
-                    Button {
-                        submitReservation()
-                    } label: {
-                        if isSubmitting {
-                            ProgressView()
-                                .progressViewStyle(CircularProgressViewStyle())
-                        } else {
-                            Text("Reserve Table")
-                                .frame(maxWidth: .infinity)
-                                .bold()
+                        // Special Requests Section
+                        VStack(alignment: .leading, spacing: 16) {
+                            sectionHeader("Special Requests (Optional)")
+                            
+                            TextEditor(text: $specialRequests)
+                                .frame(minHeight: 100)
+                                .background(Color.white.opacity(0.8))
+                                .cornerRadius(8)
                         }
+                        .padding()
+                        .background(.ultraThinMaterial)
+                        .clipShape(RoundedRectangle(cornerRadius: 16))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 16)
+                                .stroke(
+                                    LinearGradient(
+                                        colors: [.black.opacity(0.7), .clear, .black.opacity(0.3)],
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing
+                                    ),
+                                    lineWidth: 0.15
+                                )
+                        )
+                        .shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: 5)
+                        
+                        // Reserve Button
+                        Button {
+                            submitReservation()
+                        } label: {
+                            if isSubmitting {
+                                ProgressView()
+                                    .progressViewStyle(CircularProgressViewStyle())
+                            } else {
+                                Text("Reserve Table")
+                                    .frame(maxWidth: .infinity)
+                                    .bold()
+                            }
+                        }
+                        .disabled(isSubmitting || !isFormValid)
+                        .padding()
+                        .background(isFormValid ? Color.white.opacity(0.2) : Color.gray.opacity(0.3))
+                        .foregroundColor(.white)
+                        .cornerRadius(16)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 16)
+                                .stroke(
+                                    LinearGradient(
+                                        colors: [.black.opacity(0.7), .clear, .black.opacity(0.3)],
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing
+                                    ),
+                                    lineWidth: 0.5
+                                )
+                        )
+                        .shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: 5)
                     }
-                    .disabled(isSubmitting || !isFormValid)
                     .padding()
-                    .background(isFormValid ? Color.primary : Color.gray.opacity(0.3))
-                    .foregroundColor(.white)
-                    .cornerRadius(16)
-//                    .shadow(radius: 5)
                 }
-                .padding()
             }
-            .background(Color(.systemGroupedBackground))
             .navigationTitle("Reservation")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbarBackground(.visible, for: .navigationBar)
+            .toolbarBackground(.ultraThinMaterial, for: .navigationBar)
             .sheet(isPresented: $showingConfirmation) {
                 reservationConfirmationView
             }
@@ -127,7 +214,7 @@ struct ReservationView: View {
     private func sectionHeader(_ title: String) -> some View {
         Text(title)
             .font(.headline)
-            .foregroundColor(.primary)
+            .foregroundColor(.white)
     }
     
     private var isFormValid: Bool {
@@ -154,9 +241,20 @@ struct ReservationView: View {
                 reservationDetailRow(icon: "person.3.fill", label: "Party", value: "\(partySize) \(partySize == 1 ? "person" : "people")")
             }
             .padding()
-            .background(Color(.systemBackground))
-            .cornerRadius(16)
-            .shadow(radius: 5)
+            .background(.ultraThinMaterial)
+            .clipShape(RoundedRectangle(cornerRadius: 16))
+            .overlay(
+                RoundedRectangle(cornerRadius: 16)
+                    .stroke(
+                        LinearGradient(
+                            colors: [.black.opacity(0.7), .clear, .black.opacity(0.3)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        ),
+                        lineWidth: 0.15
+                    )
+            )
+            .shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: 5)
             
             Spacer()
             
@@ -169,28 +267,29 @@ struct ReservationView: View {
                     .foregroundColor(.white)
                     .frame(maxWidth: .infinity)
                     .padding()
-                    .background(Color.primary)
+                    .background(Color.blue)
                     .cornerRadius(12)
                     .padding(.horizontal)
                     .shadow(radius: 5)
             }
             .padding(.bottom, 40)
         }
+        .background(backgroundGradient.ignoresSafeArea())
     }
     
     private func reservationDetailRow(icon: String, label: String, value: String) -> some View {
         HStack(spacing: 12) {
             Image(systemName: icon)
                 .frame(width: 24, height: 24)
-                .foregroundColor(.primary)
-                .shadow(radius: 2)
+                .foregroundColor(.white)
             
             VStack(alignment: .leading) {
                 Text(label)
                     .font(.caption)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(.white.opacity(0.7))
                 Text(value)
                     .font(.body)
+                    .foregroundColor(.white)
             }
         }
     }
