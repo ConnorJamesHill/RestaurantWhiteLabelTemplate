@@ -69,7 +69,7 @@ struct OwnerMenuView: View {
                             .cornerRadius(8)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 8)
-                                    .stroke(Color.white.opacity(0.3), lineWidth: 1)
+                                    .stroke(Color.white.opacity(0.3), lineWidth: 0.15)
                             )
                     }
                 }
@@ -120,7 +120,7 @@ struct OwnerMenuView: View {
                                     startPoint: .topLeading,
                                     endPoint: .bottomTrailing
                                 ),
-                                lineWidth: 0.5
+                                lineWidth: 0.15
                             )
                     )
                     .shadow(color: Color.black.opacity(0.05), radius: 3, x: 0, y: 2)
@@ -149,7 +149,7 @@ struct OwnerMenuView: View {
                                 startPoint: .topLeading,
                                 endPoint: .bottomTrailing
                             ),
-                            lineWidth: 0.5
+                            lineWidth: 0.15
                         )
                 )
                 .shadow(color: Color.black.opacity(0.05), radius: 2, x: 0, y: 1)
@@ -168,7 +168,7 @@ struct OwnerMenuView: View {
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     ),
-                    lineWidth: 1
+                    lineWidth: 0.15
                 )
         )
         .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 5)
@@ -221,7 +221,7 @@ struct OwnerMenuView: View {
                                     startPoint: .topLeading,
                                     endPoint: .bottomTrailing
                                 ),
-                                lineWidth: 0.5
+                                lineWidth: 0.15
                             )
                     )
                     .shadow(color: Color.black.opacity(0.05), radius: 3, x: 0, y: 2)
@@ -250,7 +250,7 @@ struct OwnerMenuView: View {
                                 startPoint: .topLeading,
                                 endPoint: .bottomTrailing
                             ),
-                            lineWidth: 0.5
+                            lineWidth: 0.15
                         )
                 )
                 .shadow(color: Color.black.opacity(0.05), radius: 2, x: 0, y: 1)
@@ -269,7 +269,7 @@ struct OwnerMenuView: View {
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     ),
-                    lineWidth: 1
+                    lineWidth: 0.15
                 )
         )
         .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 5)
@@ -321,7 +321,7 @@ struct OwnerMenuView: View {
                                 startPoint: .topLeading,
                                 endPoint: .bottomTrailing
                             ),
-                            lineWidth: 0.5
+                            lineWidth: 0.15
                         )
                 )
                 .shadow(color: Color.black.opacity(0.05), radius: 3, x: 0, y: 2)
@@ -355,7 +355,7 @@ struct OwnerMenuView: View {
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     ),
-                    lineWidth: 1
+                    lineWidth: 0.15
                 )
         )
         .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 5)
@@ -378,7 +378,7 @@ struct GlassTagView: View {
             .background(.ultraThinMaterial)
             .overlay(
                 RoundedRectangle(cornerRadius: 20)
-                    .stroke(color.opacity(0.3), lineWidth: 1)
+                    .stroke(color.opacity(0.3), lineWidth: 0.15)
             )
             .background(color.opacity(0.1))
             .clipShape(Capsule())

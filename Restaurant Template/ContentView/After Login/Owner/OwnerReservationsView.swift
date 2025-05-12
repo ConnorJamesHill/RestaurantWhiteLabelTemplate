@@ -79,7 +79,7 @@ struct OwnerReservationsView: View {
                             .clipShape(Circle())
                             .overlay(
                                 Circle()
-                                    .stroke(Color.white.opacity(0.3), lineWidth: 1)
+                                    .stroke(Color.white.opacity(0.3), lineWidth: 0.15)
                             )
                     }
                 }
@@ -112,7 +112,7 @@ struct OwnerReservationsView: View {
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     ),
-                    lineWidth: 1
+                    lineWidth: 0.15
                 )
         )
         .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 5)
@@ -158,7 +158,7 @@ struct OwnerReservationsView: View {
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     ),
-                    lineWidth: 0.5
+                    lineWidth: 0.15
                 )
         )
         .shadow(color: color.opacity(0.2), radius: 8, x: 0, y: 4)
@@ -221,7 +221,7 @@ struct OwnerReservationsView: View {
                             .cornerRadius(4)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 4)
-                                    .stroke(Color.orange.opacity(0.5), lineWidth: 1)
+                                    .stroke(Color.orange.opacity(0.5), lineWidth: 0.15)
                             )
                     }
                 }
@@ -244,7 +244,7 @@ struct OwnerReservationsView: View {
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     ),
-                    lineWidth: 0.5
+                    lineWidth: 0.15
                 )
         )
         .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 5)
@@ -277,7 +277,7 @@ struct OwnerReservationsView: View {
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     ),
-                    lineWidth: 1
+                    lineWidth: 0.15
                 )
         )
         .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 5)
@@ -325,7 +325,7 @@ struct OwnerReservationsView: View {
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     ),
-                    lineWidth: 0.5
+                    lineWidth: 0.15
                 )
         )
         .shadow(color: statusColor.opacity(0.2), radius: 5, x: 0, y: 2)

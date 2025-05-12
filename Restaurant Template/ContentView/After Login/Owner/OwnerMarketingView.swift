@@ -80,7 +80,7 @@ struct OwnerMarketingView: View {
                             .cornerRadius(8)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 8)
-                                    .stroke(Color.white.opacity(0.3), lineWidth: 1)
+                                    .stroke(Color.white.opacity(0.3), lineWidth: 0.15)
                             )
                     }
                 }
@@ -132,7 +132,7 @@ struct OwnerMarketingView: View {
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     ),
-                    lineWidth: 0.5
+                    lineWidth: 0.15
                 )
         )
         .shadow(color: color.opacity(0.2), radius: 8, x: 0, y: 4)
@@ -186,7 +186,7 @@ struct OwnerMarketingView: View {
                 .cornerRadius(10)
                 .overlay(
                     RoundedRectangle(cornerRadius: 10)
-                        .stroke(Color.white.opacity(0.3), lineWidth: 0.5)
+                        .stroke(Color.white.opacity(0.3), lineWidth: 0.15)
                 )
                 .shadow(color: Color.white.opacity(0.1), radius: 2, x: 0, y: 1)
             }
@@ -203,7 +203,7 @@ struct OwnerMarketingView: View {
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     ),
-                    lineWidth: 1
+                    lineWidth: 0.15
                 )
         )
         .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 5)
@@ -248,7 +248,7 @@ struct OwnerMarketingView: View {
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     ),
-                    lineWidth: 1
+                    lineWidth: 0.15
                 )
         )
         .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 5)
@@ -289,7 +289,7 @@ struct OwnerMarketingView: View {
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     ),
-                    lineWidth: 1
+                    lineWidth: 0.15
                 )
         )
         .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 5)
@@ -339,7 +339,7 @@ struct OwnerMarketingView: View {
                             .cornerRadius(4)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 4)
-                                    .stroke(Color.green.opacity(0.5), lineWidth: 0.5)
+                                    .stroke(Color.green.opacity(0.5), lineWidth: 0.15)
                             )
                     }
                 }
@@ -361,7 +361,7 @@ struct OwnerMarketingView: View {
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
                         ),
-                        lineWidth: 0.5
+                        lineWidth: 0.15
                     )
             )
             .shadow(color: color.opacity(0.2), radius: 5, x: 0, y: 3)
@@ -406,7 +406,7 @@ struct OwnerMarketingView: View {
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
                         ),
-                        lineWidth: 0.5
+                        lineWidth: 0.15
                     )
             )
             .shadow(color: color.opacity(0.2), radius: 5, x: 0, y: 3)
@@ -460,7 +460,7 @@ struct OwnerMarketingView: View {
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
                         ),
-                        lineWidth: 0.5
+                        lineWidth: 0.15
                     )
             )
             .shadow(color: color.opacity(0.2), radius: 5, x: 0, y: 3)
