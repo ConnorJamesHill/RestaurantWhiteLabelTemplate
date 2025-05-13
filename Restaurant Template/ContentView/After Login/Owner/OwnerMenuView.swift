@@ -65,7 +65,7 @@ struct OwnerMenuView: View {
                             .fontWeight(.semibold)
                             .padding(.horizontal, 16)
                             .padding(.vertical, 8)
-                            .background(.regularMaterial)
+                            .background(.ultraThinMaterial)
                             .cornerRadius(8)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 8)

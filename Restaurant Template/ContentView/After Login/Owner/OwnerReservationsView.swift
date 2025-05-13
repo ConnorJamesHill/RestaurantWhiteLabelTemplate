@@ -75,7 +75,7 @@ struct OwnerReservationsView: View {
                         Image(systemName: "plus")
                             .foregroundColor(.white)
                             .padding(8)
-                            .background(.regularMaterial)
+                            .background(.ultraThinMaterial)
                             .clipShape(Circle())
                             .overlay(
                                 Circle()

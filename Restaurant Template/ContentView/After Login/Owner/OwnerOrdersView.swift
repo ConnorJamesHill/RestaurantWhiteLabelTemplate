@@ -65,7 +65,7 @@ struct OwnerOrdersView: View {
                         Image(systemName: "arrow.clockwise")
                             .foregroundColor(.white)
                             .padding(8)
-                            .background(.regularMaterial)
+                            .background(.ultraThinMaterial)
                             .clipShape(Circle())
                             .overlay(
                                 Circle()
