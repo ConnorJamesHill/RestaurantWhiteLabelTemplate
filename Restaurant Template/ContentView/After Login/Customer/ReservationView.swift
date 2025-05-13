@@ -35,6 +35,18 @@ struct ReservationView: View {
         return Calendar.current.date(from: components)!
     }
     
+    // Then in init(), set the default time to one of these values
+    init() {
+        // Set default time to 12:00 PM
+        let defaultTime = availableTimes.first { time in
+            let components = Calendar.current.dateComponents([.hour, .minute], from: time)
+            return components.hour == 12 && components.minute == 0
+        } ?? availableTimes[0]
+        
+        // Use _time because we need to initialize the State property wrapper
+        _time = State(initialValue: defaultTime)
+    }
+    
     var body: some View {
         NavigationStack {
             ZStack {
@@ -146,10 +158,20 @@ struct ReservationView: View {
                         VStack(alignment: .leading, spacing: 16) {
                             sectionHeader("Special Requests (Optional)")
                             
-                            TextEditor(text: $specialRequests)
-                                .frame(minHeight: 100)
-                                .background(Color.white.opacity(0.8))
-                                .cornerRadius(8)
+                            ZStack(alignment: .topLeading) {
+                                TextEditor(text: $specialRequests)
+                                    .frame(minHeight: 100)
+                                    .background(Color.white.opacity(0.8))
+                                    .cornerRadius(8)
+                                
+                                if specialRequests.isEmpty {
+                                    Text("Ex. Dietary restrictions, seating preferences, or special occasions...")
+                                        .foregroundColor(Color.gray.opacity(0.8))
+                                        .padding(.horizontal, 5)
+                                        .padding(.vertical, 8)
+                                        .allowsHitTesting(false)
+                                }
+                            }
                         }
                         .padding()
                         .background(.ultraThinMaterial)
@@ -237,7 +259,7 @@ struct ReservationView: View {
             VStack(alignment: .leading, spacing: 16) {
                 reservationDetailRow(icon: "person.fill", label: "Name", value: name)
                 reservationDetailRow(icon: "calendar", label: "Date", value: date.formatted(date: .long, time: .omitted))
-                reservationDetailRow(icon: "clock.fill", label: "Time", value: time.formatted(date: .omitted, time: .shortened))
+                reservationDetailRow(icon: "clock.fill", label: "Time", value: time.formatted())
                 reservationDetailRow(icon: "person.3.fill", label: "Party", value: "\(partySize) \(partySize == 1 ? "person" : "people")")
             }
             .padding()
