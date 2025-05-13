@@ -249,7 +249,7 @@ struct OrderView: View {
                                         startPoint: .topLeading,
                                         endPoint: .bottomTrailing
                                     ),
-                                    lineWidth: 0.5
+                                    lineWidth: 0.15
                                 )
                         )
                 }
@@ -396,7 +396,7 @@ struct SubscriptionPlanCard: View {
                                     startPoint: .topLeading,
                                     endPoint: .bottomTrailing
                                 ),
-                                lineWidth: 0.5
+                                lineWidth: 0.15
                             )
                     )
             }
@@ -893,7 +893,7 @@ struct CheckoutView: View {
                                             startPoint: .topLeading,
                                             endPoint: .bottomTrailing
                                         ),
-                                        lineWidth: 0.5
+                                        lineWidth: 0.15
                                     )
                             )
                             .shadow(color: Color.black.opacity(isFormValid ? 0.15 : 0.05), radius: 6, x: 0, y: 3)
@@ -1066,7 +1066,7 @@ struct PaymentView: View {
                                             startPoint: .topLeading,
                                             endPoint: .bottomTrailing
                                         ),
-                                        lineWidth: 0.5
+                                        lineWidth: 0.15
                                     )
                             )
                         }
@@ -1093,7 +1093,7 @@ struct PaymentView: View {
                                             startPoint: .topLeading,
                                             endPoint: .bottomTrailing
                                         ),
-                                        lineWidth: 0.5
+                                        lineWidth: 0.15
                                     )
                             )
                         }

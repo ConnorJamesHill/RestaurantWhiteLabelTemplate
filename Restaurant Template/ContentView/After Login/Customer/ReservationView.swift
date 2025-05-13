@@ -215,7 +215,7 @@ struct ReservationView: View {
                                         startPoint: .topLeading,
                                         endPoint: .bottomTrailing
                                     ),
-                                    lineWidth: 0.5
+                                    lineWidth: 0.15
                                 )
                         )
                         .shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: 5)

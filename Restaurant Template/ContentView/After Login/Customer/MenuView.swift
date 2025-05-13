@@ -372,7 +372,7 @@ struct MenuItemCard: View {
             .cornerRadius(16)
             .overlay(
                 RoundedRectangle(cornerRadius: 16)
-                    .stroke(Color.white.opacity(0.3), lineWidth: 0.5)
+                    .stroke(Color.white.opacity(0.3), lineWidth: 0.15)
             )
             .padding(10)
             .shadow(color: Color.black.opacity(0.15), radius: 4, x: 0, y: 2)

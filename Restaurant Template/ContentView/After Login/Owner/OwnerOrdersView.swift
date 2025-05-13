@@ -69,7 +69,7 @@ struct OwnerOrdersView: View {
                             .clipShape(Circle())
                             .overlay(
                                 Circle()
-                                    .stroke(Color.black.opacity(0.3), lineWidth: 1)
+                                    .stroke(Color.black.opacity(0.3), lineWidth: 0.15)
                             )
                     }
                 }
@@ -100,7 +100,7 @@ struct OwnerOrdersView: View {
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     ),
-                    lineWidth: 0.5
+                    lineWidth: 0.15
                 )
         )
         .shadow(color: Color.black.opacity(0.15), radius: 5, x: 0, y: 2)
@@ -133,7 +133,7 @@ struct OwnerOrdersView: View {
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     ),
-                    lineWidth: 1
+                    lineWidth: 0.15
                 )
         )
         .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 5)
@@ -196,7 +196,7 @@ struct OwnerOrdersView: View {
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     ),
-                    lineWidth: 0.5
+                    lineWidth: 0.15
                 )
         )
         .shadow(color: color.opacity(0.2), radius: 8, x: 0, y: 4)
@@ -275,7 +275,7 @@ struct OwnerOrdersView: View {
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     ),
-                    lineWidth: 1
+                    lineWidth: 0.15
                 )
         )
         .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 5)
@@ -298,7 +298,7 @@ struct GlassStatusPill: View {
             .background(color.opacity(0.3))
             .overlay(
                 RoundedRectangle(cornerRadius: 20)
-                    .stroke(color.opacity(0.5), lineWidth: 1)
+                    .stroke(color.opacity(0.5), lineWidth: 0.15)
             )
             .clipShape(Capsule())
             .shadow(color: color.opacity(0.2), radius: 2, x: 0, y: 1)
