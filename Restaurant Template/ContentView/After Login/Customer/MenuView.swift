@@ -72,6 +72,13 @@ struct MenuView: View {
             }
             .navigationTitle("\(restaurant.name) Menu")
             .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .principal) {
+                    Text("\(restaurant.name) Menu")
+                        .font(.headline)
+                        .foregroundColor(.white)
+                }
+            }
             .toolbarBackground(.visible, for: .navigationBar)
             .toolbarBackground(.ultraThinMaterial, for: .navigationBar)
             .sheet(isPresented: $showingItemDetail) {

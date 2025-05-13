@@ -68,6 +68,13 @@ struct OwnerReservationsView: View {
             .toolbarBackground(.visible, for: .navigationBar)
             .toolbarBackground(.ultraThinMaterial, for: .navigationBar)
             .toolbar {
+                ToolbarItem(placement: .principal) {
+                    Text("Table Management")
+                        .font(.headline)
+                        .foregroundColor(.white)
+                }
+            }
+            .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button {
                         // Add new reservation

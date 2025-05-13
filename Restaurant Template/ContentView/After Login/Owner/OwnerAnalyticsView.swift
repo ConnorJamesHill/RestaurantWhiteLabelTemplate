@@ -72,6 +72,13 @@ struct OwnerAnalyticsView: View {
             }
             .navigationTitle("Analytics")
             .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .principal) {
+                    Text("Analytics")
+                        .font(.headline)
+                        .foregroundColor(.white)
+                }
+            }
             .toolbarBackground(.visible, for: .navigationBar)
             .toolbarBackground(.ultraThinMaterial, for: .navigationBar)
         }
@@ -304,11 +311,8 @@ struct GlassStatCard: View {
                     .font(.caption2)
                     .foregroundColor(trend >= 0 ? .green : .red)
                     .padding(4)
-                    .background(
-                        (trend >= 0 ? Color.green : Color.red)
-                            .opacity(0.2)
-                            .clipShape(Capsule())
-                    )
+                    .background(.white)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
                 }
             }
             

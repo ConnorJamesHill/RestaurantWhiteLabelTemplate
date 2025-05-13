@@ -67,6 +67,13 @@ struct OwnerMarketingView: View {
             .toolbarBackground(.visible, for: .navigationBar)
             .toolbarBackground(.ultraThinMaterial, for: .navigationBar)
             .toolbar {
+                ToolbarItem(placement: .principal) {
+                    Text("Marketing")
+                        .font(.headline)
+                        .foregroundColor(.white)
+                }
+            }
+            .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button {
                         // Create new promotion
@@ -119,7 +126,7 @@ struct OwnerMarketingView: View {
                 .lineLimit(2)
                 .fixedSize(horizontal: false, vertical: true)
         }
-        .frame(maxWidth: .infinity)
+        .frame(maxWidth: .infinity, minHeight: 140, maxHeight: 140) // Fixed height of 140 to match GlassStatCard
         .padding(.vertical, 16)
         .padding(.horizontal, 8)
         .background(.ultraThinMaterial)
@@ -135,7 +142,7 @@ struct OwnerMarketingView: View {
                     lineWidth: 0.15
                 )
         )
-        .shadow(color: color.opacity(0.2), radius: 8, x: 0, y: 4)
+        .shadow(color: .black.opacity(0.2), radius: 8, x: 0, y: 4)
     }
     
     private var activePromotionsSection: some View {
@@ -327,6 +334,9 @@ struct OwnerMarketingView: View {
                         Text(dates)
                             .font(.caption)
                             .foregroundColor(.green)
+                            .padding(4)
+                            .background(.white)
+                            .clipShape(RoundedRectangle(cornerRadius: 12))
                         
                         Spacer()
                         
@@ -339,7 +349,7 @@ struct OwnerMarketingView: View {
                             .cornerRadius(4)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 4)
-                                    .stroke(Color.green.opacity(0.5), lineWidth: 0.15)
+                                    .stroke(Color.black.opacity(0.5), lineWidth: 0.15)
                             )
                     }
                 }
@@ -364,7 +374,7 @@ struct OwnerMarketingView: View {
                         lineWidth: 0.15
                     )
             )
-            .shadow(color: color.opacity(0.2), radius: 5, x: 0, y: 3)
+            .shadow(color: .black.opacity(0.2), radius: 2, x: 0, y: 3)
         }
         .buttonStyle(PlainButtonStyle())
     }
@@ -409,7 +419,7 @@ struct OwnerMarketingView: View {
                         lineWidth: 0.15
                     )
             )
-            .shadow(color: color.opacity(0.2), radius: 5, x: 0, y: 3)
+            .shadow(color: .black.opacity(0.2), radius: 2, x: 0, y: 3)
         }
         .buttonStyle(PlainButtonStyle())
     }
@@ -463,7 +473,7 @@ struct OwnerMarketingView: View {
                         lineWidth: 0.15
                     )
             )
-            .shadow(color: color.opacity(0.2), radius: 5, x: 0, y: 3)
+            .shadow(color: .black.opacity(0.2), radius: 5, x: 0, y: 3)
         }
         .buttonStyle(PlainButtonStyle())
     }

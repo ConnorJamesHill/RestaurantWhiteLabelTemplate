@@ -126,6 +126,13 @@ struct OrderView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(.visible, for: .navigationBar)
             .toolbarBackground(.ultraThinMaterial, for: .navigationBar)
+            .toolbar {
+                ToolbarItem(placement: .principal) {
+                    Text("Order Online")
+                        .font(.headline)
+                        .foregroundColor(.white)
+                }
+            }
             .sheet(isPresented: $showingCheckout) {
                 CheckoutView(
                     cart: $cart,
@@ -419,10 +426,6 @@ struct SubscriptionPlanCard: View {
         .shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: 5)
     }
 }
-
-// edit below
-
-// ... existing code ...
 
 struct OrderItemDetailView: View {
     let item: MenuItem
@@ -909,6 +912,13 @@ struct CheckoutView: View {
             .toolbarBackground(.visible, for: .navigationBar)
             .toolbarBackground(.ultraThinMaterial, for: .navigationBar)
             .toolbar {
+                ToolbarItem(placement: .principal) {
+                    Text("Checkout")
+                        .font(.headline)
+                        .foregroundColor(.white)
+                }
+            }
+            .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button("Cancel", action: onDismiss)
                         .foregroundColor(.white)
@@ -1121,6 +1131,13 @@ struct PaymentView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(.visible, for: .navigationBar)
             .toolbarBackground(.ultraThinMaterial, for: .navigationBar)
+            .toolbar {
+                ToolbarItem(placement: .principal) {
+                    Text("Payment")
+                        .font(.headline)
+                        .foregroundColor(.white)
+                }
+            }
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button("Cancel", action: onDismiss)

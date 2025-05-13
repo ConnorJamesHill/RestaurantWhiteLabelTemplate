@@ -79,6 +79,13 @@ struct InfoView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(.visible, for: .navigationBar)
             .toolbarBackground(.ultraThinMaterial, for: .navigationBar)
+            .toolbar {
+                ToolbarItem(placement: .principal) {
+                    Text("About Us")
+                        .font(.headline)
+                        .foregroundColor(.white)
+                }
+            }
             .sheet(isPresented: $showingFullMap) {
                 fullMapView
             }

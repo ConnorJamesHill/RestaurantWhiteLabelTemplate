@@ -58,6 +58,13 @@ struct OwnerOrdersView: View {
             .toolbarBackground(.visible, for: .navigationBar)
             .toolbarBackground(.ultraThinMaterial, for: .navigationBar)
             .toolbar {
+                ToolbarItem(placement: .principal) {
+                    Text("Orders")
+                        .font(.headline)
+                        .foregroundColor(.white)
+                }
+            }
+            .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button {
                         // Refresh orders

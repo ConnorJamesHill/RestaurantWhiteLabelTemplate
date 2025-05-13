@@ -57,6 +57,13 @@ struct OwnerMenuView: View {
             .toolbarBackground(.visible, for: .navigationBar)
             .toolbarBackground(.ultraThinMaterial, for: .navigationBar)
             .toolbar {
+                ToolbarItem(placement: .principal) {
+                    Text("Menu Management")
+                        .font(.headline)
+                        .foregroundColor(.white)
+                }
+            }
+            .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button {
                         // Publish menu changes
@@ -67,6 +74,7 @@ struct OwnerMenuView: View {
                             .padding(.vertical, 8)
                             .background(.ultraThinMaterial)
                             .cornerRadius(8)
+                            .foregroundColor(.white)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 8)
                                     .stroke(Color.black.opacity(0.3), lineWidth: 0.15)
