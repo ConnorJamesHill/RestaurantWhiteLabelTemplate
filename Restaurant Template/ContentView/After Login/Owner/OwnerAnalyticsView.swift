@@ -10,6 +10,7 @@ import SwiftUI
 struct OwnerAnalyticsView: View {
     @StateObject private var viewModel = OwnerDashboardViewViewModel()
     @Environment(\.colorScheme) private var colorScheme
+    var onMenuButtonTap: (() -> Void)? // Add callback for menu button
     
     // Enhanced blue gradient background
     private var backgroundGradient: LinearGradient {
@@ -72,15 +73,24 @@ struct OwnerAnalyticsView: View {
             }
             .navigationTitle("Analytics")
             .navigationBarTitleDisplayMode(.inline)
+            .toolbarBackground(.visible, for: .navigationBar)
+            .toolbarBackground(.ultraThinMaterial, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .principal) {
                     Text("Analytics")
                         .font(.headline)
                         .foregroundColor(.white)
                 }
+                
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button {
+                        onMenuButtonTap?() // Call the callback when menu button is tapped
+                    } label: {
+                        Image(systemName: "line.3.horizontal")
+                            .foregroundColor(.white)
+                    }
+                }
             }
-            .toolbarBackground(.visible, for: .navigationBar)
-            .toolbarBackground(.ultraThinMaterial, for: .navigationBar)
         }
     }
     
@@ -311,8 +321,11 @@ struct GlassStatCard: View {
                     .font(.caption2)
                     .foregroundColor(trend >= 0 ? .green : .red)
                     .padding(4)
-                    .background(.white)
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                    .background(
+                        (trend >= 0 ? Color.green : Color.red)
+                            .opacity(0.2)
+                            .clipShape(Capsule())
+                    )
                 }
             }
             
@@ -367,33 +380,5 @@ struct StatusPill: View {
         case .inProgress: return Color.blue.opacity(0.5)
         case .completed: return Color.green.opacity(0.5)
         }
-    }
-}
-
-// Extension to support hex color codes
-extension Color {
-    init(hex: String) {
-        let hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
-        var int: UInt64 = 0
-        Scanner(string: hex).scanHexInt64(&int)
-        let a, r, g, b: UInt64
-        switch hex.count {
-        case 3: // RGB (12-bit)
-            (a, r, g, b) = (255, (int >> 8) * 17, (int >> 4 & 0xF) * 17, (int & 0xF) * 17)
-        case 6: // RGB (24-bit)
-            (a, r, g, b) = (255, int >> 16, int >> 8 & 0xFF, int & 0xFF)
-        case 8: // ARGB (32-bit)
-            (a, r, g, b) = (int >> 24, int >> 16 & 0xFF, int >> 8 & 0xFF, int & 0xFF)
-        default:
-            (a, r, g, b) = (1, 1, 1, 0)
-        }
-        
-        self.init(
-            .sRGB,
-            red: Double(r) / 255,
-            green: Double(g) / 255,
-            blue: Double(b) / 255,
-            opacity: Double(a) / 255
-        )
     }
 }

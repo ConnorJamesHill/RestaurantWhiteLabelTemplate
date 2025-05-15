@@ -13,7 +13,6 @@ struct InfoView: View {
         span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
     )
     @State private var showingFullMap = false
-    @State private var position: MapCameraPosition = .automatic
     
     // Blue gradient background - matching other views
     private var backgroundGradient: LinearGradient {
@@ -87,14 +86,29 @@ struct InfoView: View {
                 }
             }
             .sheet(isPresented: $showingFullMap) {
-                fullMapView
+                fullMapViewWithFixedTabBar
             }
             .onAppear {
-                // Update position when view appears and restaurant data is available
-                position = .region(MKCoordinateRegion(
+                // Update region when view appears and restaurant data is available
+                region = MKCoordinateRegion(
                     center: restaurant.location,
                     span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
-                ))
+                )
+                
+                // Force tab bar appearance when the view appears
+                DispatchQueue.main.async {
+                    let appearance = UITabBarAppearance()
+                    appearance.configureWithOpaqueBackground()
+                    appearance.backgroundEffect = UIBlurEffect(style: .systemThinMaterialDark)
+                    appearance.backgroundColor = UIColor(Color(hex: "0d47a1"))
+                    appearance.stackedLayoutAppearance.normal.iconColor = UIColor.white.withAlphaComponent(0.5)
+                    appearance.stackedLayoutAppearance.normal.titleTextAttributes = [.foregroundColor: UIColor.white.withAlphaComponent(0.5)]
+                    appearance.stackedLayoutAppearance.selected.iconColor = .white
+                    appearance.stackedLayoutAppearance.selected.titleTextAttributes = [.foregroundColor: UIColor.white]
+                    UITabBar.appearance().standardAppearance = appearance
+                    UITabBar.appearance().scrollEdgeAppearance = appearance
+                    UITabBar.appearance().tintColor = .white
+                }
             }
         }
     }
@@ -210,11 +224,12 @@ struct InfoView: View {
                 .foregroundColor(.white.opacity(0.9))
                 .padding(.bottom, 4)
             
-            // Map view with glass effect
-            Map(position: $position) {
-                Marker(restaurant.name, coordinate: restaurant.location)
-                    .tint(.primary)
-            }
+            // Custom map wrapper to preserve tab bar appearance
+            MapWithConsistentTabBar(
+                region: $region,
+                coordinate: restaurant.location,
+                title: restaurant.name
+            )
             .frame(height: 180)
             .clipShape(RoundedRectangle(cornerRadius: 12))
             .overlay(
@@ -367,16 +382,18 @@ struct InfoView: View {
         }
     }
     
-    private var fullMapView: some View {
+    private var fullMapViewWithFixedTabBar: some View {
         NavigationStack {
             ZStack {
                 // Background gradient for the map view too
                 backgroundGradient.ignoresSafeArea()
                 
-                Map(position: $position) {
-                    Marker(restaurant.name, coordinate: restaurant.location)
-                        .tint(.primary)
-                }
+                // Use custom map here too to preserve tab bar appearance
+                MapWithConsistentTabBar(
+                    region: $region,
+                    coordinate: restaurant.location,
+                    title: restaurant.name
+                )
             }
             .edgesIgnoringSafeArea(.all)
             .navigationTitle(restaurant.name)
@@ -482,7 +499,7 @@ struct InfoView: View {
         }
         #endif
     }
-
+    
     private func sendEmail() {
         #if targetEnvironment(simulator)
         // Show a simple print message for simulator
@@ -525,7 +542,53 @@ struct InfoView: View {
     }
 }
 
-// Add this helper view for social media buttons
+// Simplified custom map wrapper that preserves tab bar appearance
+struct MapWithConsistentTabBar: UIViewRepresentable {
+    @Binding var region: MKCoordinateRegion
+    let coordinate: CLLocationCoordinate2D
+    let title: String
+    
+    func makeUIView(context: Context) -> MKMapView {
+        let mapView = MKMapView()
+        mapView.delegate = context.coordinator
+        
+        // Add annotation
+        let annotation = MKPointAnnotation()
+        annotation.coordinate = coordinate
+        annotation.title = title
+        mapView.addAnnotation(annotation)
+        
+        // Force blue tab bar appearance after map is created
+        DispatchQueue.main.async {
+            let appearance = UITabBarAppearance()
+            appearance.configureWithOpaqueBackground()
+            appearance.backgroundEffect = UIBlurEffect(style: .systemThinMaterialDark)
+            appearance.backgroundColor = UIColor(Color(hex: "0d47a1"))
+            appearance.stackedLayoutAppearance.normal.iconColor = UIColor.white.withAlphaComponent(0.5)
+            appearance.stackedLayoutAppearance.normal.titleTextAttributes = [.foregroundColor: UIColor.white.withAlphaComponent(0.5)]
+            appearance.stackedLayoutAppearance.selected.iconColor = .white
+            appearance.stackedLayoutAppearance.selected.titleTextAttributes = [.foregroundColor: UIColor.white]
+            UITabBar.appearance().standardAppearance = appearance
+            UITabBar.appearance().scrollEdgeAppearance = appearance
+            UITabBar.appearance().tintColor = .white
+        }
+        
+        return mapView
+    }
+    
+    func updateUIView(_ uiView: MKMapView, context: Context) {
+        // Simple region update
+        uiView.setRegion(region, animated: true)
+    }
+    
+    func makeCoordinator() -> Coordinator {
+        Coordinator()
+    }
+    
+    class Coordinator: NSObject, MKMapViewDelegate {}
+}
+
+// Social media button view
 struct SocialMediaButton: View {
     let platform: String
     let handle: String

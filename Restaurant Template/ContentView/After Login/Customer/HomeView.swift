@@ -1,7 +1,15 @@
+//
+//  HomeView.swift
+//  Restaurant Template
+//
+//  Created by Connor Hill on 5/2/25.
+//
+
 import SwiftUI
 
 struct HomeView: View {
     @EnvironmentObject private var restaurant: RestaurantConfiguration
+    var onMenuButtonTap: (() -> Void)?
     
     // Enhanced blue gradient background
     private var backgroundGradient: LinearGradient {
@@ -103,20 +111,20 @@ struct HomeView: View {
             }
             .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .principal) {
-                    VStack {
-                        Text(restaurant.name)
-                            .font(.headline)
-                            .foregroundColor(.white)
-                        Text(restaurant.tagline)
-                            .font(.caption)
-                            .foregroundColor(.white.opacity(0.7))
-                    }
-                }
-            }
             .toolbarBackground(.visible, for: .navigationBar)
             .toolbarBackground(.ultraThinMaterial, for: .navigationBar)
+            .toolbar {
+                ToolbarItem(placement: .principal) {
+                        VStack {
+                            Text(restaurant.name)
+                                .font(.headline)
+                                .foregroundColor(.white)
+                            Text(restaurant.tagline)
+                                .font(.caption)
+                                .foregroundColor(.white.opacity(0.7))
+                        }
+                    }
+            }
         }
     }
     
