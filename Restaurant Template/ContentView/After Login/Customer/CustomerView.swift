@@ -11,6 +11,7 @@ struct CustomerView: View {
     @EnvironmentObject private var restaurant: RestaurantConfiguration
     @State private var showMenu: Bool = false
     @State private var selectedTab = Tab.home
+    @State private var isChangingView = false // Track view change state
     
     enum Tab: String, CaseIterable {
         case home = "Home"
@@ -44,8 +45,6 @@ struct CustomerView: View {
         )
     }
     
-    // Update the init() method with this simpler approach:
-
     init() {
         // Create a tab bar with ultraThinMaterial and blue tint
         let appearance = UITabBarAppearance()
@@ -93,7 +92,6 @@ struct CustomerView: View {
         
         // Apply the appearance to all navigation bars
         UINavigationBar.appearance().standardAppearance = navBarAppearance
-        UINavigationBar.appearance().compactAppearance = navBarAppearance
         UINavigationBar.appearance().scrollEdgeAppearance = navBarAppearance
     }
     
@@ -105,67 +103,39 @@ struct CustomerView: View {
             cornerRadius: 25,
             showMenu: $showMenu
         ) { safeArea in
-            // Main Content - TabView
             NavigationStack {
-                // Update the TabView to ensure each tab has proper navigation title:
-
-                TabView(selection: $selectedTab) {
-                    HomeView(onMenuButtonTap: {
-                        withAnimation {
-                            showMenu.toggle()
+                ZStack {
+                    // Background gradient visible during transitions
+                    backgroundGradient.ignoresSafeArea()
+                    
+                    // Main content with transitions
+                    Group {
+                        if selectedTab == .home {
+                            HomeWrapper()
+                                .transition(.opacity)
+                        } else if selectedTab == .menu {
+                            MenuWrapper()
+                                .transition(.opacity)
+                        } else if selectedTab == .reserve {
+                            ReservationWrapper()
+                                .transition(.opacity)
+                        } else if selectedTab == .order {
+                            OrderWrapper()
+                                .transition(.opacity)
+                        } else if selectedTab == .info {
+                            InfoWrapper()
+                                .transition(.opacity)
                         }
-                    })
-                    .tag(Tab.home)
-                    .tabItem {
-                        Label("Home", systemImage: "house")
                     }
-                    .navigationTitle("Home")
+                    .opacity(isChangingView ? 0 : 1) // Fade out during transitions
                     
-                    MenuView()
-                        .tag(Tab.menu)
-                        .tabItem {
-                            Label("Menu", systemImage: "menucard")
-                        }
-                        .navigationTitle("\(restaurant.name) Menu")
-                    
-                    ReservationView()
-                        .tag(Tab.reserve)
-                        .tabItem {
-                            Label("Reserve", systemImage: "calendar")
-                        }
-                        .navigationTitle("Make a Reservation")
-                    
-                    OrderView()
-                        .tag(Tab.order)
-                        .tabItem {
-                            Label("Order", systemImage: "bag")
-                        }
-                        .navigationTitle("Order")
-                    
-                    InfoView()
-                        .tag(Tab.info)
-                        .tabItem {
-                            Label("Info", systemImage: "info.circle")
-                        }
-                        .navigationTitle("About Us")
+                    // Custom tab bar
+                    .safeAreaInset(edge: .bottom) {
+                        CustomTabBar(selectedTab: $selectedTab, isChangingView: $isChangingView)
+                            .background(.ultraThinMaterial)
+                    }
                 }
-                .tint(.white)
                 .navigationBarTitleDisplayMode(.inline)
-                .onChange(of: selectedTab) { oldValue, newValue in
-                    // Ensure the navigation title is updated when tab changes
-                    switch newValue {
-                    case .home:
-                        UINavigationBar.appearance().topItem?.title = "Home"
-                    case .menu:
-                        UINavigationBar.appearance().topItem?.title = "\(restaurant.name) Menu"
-                    case .reserve:
-                        UINavigationBar.appearance().topItem?.title = "Make a Reservation"
-                    case .order:
-                        UINavigationBar.appearance().topItem?.title = "Order"
-                    case .info:
-                        UINavigationBar.appearance().topItem?.title = "About Us"
-                    }
-                }
                 .toolbar {
                     ToolbarItem(placement: .navigationBarLeading) {
                         Button {
@@ -177,61 +147,85 @@ struct CustomerView: View {
                                 .foregroundColor(.white)
                         }
                     }
-                }
-                // Add this to the TabView in the body
-                .onAppear {
-                    // Force tab bar appearance when view appears
-                    DispatchQueue.main.async {
-                        let appearance = UITabBarAppearance()
-                        
-                        // Start with transparent background for material effect
-                        appearance.configureWithTransparentBackground()
-                        
-                        // Apply ultraThinMaterial effect
-                        appearance.backgroundEffect = UIBlurEffect(style: .systemThinMaterialDark)
-                        
-                        // Create a gradient-like effect with a semi-transparent overlay
-                        // Top color: lighter blue
-                        let topColor = UIColor(Color(hex: "1a73e8").opacity(0.85))
-                        // Bottom color: darker blue
-                        let bottomColor = UIColor(Color(hex: "002171").opacity(0.85))
-                        
-                        // Use the average color for the backgroundColor with material effect
-                        appearance.backgroundColor = UIColor(
-                            red: (topColor.cgColor.components![0] + bottomColor.cgColor.components![0]) / 2,
-                            green: (topColor.cgColor.components![1] + bottomColor.cgColor.components![1]) / 2,
-                            blue: (topColor.cgColor.components![2] + bottomColor.cgColor.components![2]) / 2,
-                            alpha: 0.85
-                        )
-                        
-                        // Style the tab items
-                        appearance.stackedLayoutAppearance.normal.iconColor = UIColor.white.withAlphaComponent(0.5)
-                        appearance.stackedLayoutAppearance.normal.titleTextAttributes = [.foregroundColor: UIColor.white.withAlphaComponent(0.5)]
-                        appearance.stackedLayoutAppearance.selected.iconColor = .white
-                        appearance.stackedLayoutAppearance.selected.titleTextAttributes = [.foregroundColor: UIColor.white]
-                        
-                        // Apply this appearance to the tab bar
-                        UITabBar.appearance().standardAppearance = appearance
-                        UITabBar.appearance().scrollEdgeAppearance = appearance
-                        UITabBar.appearance().tintColor = .white
-                        
-                        // Enhance the tab bar with a subtle border
-                        UITabBar.appearance().layer.borderWidth = 0.2
-                        UITabBar.appearance().layer.borderColor = UIColor.white.withAlphaComponent(0.2).cgColor
+                    
+                    ToolbarItem(placement: .principal) {
+                        Text(getTitleForTab(selectedTab))
+                            .font(.headline)
+                            .foregroundColor(.white)
                     }
                 }
             }
         } menuView: { safeArea in
-            // Sidebar Menu View
             SideBarMenuView(safeArea)
         } background: {
-            backgroundGradient
-                .ignoresSafeArea()
+            backgroundGradient.ignoresSafeArea()
         }
     }
     
-    // Update the SideBarMenuView method in CustomerView:
-
+    // Get the appropriate title for the selected tab
+    private func getTitleForTab(_ tab: Tab) -> String {
+        switch tab {
+        case .home:
+            return "Home"
+        case .menu:
+            return "\(restaurant.name) Menu"
+        case .reserve:
+            return "Make a Reservation"
+        case .order:
+            return "Order"
+        case .info:
+            return "About Us"
+        }
+    }
+    
+    // Custom tab bar
+    struct CustomTabBar: View {
+        @Binding var selectedTab: Tab
+        @Binding var isChangingView: Bool
+        
+        var body: some View {
+            HStack(spacing: 0) {
+                ForEach(Tab.allCases, id: \.self) { tab in
+                    Button {
+                        handleTabSelection(tab)
+                    } label: {
+                        VStack(spacing: 4) {
+                            Image(systemName: tab.icon)
+                                .font(.system(size: 20))
+                            
+                            Text(tab.rawValue)
+                                .font(.caption)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 8)
+                        .foregroundColor(selectedTab == tab ? .white : .white.opacity(0.5))
+                    }
+                }
+            }
+            .background(Color(hex: "0d47a1").opacity(0.7))
+        }
+        
+        private func handleTabSelection(_ tab: Tab) {
+            guard tab != selectedTab else { return }
+            
+            // Start transition
+            withAnimation(.easeOut(duration: 0.15)) {
+                isChangingView = true
+            }
+            
+            // Wait briefly
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                // Switch tab
+                selectedTab = tab
+                
+                // Complete transition
+                withAnimation(.easeIn(duration: 0.2)) {
+                    isChangingView = false
+                }
+            }
+        }
+    }
+    
     @ViewBuilder
     func SideBarMenuView(_ safeArea: UIEdgeInsets) -> some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -258,30 +252,7 @@ struct CustomerView: View {
             VStack(alignment: .leading, spacing: 10) {
                 ForEach(Tab.allCases, id: \.self) { tab in
                     Button {
-                        // Set the selected tab when clicked
-                        selectedTab = tab
-                        
-                        // Close the side menu with animation
-                        withAnimation {
-                            showMenu = false
-                        }
-                        
-                        // Ensure the navigation title is preserved
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                            // Force navigation title update based on selected tab
-                            switch tab {
-                            case .home:
-                                UINavigationBar.appearance().topItem?.title = "Home"
-                            case .menu:
-                                UINavigationBar.appearance().topItem?.title = "\(restaurant.name) Menu"
-                            case .reserve:
-                                UINavigationBar.appearance().topItem?.title = "Make a Reservation"
-                            case .order:
-                                UINavigationBar.appearance().topItem?.title = "Order"
-                            case .info:
-                                UINavigationBar.appearance().topItem?.title = "About Us"
-                            }
-                        }
+                        handleSidebarTabSelection(tab)
                     } label: {
                         HStack(spacing: 12) {
                             Image(systemName: tab.icon)
@@ -325,5 +296,69 @@ struct CustomerView: View {
             .padding(.bottom, safeArea.bottom + 15)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
+    }
+    
+    // Coordinate sidebar navigation with proper transitions
+    private func handleSidebarTabSelection(_ tab: Tab) {
+        guard tab != selectedTab else {
+            // Just close the menu if it's the same tab
+            withAnimation {
+                showMenu = false
+            }
+            return
+        }
+        
+        // Start transition - fade out current view
+        withAnimation(.easeOut(duration: 0.15)) {
+            isChangingView = true
+        }
+        
+        // First close the menu
+        withAnimation {
+            showMenu = false
+        }
+        
+        // Then switch tabs after a small delay
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            selectedTab = tab
+            
+            // Fade in the new view
+            withAnimation(.easeIn(duration: 0.25)) {
+                isChangingView = false
+            }
+        }
+    }
+    
+    // Wrapper views
+    struct HomeWrapper: View {
+        @EnvironmentObject private var restaurant: RestaurantConfiguration
+        
+        var body: some View {
+            HomeView(onMenuButtonTap: nil) // No need for menu button in individual views
+        }
+    }
+    
+    struct MenuWrapper: View {
+        var body: some View {
+            MenuView()
+        }
+    }
+    
+    struct ReservationWrapper: View {
+        var body: some View {
+            ReservationView()
+        }
+    }
+    
+    struct OrderWrapper: View {
+        var body: some View {
+            OrderView()
+        }
+    }
+    
+    struct InfoWrapper: View {
+        var body: some View {
+            InfoView()
+        }
     }
 }
