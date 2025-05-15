@@ -13,7 +13,7 @@ struct OwnerReservationsView: View {
     @Environment(\.colorScheme) private var colorScheme
     
     // Blue gradient background - matching other owner views
-    private var backgroundGradient: LinearGradient {
+    var backgroundGradient: LinearGradient {
         LinearGradient(
             gradient: Gradient(colors: [
                 Color(hex: "1a73e8"), // Vibrant blue
@@ -94,7 +94,7 @@ struct OwnerReservationsView: View {
     
     // MARK: - Glassmorphism Sections
     
-    private var calendarSection: some View {
+    var calendarSection: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text("Select Date")
                 .font(.headline)
@@ -124,7 +124,7 @@ struct OwnerReservationsView: View {
         .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 5)
     }
     
-    private var reservationSummarySection: some View {
+    var reservationSummarySection: some View {
         HStack(spacing: 15) {
             reservationStatView(count: "8", title: "Today", iconName: "calendar", color: .blue)
             reservationStatView(count: "32", title: "This Week", iconName: "calendar.badge.clock", color: .purple)

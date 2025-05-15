@@ -103,7 +103,7 @@ struct OwnerDashboardView: View {
                     // Content views with transitions
                     Group {
                         if selectedTab == .analytics {
-                            AnalyticsWrapper()
+                            AnalyticsWrapper(dashboardViewModel: viewModel)
                                 .transition(.opacity)
                         } else if selectedTab == .menu {
                             MenuWrapper()
@@ -380,50 +380,13 @@ struct OwnerDashboardView: View {
     }
     
     // Wrapper views
+    // In OwnerDashboardView.swift
     struct AnalyticsWrapper: View {
+        // Instead of creating a new viewModel, use the one from parent
+        var dashboardViewModel: OwnerDashboardViewViewModel
+        
         var body: some View {
-            let view = OwnerAnalyticsView()
-            return ZStack {
-                view.backgroundGradient.ignoresSafeArea()
-                
-                // Decorative elements
-                Circle()
-                    .fill(Color.black.opacity(0.05))
-                    .frame(width: 300, height: 300)
-                    .blur(radius: 30)
-                    .offset(x: -150, y: -100)
-                
-                Circle()
-                    .fill(Color.black.opacity(0.08))
-                    .frame(width: 250, height: 250)
-                    .blur(radius: 20)
-                    .offset(x: 180, y: 400)
-                
-                ScrollView {
-                    VStack(spacing: 24) {
-                        // Title with glass effect
-                        Text("Analytics Dashboard")
-                            .font(.title2.bold())
-                            .foregroundColor(.white)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding(.horizontal, 6)
-                            .padding(.top, 10)
-                        
-                        // Quick Stats Cards
-                        view.quickStatsSection
-                        
-                        // Revenue Chart
-                        view.revenueChartSection
-                        
-                        // Popular Items
-                        view.popularItemsSection
-                        
-                        // Recent Orders
-                        view.recentOrdersSection
-                    }
-                    .padding()
-                }
-            }
+            OwnerAnalyticsView(viewModel: dashboardViewModel)
         }
     }
     

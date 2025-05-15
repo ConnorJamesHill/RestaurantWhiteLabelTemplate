@@ -8,9 +8,15 @@
 import SwiftUI
 
 struct OwnerAnalyticsView: View {
-    @StateObject private var viewModel = OwnerDashboardViewViewModel()
+    // Change from @StateObject to @ObservedObject
+    @ObservedObject var viewModel: OwnerDashboardViewViewModel
     @Environment(\.colorScheme) private var colorScheme
     var onMenuButtonTap: (() -> Void)? // Add callback for menu button
+    
+    // Add initializer with default parameter
+    init(viewModel: OwnerDashboardViewViewModel = OwnerDashboardViewViewModel()) {
+        self.viewModel = viewModel
+    }
     
     // Enhanced blue gradient background
     var backgroundGradient: LinearGradient {
