@@ -44,31 +44,28 @@ struct CustomerView: View {
         )
     }
     
+    // Update the init() method with this simpler approach:
+
     init() {
-        // Create a blue gradient for the tab bar
+        // Create a tab bar with ultraThinMaterial and blue tint
         let appearance = UITabBarAppearance()
-        appearance.configureWithOpaqueBackground() // Use opaque instead of transparent
         
-        // Use a visual effect with blue tint
-        let blurEffect = UIBlurEffect(style: .systemThinMaterialDark)
-        appearance.backgroundEffect = blurEffect
+        // Start with a clean transparent background
+        appearance.configureWithTransparentBackground()
         
-        // Add a blue overlay color - make it stronger
-        appearance.backgroundColor = UIColor(Color(hex: "0d47a1"))
+        // Use ultraThinMaterial for the glassy effect
+        appearance.backgroundEffect = UIBlurEffect(style: .systemThinMaterialDark)
         
-        // Use this appearance for the tab bar
-        UITabBar.appearance().standardAppearance = appearance
-        UITabBar.appearance().scrollEdgeAppearance = appearance
+        // Add a semi-transparent blue tint
+        appearance.backgroundColor = UIColor(Color(hex: "0d47a1").opacity(0.7))
         
-        // Set the unselected icons to white with reduced opacity
+        // Style the tab items
         appearance.stackedLayoutAppearance.normal.iconColor = UIColor.white.withAlphaComponent(0.5)
         appearance.stackedLayoutAppearance.normal.titleTextAttributes = [.foregroundColor: UIColor.white.withAlphaComponent(0.5)]
-        
-        // Set the selected icons to full white
         appearance.stackedLayoutAppearance.selected.iconColor = .white
         appearance.stackedLayoutAppearance.selected.titleTextAttributes = [.foregroundColor: UIColor.white]
         
-        // Apply to ALL layout appearances
+        // Apply to all layout appearances for consistency
         appearance.inlineLayoutAppearance.normal.iconColor = UIColor.white.withAlphaComponent(0.5)
         appearance.inlineLayoutAppearance.normal.titleTextAttributes = [.foregroundColor: UIColor.white.withAlphaComponent(0.5)]
         appearance.inlineLayoutAppearance.selected.iconColor = .white
@@ -79,7 +76,9 @@ struct CustomerView: View {
         appearance.compactInlineLayoutAppearance.selected.iconColor = .white
         appearance.compactInlineLayoutAppearance.selected.titleTextAttributes = [.foregroundColor: UIColor.white]
         
-        // Force the tab bar tint to white
+        // Apply this appearance to the tab bar
+        UITabBar.appearance().standardAppearance = appearance
+        UITabBar.appearance().scrollEdgeAppearance = appearance
         UITabBar.appearance().tintColor = .white
         
         // Configure the navigation bar appearance
@@ -108,6 +107,8 @@ struct CustomerView: View {
         ) { safeArea in
             // Main Content - TabView
             NavigationStack {
+                // Update the TabView to ensure each tab has proper navigation title:
+
                 TabView(selection: $selectedTab) {
                     HomeView(onMenuButtonTap: {
                         withAnimation {
@@ -118,33 +119,53 @@ struct CustomerView: View {
                     .tabItem {
                         Label("Home", systemImage: "house")
                     }
+                    .navigationTitle("Home")
                     
                     MenuView()
                         .tag(Tab.menu)
                         .tabItem {
                             Label("Menu", systemImage: "menucard")
                         }
+                        .navigationTitle("\(restaurant.name) Menu")
                     
                     ReservationView()
                         .tag(Tab.reserve)
                         .tabItem {
                             Label("Reserve", systemImage: "calendar")
                         }
+                        .navigationTitle("Make a Reservation")
                     
                     OrderView()
                         .tag(Tab.order)
                         .tabItem {
                             Label("Order", systemImage: "bag")
                         }
+                        .navigationTitle("Order")
                     
                     InfoView()
                         .tag(Tab.info)
                         .tabItem {
                             Label("Info", systemImage: "info.circle")
                         }
+                        .navigationTitle("About Us")
                 }
-                .tint(.white) // Add this line to make icons white
+                .tint(.white)
                 .navigationBarTitleDisplayMode(.inline)
+                .onChange(of: selectedTab) { oldValue, newValue in
+                    // Ensure the navigation title is updated when tab changes
+                    switch newValue {
+                    case .home:
+                        UINavigationBar.appearance().topItem?.title = "Home"
+                    case .menu:
+                        UINavigationBar.appearance().topItem?.title = "\(restaurant.name) Menu"
+                    case .reserve:
+                        UINavigationBar.appearance().topItem?.title = "Make a Reservation"
+                    case .order:
+                        UINavigationBar.appearance().topItem?.title = "Order"
+                    case .info:
+                        UINavigationBar.appearance().topItem?.title = "About Us"
+                    }
+                }
                 .toolbar {
                     ToolbarItem(placement: .navigationBarLeading) {
                         Button {
@@ -157,15 +178,47 @@ struct CustomerView: View {
                         }
                     }
                 }
+                // Add this to the TabView in the body
                 .onAppear {
                     // Force tab bar appearance when view appears
-                    let appearance = UITabBarAppearance()
-                    appearance.configureWithOpaqueBackground()
-                    appearance.backgroundEffect = UIBlurEffect(style: .systemThinMaterialDark)
-                    appearance.backgroundColor = UIColor(Color(hex: "0d47a1"))
-                    UITabBar.appearance().standardAppearance = appearance
-                    UITabBar.appearance().scrollEdgeAppearance = appearance
-                    UITabBar.appearance().tintColor = .white
+                    DispatchQueue.main.async {
+                        let appearance = UITabBarAppearance()
+                        
+                        // Start with transparent background for material effect
+                        appearance.configureWithTransparentBackground()
+                        
+                        // Apply ultraThinMaterial effect
+                        appearance.backgroundEffect = UIBlurEffect(style: .systemThinMaterialDark)
+                        
+                        // Create a gradient-like effect with a semi-transparent overlay
+                        // Top color: lighter blue
+                        let topColor = UIColor(Color(hex: "1a73e8").opacity(0.85))
+                        // Bottom color: darker blue
+                        let bottomColor = UIColor(Color(hex: "002171").opacity(0.85))
+                        
+                        // Use the average color for the backgroundColor with material effect
+                        appearance.backgroundColor = UIColor(
+                            red: (topColor.cgColor.components![0] + bottomColor.cgColor.components![0]) / 2,
+                            green: (topColor.cgColor.components![1] + bottomColor.cgColor.components![1]) / 2,
+                            blue: (topColor.cgColor.components![2] + bottomColor.cgColor.components![2]) / 2,
+                            alpha: 0.85
+                        )
+                        
+                        // Style the tab items
+                        appearance.stackedLayoutAppearance.normal.iconColor = UIColor.white.withAlphaComponent(0.5)
+                        appearance.stackedLayoutAppearance.normal.titleTextAttributes = [.foregroundColor: UIColor.white.withAlphaComponent(0.5)]
+                        appearance.stackedLayoutAppearance.selected.iconColor = .white
+                        appearance.stackedLayoutAppearance.selected.titleTextAttributes = [.foregroundColor: UIColor.white]
+                        
+                        // Apply this appearance to the tab bar
+                        UITabBar.appearance().standardAppearance = appearance
+                        UITabBar.appearance().scrollEdgeAppearance = appearance
+                        UITabBar.appearance().tintColor = .white
+                        
+                        // Enhance the tab bar with a subtle border
+                        UITabBar.appearance().layer.borderWidth = 0.2
+                        UITabBar.appearance().layer.borderColor = UIColor.white.withAlphaComponent(0.2).cgColor
+                    }
                 }
             }
         } menuView: { safeArea in
@@ -177,6 +230,8 @@ struct CustomerView: View {
         }
     }
     
+    // Update the SideBarMenuView method in CustomerView:
+
     @ViewBuilder
     func SideBarMenuView(_ safeArea: UIEdgeInsets) -> some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -203,9 +258,29 @@ struct CustomerView: View {
             VStack(alignment: .leading, spacing: 10) {
                 ForEach(Tab.allCases, id: \.self) { tab in
                     Button {
+                        // Set the selected tab when clicked
                         selectedTab = tab
+                        
+                        // Close the side menu with animation
                         withAnimation {
                             showMenu = false
+                        }
+                        
+                        // Ensure the navigation title is preserved
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                            // Force navigation title update based on selected tab
+                            switch tab {
+                            case .home:
+                                UINavigationBar.appearance().topItem?.title = "Home"
+                            case .menu:
+                                UINavigationBar.appearance().topItem?.title = "\(restaurant.name) Menu"
+                            case .reserve:
+                                UINavigationBar.appearance().topItem?.title = "Make a Reservation"
+                            case .order:
+                                UINavigationBar.appearance().topItem?.title = "Order"
+                            case .info:
+                                UINavigationBar.appearance().topItem?.title = "About Us"
+                            }
                         }
                     } label: {
                         HStack(spacing: 12) {

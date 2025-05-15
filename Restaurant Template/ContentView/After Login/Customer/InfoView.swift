@@ -98,17 +98,46 @@ struct InfoView: View {
                 // Force tab bar appearance when the view appears
                 DispatchQueue.main.async {
                     let appearance = UITabBarAppearance()
-                    appearance.configureWithOpaqueBackground()
+                    
+                    // Start with transparent background for material effect
+                    appearance.configureWithTransparentBackground()
+                    
+                    // Apply ultraThinMaterial effect
                     appearance.backgroundEffect = UIBlurEffect(style: .systemThinMaterialDark)
-                    appearance.backgroundColor = UIColor(Color(hex: "0d47a1"))
+                    
+                    // Create a gradient-like effect with a semi-transparent overlay
+                    // Top color: lighter blue
+                    let topColor = UIColor(Color(hex: "1a73e8").opacity(0.85))
+                    // Bottom color: darker blue
+                    let bottomColor = UIColor(Color(hex: "002171").opacity(0.85))
+                    
+                    // Use the average color for the backgroundColor with material effect
+                    appearance.backgroundColor = UIColor(
+                        red: (topColor.cgColor.components![0] + bottomColor.cgColor.components![0]) / 2,
+                        green: (topColor.cgColor.components![1] + bottomColor.cgColor.components![1]) / 2,
+                        blue: (topColor.cgColor.components![2] + bottomColor.cgColor.components![2]) / 2,
+                        alpha: 0.85
+                    )
+                    
+                    // Style the tab items
                     appearance.stackedLayoutAppearance.normal.iconColor = UIColor.white.withAlphaComponent(0.5)
                     appearance.stackedLayoutAppearance.normal.titleTextAttributes = [.foregroundColor: UIColor.white.withAlphaComponent(0.5)]
                     appearance.stackedLayoutAppearance.selected.iconColor = .white
                     appearance.stackedLayoutAppearance.selected.titleTextAttributes = [.foregroundColor: UIColor.white]
+                    
+                    // Apply shadow to tab bar
+                    appearance.shadowColor = UIColor.black.withAlphaComponent(0.2)
+                    
+                    // Apply this appearance to the tab bar
                     UITabBar.appearance().standardAppearance = appearance
                     UITabBar.appearance().scrollEdgeAppearance = appearance
                     UITabBar.appearance().tintColor = .white
+                    
+                    // Enhance the tab bar with a subtle border
+                    UITabBar.appearance().layer.borderWidth = 0.2
+                    UITabBar.appearance().layer.borderColor = UIColor.white.withAlphaComponent(0.2).cgColor
                 }
+                
             }
         }
     }
@@ -548,6 +577,8 @@ struct MapWithConsistentTabBar: UIViewRepresentable {
     let coordinate: CLLocationCoordinate2D
     let title: String
     
+    // In MapWithConsistentTabBar, update the makeUIView method:
+
     func makeUIView(context: Context) -> MKMapView {
         let mapView = MKMapView()
         mapView.delegate = context.coordinator
@@ -558,16 +589,18 @@ struct MapWithConsistentTabBar: UIViewRepresentable {
         annotation.title = title
         mapView.addAnnotation(annotation)
         
-        // Force blue tab bar appearance after map is created
+        // Apply the same tab bar appearance that worked well
         DispatchQueue.main.async {
             let appearance = UITabBarAppearance()
-            appearance.configureWithOpaqueBackground()
+            appearance.configureWithTransparentBackground()
             appearance.backgroundEffect = UIBlurEffect(style: .systemThinMaterialDark)
-            appearance.backgroundColor = UIColor(Color(hex: "0d47a1"))
+            appearance.backgroundColor = UIColor(Color(hex: "0d47a1").opacity(0.7))
+            
             appearance.stackedLayoutAppearance.normal.iconColor = UIColor.white.withAlphaComponent(0.5)
             appearance.stackedLayoutAppearance.normal.titleTextAttributes = [.foregroundColor: UIColor.white.withAlphaComponent(0.5)]
             appearance.stackedLayoutAppearance.selected.iconColor = .white
             appearance.stackedLayoutAppearance.selected.titleTextAttributes = [.foregroundColor: UIColor.white]
+            
             UITabBar.appearance().standardAppearance = appearance
             UITabBar.appearance().scrollEdgeAppearance = appearance
             UITabBar.appearance().tintColor = .white
