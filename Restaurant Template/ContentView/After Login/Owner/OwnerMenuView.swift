@@ -62,8 +62,7 @@ struct OwnerMenuView: View {
                         .font(.headline)
                         .foregroundColor(.white)
                 }
-            }
-            .toolbar {
+                
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button {
                         // Publish menu changes

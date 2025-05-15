@@ -93,15 +93,11 @@ struct OwnerDashboardView: View {
             NavigationStack {
                 TabView(selection: $selectedTab) {
                     // Dashboard Tab - Analytics
-                    OwnerAnalyticsView(onMenuButtonTap: {
-                        withAnimation {
-                            showMenu.toggle()
+                    OwnerAnalyticsView()
+                        .tag(Tab.analytics)
+                        .tabItem {
+                            Label("Analytics", systemImage: "chart.bar.fill")
                         }
-                    })
-                    .tag(Tab.analytics)
-                    .tabItem {
-                        Label("Analytics", systemImage: "chart.bar.fill")
-                    }
                     
                     // Menu Management Tab
                     OwnerMenuView()
@@ -142,15 +138,14 @@ struct OwnerDashboardView: View {
                 .navigationBarTitleDisplayMode(.inline) 
                 .toolbar {
                     ToolbarItem(placement: .navigationBarLeading) {
-                        if selectedTab != .analytics {
-                            Button {
-                                withAnimation {
-                                    showMenu.toggle()
-                                }
-                            } label: {
-                                Image(systemName: "line.3.horizontal")
-                                    .foregroundColor(.white)
+                        // Show menu button for all tabs since we'll remove it from individual views
+                        Button {
+                            withAnimation {
+                                showMenu.toggle()
                             }
+                        } label: {
+                            Image(systemName: "line.3.horizontal")
+                                .foregroundColor(.white)
                         }
                     }
                     

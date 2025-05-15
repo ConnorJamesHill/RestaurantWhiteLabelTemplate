@@ -73,8 +73,6 @@ struct OwnerReservationsView: View {
                         .font(.headline)
                         .foregroundColor(.white)
                 }
-            }
-            .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button {
                         // Add new reservation

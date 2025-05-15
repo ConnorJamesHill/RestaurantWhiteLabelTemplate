@@ -63,8 +63,6 @@ struct OwnerOrdersView: View {
                         .font(.headline)
                         .foregroundColor(.white)
                 }
-            }
-            .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button {
                         // Refresh orders

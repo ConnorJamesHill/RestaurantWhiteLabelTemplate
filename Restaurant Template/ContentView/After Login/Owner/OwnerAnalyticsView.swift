@@ -81,15 +81,6 @@ struct OwnerAnalyticsView: View {
                         .font(.headline)
                         .foregroundColor(.white)
                 }
-                
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button {
-                        onMenuButtonTap?() // Call the callback when menu button is tapped
-                    } label: {
-                        Image(systemName: "line.3.horizontal")
-                            .foregroundColor(.white)
-                    }
-                }
             }
         }
     }
