@@ -311,12 +311,11 @@ struct GlassStatCard: View {
                     }
                     .font(.caption2)
                     .foregroundColor(trend >= 0 ? .green : .red)
-                    .padding(4)
-                    .background(
-                        (trend >= 0 ? Color.green : Color.red)
-                            .opacity(0.2)
-                            .clipShape(Capsule())
-                    )
+                    .padding(.horizontal, 6)
+                    .padding(.vertical, 4)
+                    .background(.white.opacity(0.9))
+                    .clipShape(Capsule()) // Changed from rectangle to rounded capsule
+                    .shadow(color: Color.black.opacity(0.2), radius: 1, x: 0, y: 1)
                 }
             }
             
