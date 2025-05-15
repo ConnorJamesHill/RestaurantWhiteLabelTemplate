@@ -6,6 +6,7 @@ struct OwnerDashboardView: View {
     @StateObject private var viewModel = OwnerDashboardViewViewModel()
     @State private var showMenu: Bool = false
     @State private var selectedTab = Tab.analytics
+    @State private var isChangingView = false // Track view change state
     
     enum Tab: String, CaseIterable {
         case analytics = "Analytics"
@@ -95,32 +96,39 @@ struct OwnerDashboardView: View {
         ) { safeArea in
             // Main Content - TabView
             NavigationStack {
-                // We create separate content for each tab to ensure toolbar refreshes
-                Group {
-                    if selectedTab == .analytics {
-                        AnalyticsWrapper()
-                            .transition(.opacity)
-                    } else if selectedTab == .menu {
-                        MenuWrapper()
-                            .transition(.opacity)
-                    } else if selectedTab == .orders {
-                        OrdersWrapper()
-                            .transition(.opacity)
-                    } else if selectedTab == .tables {
-                        ReservationsWrapper()
-                            .transition(.opacity)
-                    } else if selectedTab == .marketing {
-                        MarketingWrapper()
-                            .transition(.opacity)
-                    } else if selectedTab == .settings {
-                        SettingsWrapper()
-                            .transition(.opacity)
+                ZStack {
+                    // Background gradient visible during transitions
+                    backgroundGradient.ignoresSafeArea()
+                    
+                    // Content views with transitions
+                    Group {
+                        if selectedTab == .analytics {
+                            AnalyticsWrapper()
+                                .transition(.opacity)
+                        } else if selectedTab == .menu {
+                            MenuWrapper()
+                                .transition(.opacity)
+                        } else if selectedTab == .orders {
+                            OrdersWrapper()
+                                .transition(.opacity)
+                        } else if selectedTab == .tables {
+                            ReservationsWrapper()
+                                .transition(.opacity)
+                        } else if selectedTab == .marketing {
+                            MarketingWrapper()
+                                .transition(.opacity)
+                        } else if selectedTab == .settings {
+                            SettingsWrapper()
+                                .transition(.opacity)
+                        }
                     }
-                }
-                // Custom tab bar at the bottom
-                .safeAreaInset(edge: .bottom) {
-                    CustomTabBar(selectedTab: $selectedTab)
-                        .background(.ultraThinMaterial)
+                    .opacity(isChangingView ? 0 : 1) // Fade out during transitions
+                    
+                    // Custom tab bar at the bottom
+                    .safeAreaInset(edge: .bottom) {
+                        CustomTabBar(selectedTab: $selectedTab, isChangingView: $isChangingView)
+                            .background(.ultraThinMaterial)
+                    }
                 }
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar {
@@ -141,7 +149,7 @@ struct OwnerDashboardView: View {
                             .foregroundColor(.white)
                     }
                     
-                    // Now we use different toolbar items based on the selected tab
+                    // Toolbar trailing items based on the selected tab
                     if selectedTab == .menu {
                         ToolbarItem(placement: .navigationBarTrailing) {
                             Button {
@@ -220,15 +228,14 @@ struct OwnerDashboardView: View {
     // Custom tab bar
     struct CustomTabBar: View {
         @Binding var selectedTab: Tab
+        @Binding var isChangingView: Bool
         
         var body: some View {
             HStack(spacing: 0) {
                 // Only show tabs that should appear in the tab bar (not settings)
                 ForEach(Tab.tabBarCases, id: \.self) { tab in
                     Button {
-                        withAnimation {
-                            selectedTab = tab
-                        }
+                        handleTabSelection(tab)
                     } label: {
                         VStack(spacing: 4) {
                             Image(systemName: tab.icon)
@@ -244,6 +251,26 @@ struct OwnerDashboardView: View {
                 }
             }
             .background(Color(hex: "0d47a1").opacity(0.7))
+        }
+        
+        private func handleTabSelection(_ tab: Tab) {
+            guard tab != selectedTab else { return }
+            
+            // Start transition
+            withAnimation(.easeOut(duration: 0.15)) {
+                isChangingView = true
+            }
+            
+            // Wait briefly
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                // Switch tab
+                selectedTab = tab
+                
+                // Complete transition
+                withAnimation(.easeIn(duration: 0.2)) {
+                    isChangingView = false
+                }
+            }
         }
     }
     
@@ -273,10 +300,7 @@ struct OwnerDashboardView: View {
             VStack(alignment: .leading, spacing: 10) {
                 ForEach(Tab.allCases, id: \.self) { tab in
                     Button {
-                        selectedTab = tab
-                        withAnimation {
-                            showMenu = false
-                        }
+                        handleSidebarTabSelection(tab)
                     } label: {
                         HStack(spacing: 12) {
                             Image(systemName: tab.icon)
@@ -322,6 +346,37 @@ struct OwnerDashboardView: View {
             .padding(.bottom, safeArea.bottom + 15)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
+    }
+    
+    // Coordinate sidebar navigation with proper transitions
+    private func handleSidebarTabSelection(_ tab: Tab) {
+        guard tab != selectedTab else {
+            // Just close the menu if it's the same tab
+            withAnimation {
+                showMenu = false
+            }
+            return
+        }
+        
+        // Start transition - fade out current view
+        withAnimation(.easeOut(duration: 0.15)) {
+            isChangingView = true
+        }
+        
+        // First close the menu
+        withAnimation {
+            showMenu = false
+        }
+        
+        // Then switch tabs after a small delay
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            selectedTab = tab
+            
+            // Fade in the new view
+            withAnimation(.easeIn(duration: 0.25)) {
+                isChangingView = false
+            }
+        }
     }
     
     // Wrapper views
