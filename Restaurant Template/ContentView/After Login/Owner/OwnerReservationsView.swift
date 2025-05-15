@@ -99,7 +99,8 @@ struct OwnerReservationsView: View {
             Text("Select Date")
                 .font(.headline)
                 .foregroundColor(.white)
-                .padding(.leading, 8)
+                .padding(.leading, 12)
+                .padding(.top, 12)
             
             DatePicker("", selection: $selectedDate, displayedComponents: .date)
                 .datePickerStyle(GraphicalDatePickerStyle())
