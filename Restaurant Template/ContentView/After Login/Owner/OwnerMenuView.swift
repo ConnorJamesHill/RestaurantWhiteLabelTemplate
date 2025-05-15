@@ -5,7 +5,7 @@ struct OwnerMenuView: View {
     @Environment(\.colorScheme) private var colorScheme
     
     // Using the same blue gradient from OwnerAnalyticsView
-    private var backgroundGradient: LinearGradient {
+    var backgroundGradient: LinearGradient {
         LinearGradient(
             gradient: Gradient(colors: [
                 Color(hex: "1a73e8"), // Vibrant blue
@@ -86,7 +86,7 @@ struct OwnerMenuView: View {
     
     // MARK: - Glassmorphism Sections
     
-    private var menuCategoriesSection: some View {
+    var menuCategoriesSection: some View {
         VStack(alignment: .leading, spacing: 10) {
             Text("Menu Categories")
                 .font(.headline)
@@ -181,7 +181,7 @@ struct OwnerMenuView: View {
         .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 5)
     }
     
-    private var featuredItemsSection: some View {
+    var featuredItemsSection: some View {
         VStack(alignment: .leading, spacing: 10) {
             Text("Featured Items")
                 .font(.headline)
@@ -282,7 +282,7 @@ struct OwnerMenuView: View {
         .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 5)
     }
     
-    private var dietaryOptionsSection: some View {
+    var dietaryOptionsSection: some View {
         VStack(alignment: .leading, spacing: 10) {
             Text("Special Dietary Options")
                 .font(.headline)

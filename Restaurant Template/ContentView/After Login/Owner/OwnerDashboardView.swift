@@ -13,7 +13,7 @@ struct OwnerDashboardView: View {
         case orders = "Orders"
         case tables = "Tables"
         case marketing = "Marketing"
-        case settings = "Settings"
+        case settings = "Settings" // Keep settings in enum but don't show in tab bar
         
         var icon: String {
             switch self {
@@ -24,6 +24,11 @@ struct OwnerDashboardView: View {
             case .marketing: return "megaphone.fill"
             case .settings: return "gear"
             }
+        }
+        
+        // New computed property to get tabs for the bottom bar
+        static var tabBarCases: [Tab] {
+            return [.analytics, .menu, .orders, .tables, .marketing]
         }
     }
     
@@ -77,7 +82,6 @@ struct OwnerDashboardView: View {
         
         // Apply the appearance to all navigation bars
         UINavigationBar.appearance().standardAppearance = navBarAppearance
-        UINavigationBar.appearance().compactAppearance = navBarAppearance
         UINavigationBar.appearance().scrollEdgeAppearance = navBarAppearance
     }
     
@@ -91,54 +95,36 @@ struct OwnerDashboardView: View {
         ) { safeArea in
             // Main Content - TabView
             NavigationStack {
-                TabView(selection: $selectedTab) {
-                    // Dashboard Tab - Analytics
-                    OwnerAnalyticsView()
-                        .tag(Tab.analytics)
-                        .tabItem {
-                            Label("Analytics", systemImage: "chart.bar.fill")
-                        }
-                    
-                    // Menu Management Tab
-                    OwnerMenuView()
-                        .tag(Tab.menu)
-                        .tabItem {
-                            Label("Menu", systemImage: "doc.text.fill")
-                        }
-                    
-                    // Orders Management Tab
-                    OwnerOrdersView()
-                        .tag(Tab.orders)
-                        .tabItem {
-                            Label("Orders", systemImage: "bag.fill")
-                        }
-                    
-                    // Reservations Management Tab
-                    OwnerReservationsView()
-                        .tag(Tab.tables)
-                        .tabItem {
-                            Label("Tables", systemImage: "calendar")
-                        }
-                    
-                    // Marketing & Promotions Tab
-                    OwnerMarketingView()
-                        .tag(Tab.marketing)
-                        .tabItem {
-                            Label("Marketing", systemImage: "megaphone.fill")
-                        }
-                    
-                    // Settings & Account Tab
-                    OwnerSettingsView()
-                        .tag(Tab.settings)
-                        .tabItem {
-                            Label("Settings", systemImage: "gear")
-                        }
+                // We create separate content for each tab to ensure toolbar refreshes
+                Group {
+                    if selectedTab == .analytics {
+                        AnalyticsWrapper()
+                            .transition(.opacity)
+                    } else if selectedTab == .menu {
+                        MenuWrapper()
+                            .transition(.opacity)
+                    } else if selectedTab == .orders {
+                        OrdersWrapper()
+                            .transition(.opacity)
+                    } else if selectedTab == .tables {
+                        ReservationsWrapper()
+                            .transition(.opacity)
+                    } else if selectedTab == .marketing {
+                        MarketingWrapper()
+                            .transition(.opacity)
+                    } else if selectedTab == .settings {
+                        SettingsWrapper()
+                            .transition(.opacity)
+                    }
                 }
-                .tint(.white) // Add this line to make icons white
-                .navigationBarTitleDisplayMode(.inline) 
+                // Custom tab bar at the bottom
+                .safeAreaInset(edge: .bottom) {
+                    CustomTabBar(selectedTab: $selectedTab)
+                        .background(.ultraThinMaterial)
+                }
+                .navigationBarTitleDisplayMode(.inline)
                 .toolbar {
                     ToolbarItem(placement: .navigationBarLeading) {
-                        // Show menu button for all tabs since we'll remove it from individual views
                         Button {
                             withAnimation {
                                 showMenu.toggle()
@@ -149,11 +135,57 @@ struct OwnerDashboardView: View {
                         }
                     }
                     
-                    ToolbarItem(placement: .navigationBarTrailing) {
-                        Button {
-                            viewModel.signOut()
-                        } label: {
-                            Image(systemName: "rectangle.portrait.and.arrow.right")
+                    ToolbarItem(placement: .principal) {
+                        Text(getTitleForTab(selectedTab))
+                            .font(.headline)
+                            .foregroundColor(.white)
+                    }
+                    
+                    // Now we use different toolbar items based on the selected tab
+                    if selectedTab == .menu {
+                        ToolbarItem(placement: .navigationBarTrailing) {
+                            Button {
+                                // Publish menu changes
+                            } label: {
+                                Text("Publish")
+                                    .fontWeight(.semibold)
+                                    .padding(.horizontal, 16)
+                                    .padding(.vertical, 8)
+                                    .background(.ultraThinMaterial)
+                                    .cornerRadius(8)
+                                    .foregroundColor(.white)
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 8)
+                                            .stroke(Color.black.opacity(0.3), lineWidth: 0.15)
+                                    )
+                            }
+                        }
+                    } else if selectedTab == .marketing {
+                        ToolbarItem(placement: .navigationBarTrailing) {
+                            Button {
+                                // Create new promotion
+                            } label: {
+                                Text("New")
+                                    .fontWeight(.medium)
+                                    .foregroundColor(.white)
+                                    .padding(.horizontal, 12)
+                                    .padding(.vertical, 6)
+                                    .background(.ultraThinMaterial)
+                                    .cornerRadius(8)
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 8)
+                                            .stroke(Color.black.opacity(0.3), lineWidth: 0.15)
+                                    )
+                            }
+                        }
+                    } else {
+                        ToolbarItem(placement: .navigationBarTrailing) {
+                            Button {
+                                viewModel.signOut()
+                            } label: {
+                                Image(systemName: "rectangle.portrait.and.arrow.right")
+                                    .foregroundColor(.white)
+                            }
                         }
                     }
                 }
@@ -164,6 +196,54 @@ struct OwnerDashboardView: View {
         } background: {
             backgroundGradient
                 .ignoresSafeArea()
+        }
+    }
+    
+    // Get the appropriate title for the selected tab
+    private func getTitleForTab(_ tab: Tab) -> String {
+        switch tab {
+        case .analytics:
+            return "Analytics"
+        case .menu:
+            return "Menu Management"
+        case .orders:
+            return "Orders"
+        case .tables:
+            return "Tables & Reservations"
+        case .marketing:
+            return "Marketing"
+        case .settings:
+            return "Settings"
+        }
+    }
+    
+    // Custom tab bar
+    struct CustomTabBar: View {
+        @Binding var selectedTab: Tab
+        
+        var body: some View {
+            HStack(spacing: 0) {
+                // Only show tabs that should appear in the tab bar (not settings)
+                ForEach(Tab.tabBarCases, id: \.self) { tab in
+                    Button {
+                        withAnimation {
+                            selectedTab = tab
+                        }
+                    } label: {
+                        VStack(spacing: 4) {
+                            Image(systemName: tab.icon)
+                                .font(.system(size: 20))
+                            
+                            Text(tab.rawValue)
+                                .font(.caption)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 8)
+                        .foregroundColor(selectedTab == tab ? .white : .white.opacity(0.5))
+                    }
+                }
+            }
+            .background(Color(hex: "0d47a1").opacity(0.7))
         }
     }
     
@@ -189,7 +269,7 @@ struct OwnerDashboardView: View {
             .padding(.bottom, 30)
             .padding(.horizontal, 25)
             
-            // Menu Items
+            // Menu Items - show ALL tabs in the sidebar including Settings
             VStack(alignment: .leading, spacing: 10) {
                 ForEach(Tab.allCases, id: \.self) { tab in
                     Button {
@@ -242,6 +322,188 @@ struct OwnerDashboardView: View {
             .padding(.bottom, safeArea.bottom + 15)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
+    }
+    
+    // Wrapper views
+    struct AnalyticsWrapper: View {
+        var body: some View {
+            let view = OwnerAnalyticsView()
+            return ZStack {
+                view.backgroundGradient.ignoresSafeArea()
+                
+                // Decorative elements
+                Circle()
+                    .fill(Color.black.opacity(0.05))
+                    .frame(width: 300, height: 300)
+                    .blur(radius: 30)
+                    .offset(x: -150, y: -100)
+                
+                Circle()
+                    .fill(Color.black.opacity(0.08))
+                    .frame(width: 250, height: 250)
+                    .blur(radius: 20)
+                    .offset(x: 180, y: 400)
+                
+                ScrollView {
+                    VStack(spacing: 24) {
+                        // Title with glass effect
+                        Text("Analytics Dashboard")
+                            .font(.title2.bold())
+                            .foregroundColor(.white)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.horizontal, 6)
+                            .padding(.top, 10)
+                        
+                        // Quick Stats Cards
+                        view.quickStatsSection
+                        
+                        // Revenue Chart
+                        view.revenueChartSection
+                        
+                        // Popular Items
+                        view.popularItemsSection
+                        
+                        // Recent Orders
+                        view.recentOrdersSection
+                    }
+                    .padding()
+                }
+            }
+        }
+    }
+    
+    struct MenuWrapper: View {
+        var body: some View {
+            let view = OwnerMenuView()
+            return ZStack {
+                view.backgroundGradient.ignoresSafeArea()
+                
+                // Decorative elements
+                Circle()
+                    .fill(Color.white.opacity(0.05))
+                    .frame(width: 300, height: 300)
+                    .blur(radius: 30)
+                    .offset(x: -150, y: -100)
+                
+                Circle()
+                    .fill(Color.white.opacity(0.08))
+                    .frame(width: 250, height: 250)
+                    .blur(radius: 20)
+                    .offset(x: 180, y: 400)
+                
+                ScrollView {
+                    VStack(spacing: 20) {
+                        // Menu Categories Section
+                        view.menuCategoriesSection
+                        
+                        // Featured Items Section
+                        view.featuredItemsSection
+                        
+                        // Special Dietary Options Section
+                        view.dietaryOptionsSection
+                    }
+                    .padding()
+                }
+            }
+        }
+    }
+    
+    struct OrdersWrapper: View {
+        var body: some View {
+            let view = OwnerOrdersView()
+            return ZStack {
+                view.backgroundGradient.ignoresSafeArea()
+                
+                // Content without NavigationStack or toolbar
+                VStack(spacing: 16) {
+                    // Search Bar
+                    view.searchBarSection
+                    
+                    // Order Type Picker
+                    view.orderTypeSection
+                    
+                    // Orders List
+                    view.ordersListSection
+                }
+                .padding(.horizontal)
+            }
+        }
+    }
+    
+    struct ReservationsWrapper: View {
+        var body: some View {
+            OwnerReservationsView()
+        }
+    }
+    
+    struct MarketingWrapper: View {
+        var body: some View {
+            let view = OwnerMarketingView()
+            return ZStack {
+                view.backgroundGradient.ignoresSafeArea()
+                
+                // Decorative elements
+                Circle()
+                    .fill(Color.white.opacity(0.05))
+                    .frame(width: 300, height: 300)
+                    .blur(radius: 30)
+                    .offset(x: -150, y: -100)
+                
+                Circle()
+                    .fill(Color.white.opacity(0.08))
+                    .frame(width: 250, height: 250)
+                    .blur(radius: 20)
+                    .offset(x: 180, y: 400)
+                
+                ScrollView {
+                    VStack(spacing: 20) {
+                        // Marketing Overview
+                        view.marketingOverviewSection
+                        
+                        // Active Promotions
+                        view.activePromotionsSection
+                        
+                        // Customer Engagement
+                        view.customerEngagementSection
+                        
+                        // Analytics
+                        view.analyticsSection
+                    }
+                    .padding()
+                }
+            }
+        }
+    }
+    
+    struct SettingsWrapper: View {
+        var body: some View {
+            let view = OwnerSettingsView()
+            return ZStack {
+                view.backgroundGradient.ignoresSafeArea()
+                
+                ScrollView {
+                    VStack(spacing: 20) {
+                        view.profileHeader
+                        
+                        // Restaurant Profile
+                        view.restaurantProfileSection
+                        
+                        // Staff Management
+                        view.staffManagementSection
+                        
+                        // System Settings
+                        view.systemSection
+                        
+                        // Account Actions
+                        view.accountActionsSection
+                        
+                        // App Info
+                        view.appInfoSection
+                    }
+                    .padding()
+                }
+            }
+        }
     }
 }
 

@@ -14,7 +14,7 @@ struct OwnerSettingsView: View {
     @Environment(\.colorScheme) private var colorScheme
     
     // Blue gradient background - matching other owner views
-    private var backgroundGradient: LinearGradient {
+    var backgroundGradient: LinearGradient {
         LinearGradient(
             gradient: Gradient(colors: [
                 Color(hex: "1a73e8"), // Vibrant blue
@@ -85,7 +85,7 @@ struct OwnerSettingsView: View {
     
     // MARK: - Glassmorphism Sections
     
-    private var profileHeader: some View {
+    var profileHeader: some View {
         VStack(spacing: 16) {
             Image("restaurant_logo")
                 .resizable()
@@ -125,7 +125,7 @@ struct OwnerSettingsView: View {
         .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 5)
     }
     
-    private var restaurantProfileSection: some View {
+    var restaurantProfileSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             sectionHeader("Restaurant Profile")
             
@@ -167,7 +167,7 @@ struct OwnerSettingsView: View {
         .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 5)
     }
     
-    private var staffManagementSection: some View {
+    var staffManagementSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             sectionHeader("Staff Management")
             
@@ -222,7 +222,7 @@ struct OwnerSettingsView: View {
         .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 5)
     }
     
-    private var systemSection: some View {
+    var systemSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             sectionHeader("System")
             
@@ -264,7 +264,7 @@ struct OwnerSettingsView: View {
         .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 5)
     }
     
-    private var accountActionsSection: some View {
+    var accountActionsSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             sectionHeader("Account")
             
@@ -320,7 +320,7 @@ struct OwnerSettingsView: View {
         .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 5)
     }
     
-    private var appInfoSection: some View {
+    var appInfoSection: some View {
         VStack(alignment: .center, spacing: 12) {
             Text("Restaurant Manager App")
                 .font(.caption)

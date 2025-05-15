@@ -13,7 +13,7 @@ struct OwnerAnalyticsView: View {
     var onMenuButtonTap: (() -> Void)? // Add callback for menu button
     
     // Enhanced blue gradient background
-    private var backgroundGradient: LinearGradient {
+    var backgroundGradient: LinearGradient {
         LinearGradient(
             gradient: Gradient(colors: [
                 Color(hex: "1a73e8"), // Vibrant blue
@@ -87,7 +87,7 @@ struct OwnerAnalyticsView: View {
     
     // MARK: - Glassmorphism Sections
     
-    private var quickStatsSection: some View {
+    var quickStatsSection: some View {
         LazyVGrid(columns: [
             GridItem(.flexible()),
             GridItem(.flexible())
@@ -126,7 +126,7 @@ struct OwnerAnalyticsView: View {
         }
     }
     
-    private var revenueChartSection: some View {
+    var revenueChartSection: some View {
         VStack(alignment: .leading, spacing: 16) {
             Text("Revenue Overview")
                 .font(.headline)
@@ -176,7 +176,7 @@ struct OwnerAnalyticsView: View {
         .shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: 5)
     }
     
-    private var popularItemsSection: some View {
+    var popularItemsSection: some View {
         VStack(alignment: .leading, spacing: 16) {
             Text("Popular Items")
                 .font(.headline)
@@ -222,7 +222,7 @@ struct OwnerAnalyticsView: View {
         .shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: 5)
     }
     
-    private var recentOrdersSection: some View {
+    var recentOrdersSection: some View {
         VStack(alignment: .leading, spacing: 16) {
             Text("Recent Orders")
                 .font(.headline)

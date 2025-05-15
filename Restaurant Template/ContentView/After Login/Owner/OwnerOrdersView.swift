@@ -8,7 +8,7 @@ struct OwnerOrdersView: View {
     @Environment(\.colorScheme) private var colorScheme
     
     // Blue gradient background - matching other owner views
-    private var backgroundGradient: LinearGradient {
+    var backgroundGradient: LinearGradient {
         LinearGradient(
             gradient: Gradient(colors: [
                 Color(hex: "1a73e8"), // Vibrant blue
@@ -84,7 +84,7 @@ struct OwnerOrdersView: View {
     
     // MARK: - Glassmorphism Sections
     
-    private var searchBarSection: some View {
+    var searchBarSection: some View {
         HStack {
             Image(systemName: "magnifyingglass")
                 .foregroundColor(.white.opacity(0.7))
@@ -112,7 +112,7 @@ struct OwnerOrdersView: View {
         .padding(.top)
     }
     
-    private var orderTypeSection: some View {
+    var orderTypeSection: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text("Filter Orders")
                 .font(.headline)
@@ -144,7 +144,7 @@ struct OwnerOrdersView: View {
         .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 5)
     }
     
-    private var ordersListSection: some View {
+    var ordersListSection: some View {
         ScrollView {
             LazyVStack(spacing: 12) {
                 // Summary Stats

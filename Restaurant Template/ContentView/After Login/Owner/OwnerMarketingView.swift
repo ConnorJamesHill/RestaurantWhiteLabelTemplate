@@ -12,7 +12,7 @@ struct OwnerMarketingView: View {
     @Environment(\.colorScheme) private var colorScheme
     
     // Blue gradient background - matching other owner views
-    private var backgroundGradient: LinearGradient {
+    var backgroundGradient: LinearGradient {
         LinearGradient(
             gradient: Gradient(colors: [
                 Color(hex: "1a73e8"), // Vibrant blue
@@ -97,7 +97,7 @@ struct OwnerMarketingView: View {
     
     // MARK: - Glassmorphism Sections
     
-    private var marketingOverviewSection: some View {
+    var marketingOverviewSection: some View {
         HStack(spacing: 15) {
             marketingStatView(count: "3", title: "Active Promotions", iconName: "tag.fill", color: .blue)
             marketingStatView(count: "235", title: "Customer Engagements", iconName: "person.3.fill", color: .green)
@@ -145,7 +145,7 @@ struct OwnerMarketingView: View {
         .shadow(color: .black.opacity(0.2), radius: 8, x: 0, y: 4)
     }
     
-    private var activePromotionsSection: some View {
+    var activePromotionsSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             sectionHeader("Active Promotions")
             
@@ -216,7 +216,7 @@ struct OwnerMarketingView: View {
         .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 5)
     }
     
-    private var customerEngagementSection: some View {
+    var customerEngagementSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             sectionHeader("Customer Engagement")
             
@@ -261,7 +261,7 @@ struct OwnerMarketingView: View {
         .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 5)
     }
     
-    private var analyticsSection: some View {
+    var analyticsSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             sectionHeader("Analytics")
             
