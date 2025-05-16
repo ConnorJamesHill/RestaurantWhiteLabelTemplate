@@ -3,6 +3,7 @@ import Charts
 
 struct OwnerDashboardView: View {
     @EnvironmentObject private var restaurant: RestaurantConfiguration
+    @EnvironmentObject private var themeManager: ThemeManager
     @StateObject private var viewModel = OwnerDashboardViewViewModel()
     @State private var showMenu: Bool = false
     @State private var selectedTab = Tab.analytics
@@ -27,63 +28,14 @@ struct OwnerDashboardView: View {
             }
         }
         
-        // New computed property to get tabs for the bottom bar
+        // Computed property to get tabs for the bottom bar
         static var tabBarCases: [Tab] {
             return [.analytics, .menu, .orders, .tables, .marketing]
         }
     }
     
-    // Blue gradient background for sidebar
-    private var backgroundGradient: LinearGradient {
-        LinearGradient(
-            gradient: Gradient(colors: [
-                Color(hex: "1a73e8"),
-                Color(hex: "0d47a1"),
-                Color(hex: "002171"),
-                Color(hex: "002984")
-            ]),
-            startPoint: .topLeading,
-            endPoint: .bottomTrailing
-        )
-    }
-    
     init() {
-        // Create a blue gradient for the tab bar
-        let appearance = UITabBarAppearance()
-        appearance.configureWithTransparentBackground()
-        
-        // Use a visual effect with blue tint
-        let blurEffect = UIBlurEffect(style: .systemThinMaterialDark)
-        appearance.backgroundEffect = blurEffect
-        
-        // Add a blue overlay color
-        appearance.backgroundColor = UIColor(Color(hex: "0d47a1").opacity(0.7))
-        
-        // Use this appearance for the tab bar
-        UITabBar.appearance().standardAppearance = appearance
-        UITabBar.appearance().scrollEdgeAppearance = appearance
-        
-        // Set the unselected icons to white with reduced opacity
-        appearance.stackedLayoutAppearance.normal.iconColor = UIColor.white.withAlphaComponent(0.5)
-        appearance.stackedLayoutAppearance.normal.titleTextAttributes = [.foregroundColor: UIColor.white.withAlphaComponent(0.5)]
-        
-        // Set the selected icons to full white
-        appearance.stackedLayoutAppearance.selected.iconColor = .white
-        appearance.stackedLayoutAppearance.selected.titleTextAttributes = [.foregroundColor: UIColor.white]
-        
-        // Configure the navigation bar appearance
-        let navBarAppearance = UINavigationBarAppearance()
-        navBarAppearance.configureWithTransparentBackground()
-        navBarAppearance.backgroundEffect = UIBlurEffect(style: .systemThinMaterialDark)
-        navBarAppearance.backgroundColor = UIColor(Color(hex: "0d47a1").opacity(0.7))
-        navBarAppearance.titleTextAttributes = [.foregroundColor: UIColor.white]
-        
-        // Remove the shadow (line underneath the navigation bar)
-        navBarAppearance.shadowColor = .clear
-        
-        // Apply the appearance to all navigation bars
-        UINavigationBar.appearance().standardAppearance = navBarAppearance
-        UINavigationBar.appearance().scrollEdgeAppearance = navBarAppearance
+        // No UIKit appearance configuration - ThemeManager handles this
     }
     
     var body: some View {
@@ -97,8 +49,9 @@ struct OwnerDashboardView: View {
             // Main Content - TabView
             NavigationStack {
                 ZStack {
-                    // Background gradient visible during transitions
-                    backgroundGradient.ignoresSafeArea()
+                    // Background gradient from ThemeManager
+                    themeManager.backgroundGradient
+                        .ignoresSafeArea()
                     
                     // Content views with transitions
                     Group {
@@ -131,6 +84,9 @@ struct OwnerDashboardView: View {
                     }
                 }
                 .navigationBarTitleDisplayMode(.inline)
+                .toolbarBackground(themeManager.tabBarColor, for: .navigationBar)
+                .toolbarBackground(.visible, for: .navigationBar)
+                .toolbarColorScheme(themeManager.currentTheme == .light ? .dark : .light, for: .navigationBar)
                 .toolbar {
                     ToolbarItem(placement: .navigationBarLeading) {
                         Button {
@@ -139,14 +95,14 @@ struct OwnerDashboardView: View {
                             }
                         } label: {
                             Image(systemName: "line.3.horizontal")
-                                .foregroundColor(.white)
+                                .foregroundColor(themeManager.textColor)
                         }
                     }
                     
                     ToolbarItem(placement: .principal) {
                         Text(getTitleForTab(selectedTab))
                             .font(.headline)
-                            .foregroundColor(.white)
+                            .foregroundColor(themeManager.textColor)
                     }
                     
                     // Toolbar trailing items based on the selected tab
@@ -161,7 +117,7 @@ struct OwnerDashboardView: View {
                                     .padding(.vertical, 8)
                                     .background(.ultraThinMaterial)
                                     .cornerRadius(8)
-                                    .foregroundColor(.white)
+                                    .foregroundColor(themeManager.textColor)
                                     .overlay(
                                         RoundedRectangle(cornerRadius: 8)
                                             .stroke(Color.black.opacity(0.3), lineWidth: 0.15)
@@ -175,7 +131,7 @@ struct OwnerDashboardView: View {
                             } label: {
                                 Text("New")
                                     .fontWeight(.medium)
-                                    .foregroundColor(.white)
+                                    .foregroundColor(themeManager.textColor)
                                     .padding(.horizontal, 12)
                                     .padding(.vertical, 6)
                                     .background(.ultraThinMaterial)
@@ -192,7 +148,7 @@ struct OwnerDashboardView: View {
                                 viewModel.signOut()
                             } label: {
                                 Image(systemName: "rectangle.portrait.and.arrow.right")
-                                    .foregroundColor(.white)
+                                    .foregroundColor(themeManager.textColor)
                             }
                         }
                     }
@@ -202,7 +158,7 @@ struct OwnerDashboardView: View {
             // Sidebar Menu View
             SideBarMenuView(safeArea)
         } background: {
-            backgroundGradient
+            themeManager.backgroundGradient
                 .ignoresSafeArea()
         }
     }
@@ -227,6 +183,7 @@ struct OwnerDashboardView: View {
     
     // Custom tab bar
     struct CustomTabBar: View {
+        @EnvironmentObject var themeManager: ThemeManager
         @Binding var selectedTab: Tab
         @Binding var isChangingView: Bool
         
@@ -246,11 +203,12 @@ struct OwnerDashboardView: View {
                         }
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 8)
-                        .foregroundColor(selectedTab == tab ? .white : .white.opacity(0.5))
+                        .foregroundColor(selectedTab == tab ? themeManager.textColor : themeManager.textColor.opacity(0.5))
                     }
                 }
             }
-            .background(Color(hex: "0d47a1").opacity(0.7))
+            // Use the themeManager's tabBarColor directly for the tab bar background
+            .background(themeManager.tabBarColor)
         }
         
         private func handleTabSelection(_ tab: Tab) {
@@ -288,7 +246,7 @@ struct OwnerDashboardView: View {
                 Text(restaurant.name)
                     .font(.title3)
                     .fontWeight(.bold)
-                    .foregroundColor(.white)
+                    .foregroundColor(themeManager.textColor)
                 
                 Spacer()
             }
@@ -310,7 +268,7 @@ struct OwnerDashboardView: View {
                             Text(tab.rawValue)
                                 .font(.headline)
                         }
-                        .foregroundColor(selectedTab == tab ? .white : .white.opacity(0.7))
+                        .foregroundColor(selectedTab == tab ? themeManager.textColor : themeManager.textColor.opacity(0.7))
                         .padding(.vertical, 12)
                         .padding(.horizontal, 15)
                         .background(
@@ -326,6 +284,11 @@ struct OwnerDashboardView: View {
             
             Spacer()
             
+            // Theme Selector
+            ThemeSelector()
+                .padding(.horizontal, 15)
+                .padding(.bottom, 20)
+            
             // Sign Out Button
             Button {
                 viewModel.signOut()
@@ -338,7 +301,7 @@ struct OwnerDashboardView: View {
                     Text("Sign Out")
                         .font(.headline)
                 }
-                .foregroundColor(.white)
+                .foregroundColor(themeManager.textColor)
                 .padding(.vertical, 12)
                 .padding(.horizontal, 15)
             }
@@ -379,22 +342,100 @@ struct OwnerDashboardView: View {
         }
     }
     
+    // Theme Selector View
+    struct ThemeSelector: View {
+        @EnvironmentObject private var themeManager: ThemeManager
+        @State private var showThemes = false
+        
+        var body: some View {
+            VStack(alignment: .leading) {
+                Button {
+                    withAnimation {
+                        showThemes.toggle()
+                    }
+                } label: {
+                    HStack(spacing: 12) {
+                        Image(systemName: "paintbrush.fill")
+                            .font(.title3)
+                            .frame(width: 30)
+                        
+                        Text("Theme")
+                            .font(.headline)
+                        
+                        Spacer()
+                        
+                        Image(systemName: showThemes ? "chevron.up" : "chevron.down")
+                            .font(.caption)
+                    }
+                    .foregroundColor(themeManager.textColor)
+                    .padding(.vertical, 12)
+                    .padding(.horizontal, 15)
+                }
+                
+                if showThemes {
+                    VStack(alignment: .leading, spacing: 8) {
+                        ForEach(ThemeManager.AppTheme.allCases) { theme in
+                            Button {
+                                themeManager.currentTheme = theme
+                            } label: {
+                                HStack {
+                                    Image(systemName: theme.icon)
+                                        .foregroundColor(themeColor(for: theme))
+                                    
+                                    Text(theme.rawValue)
+                                        .font(.subheadline)
+                                    
+                                    Spacer()
+                                    
+                                    if themeManager.currentTheme == theme {
+                                        Image(systemName: "checkmark")
+                                            .font(.caption)
+                                    }
+                                }
+                                .foregroundColor(themeManager.textColor)
+                                .padding(.vertical, 8)
+                                .padding(.horizontal, 15)
+                                .padding(.leading, 20)
+                            }
+                        }
+                    }
+                    .padding(.vertical, 8)
+                    .background(.ultraThinMaterial.opacity(0.4))
+                    .cornerRadius(10)
+                    .transition(.scale(scale: 0.9).combined(with: .opacity))
+                }
+            }
+        }
+        
+        private func themeColor(for theme: ThemeManager.AppTheme) -> Color {
+            switch theme {
+            case .blue: return Color(hex: "1a73e8")
+            case .dark: return Color(hex: "424242")
+            case .light: return Color(hex: "BDBDBD")
+            case .red: return Color(hex: "E53935")
+            case .brown: return Color(hex: "8D6E63")
+            case .green: return Color(hex: "43A047")
+            }
+        }
+    }
+    
     // Wrapper views
-    // In OwnerDashboardView.swift
     struct AnalyticsWrapper: View {
-        // Instead of creating a new viewModel, use the one from parent
         var dashboardViewModel: OwnerDashboardViewViewModel
+        @EnvironmentObject private var themeManager: ThemeManager
         
         var body: some View {
             OwnerAnalyticsView(viewModel: dashboardViewModel)
+                .environmentObject(themeManager)
         }
     }
     
     struct MenuWrapper: View {
+        @EnvironmentObject private var themeManager: ThemeManager
+        
         var body: some View {
-            let view = OwnerMenuView()
-            return ZStack {
-                view.backgroundGradient.ignoresSafeArea()
+            ZStack {
+                themeManager.backgroundGradient.ignoresSafeArea()
                 
                 // Decorative elements
                 Circle()
@@ -409,56 +450,47 @@ struct OwnerDashboardView: View {
                     .blur(radius: 20)
                     .offset(x: 180, y: 400)
                 
-                ScrollView {
-                    VStack(spacing: 20) {
-                        // Menu Categories Section
-                        view.menuCategoriesSection
-                        
-                        // Featured Items Section
-                        view.featuredItemsSection
-                        
-                        // Special Dietary Options Section
-                        view.dietaryOptionsSection
-                    }
-                    .padding()
-                }
+                // Important: Explicitly pass themeManager to OwnerMenuView
+                OwnerMenuView()
+                    .environmentObject(themeManager)
             }
         }
     }
     
     struct OrdersWrapper: View {
+        @EnvironmentObject private var themeManager: ThemeManager
+        
         var body: some View {
-            let view = OwnerOrdersView()
-            return ZStack {
-                view.backgroundGradient.ignoresSafeArea()
+            ZStack {
+                themeManager.backgroundGradient.ignoresSafeArea()
                 
-                // Content without NavigationStack or toolbar
-                VStack(spacing: 16) {
-                    // Search Bar
-                    view.searchBarSection
-                    
-                    // Order Type Picker
-                    view.orderTypeSection
-                    
-                    // Orders List
-                    view.ordersListSection
-                }
-                .padding(.horizontal)
+                // Explicitly pass themeManager to OwnerOrdersView
+                OwnerOrdersView()
+                    .environmentObject(themeManager)
             }
         }
     }
     
     struct ReservationsWrapper: View {
+        @EnvironmentObject private var themeManager: ThemeManager
+        
         var body: some View {
-            OwnerReservationsView()
+            ZStack {
+                themeManager.backgroundGradient.ignoresSafeArea()
+                
+                // Explicitly pass themeManager to OwnerReservationsView
+                OwnerReservationsView()
+                    .environmentObject(themeManager)
+            }
         }
     }
     
     struct MarketingWrapper: View {
+        @EnvironmentObject private var themeManager: ThemeManager
+        
         var body: some View {
-            let view = OwnerMarketingView()
-            return ZStack {
-                view.backgroundGradient.ignoresSafeArea()
+            ZStack {
+                themeManager.backgroundGradient.ignoresSafeArea()
                 
                 // Decorative elements
                 Circle()
@@ -473,53 +505,23 @@ struct OwnerDashboardView: View {
                     .blur(radius: 20)
                     .offset(x: 180, y: 400)
                 
-                ScrollView {
-                    VStack(spacing: 20) {
-                        // Marketing Overview
-                        view.marketingOverviewSection
-                        
-                        // Active Promotions
-                        view.activePromotionsSection
-                        
-                        // Customer Engagement
-                        view.customerEngagementSection
-                        
-                        // Analytics
-                        view.analyticsSection
-                    }
-                    .padding()
-                }
+                // Explicitly pass themeManager to OwnerMarketingView
+                OwnerMarketingView()
+                    .environmentObject(themeManager)
             }
         }
     }
     
     struct SettingsWrapper: View {
+        @EnvironmentObject private var themeManager: ThemeManager
+        
         var body: some View {
-            let view = OwnerSettingsView()
-            return ZStack {
-                view.backgroundGradient.ignoresSafeArea()
+            ZStack {
+                themeManager.backgroundGradient.ignoresSafeArea()
                 
-                ScrollView {
-                    VStack(spacing: 20) {
-                        view.profileHeader
-                        
-                        // Restaurant Profile
-                        view.restaurantProfileSection
-                        
-                        // Staff Management
-                        view.staffManagementSection
-                        
-                        // System Settings
-                        view.systemSection
-                        
-                        // Account Actions
-                        view.accountActionsSection
-                        
-                        // App Info
-                        view.appInfoSection
-                    }
-                    .padding()
-                }
+                // Explicitly pass themeManager to OwnerSettingsView
+                OwnerSettingsView()
+                    .environmentObject(themeManager)
             }
         }
     }

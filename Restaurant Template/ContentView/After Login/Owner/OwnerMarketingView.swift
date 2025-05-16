@@ -7,474 +7,736 @@
 
 import Foundation
 import SwiftUI
+import Charts
 
 struct OwnerMarketingView: View {
-    @Environment(\.colorScheme) private var colorScheme
+    @EnvironmentObject private var themeManager: ThemeManager
     
-    // Blue gradient background - matching other owner views
-    var backgroundGradient: LinearGradient {
-        LinearGradient(
-            gradient: Gradient(colors: [
-                Color(hex: "1a73e8"), // Vibrant blue
-                Color(hex: "0d47a1"), // Deep blue
-                Color(hex: "002171"), // Dark blue
-                Color(hex: "002984")  // Navy blue
-            ]),
-            startPoint: .topLeading,
-            endPoint: .bottomTrailing
+    // Sample data for promotions
+    let promotions = [
+        PromotionData(
+            id: "P1001",
+            title: "Happy Hour Special",
+            description: "Half price on selected appetizers and drinks",
+            startDate: "June 1, 2023",
+            endDate: "August 31, 2023",
+            type: .happyHour,
+            isActive: true
+        ),
+        PromotionData(
+            id: "P1002",
+            title: "Weekend Brunch",
+            description: "Complimentary mimosa with any brunch entree",
+            startDate: "May 15, 2023",
+            endDate: "December 31, 2023",
+            type: .event,
+            isActive: true
+        ),
+        PromotionData(
+            id: "P1003",
+            title: "Summer Menu Launch",
+            description: "New seasonal items with 15% off for the first week",
+            startDate: "June 15, 2023",
+            endDate: "June 22, 2023",
+            type: .seasonal,
+            isActive: false
+        ),
+        PromotionData(
+            id: "P1004",
+            title: "Loyalty Program",
+            description: "Earn points with every purchase for exclusive rewards",
+            startDate: "January 1, 2023",
+            endDate: "December 31, 2023",
+            type: .loyalty,
+            isActive: true
         )
-    }
+    ]
+    
+    // Sample data for engagement metrics
+    let engagementData = [
+        EngagementData(month: "Jan", value: 120),
+        EngagementData(month: "Feb", value: 150),
+        EngagementData(month: "Mar", value: 180),
+        EngagementData(month: "Apr", value: 220),
+        EngagementData(month: "May", value: 270),
+        EngagementData(month: "Jun", value: 250)
+    ]
     
     var body: some View {
-        NavigationStack {
-            ZStack {
-                // Background gradient
-                backgroundGradient
-                    .ignoresSafeArea()
+        ZStack {
+            // Background gradient from ThemeManager
+            themeManager.backgroundGradient
+                .ignoresSafeArea()
+            
+            // Decorative elements
+            Circle()
+                .fill(Color.white.opacity(0.05))
+                .frame(width: 300, height: 300)
+                .blur(radius: 30)
+                .offset(x: -150, y: -100)
+            
+            Circle()
+                .fill(Color.white.opacity(0.08))
+                .frame(width: 250, height: 250)
+                .blur(radius: 20)
+                .offset(x: 180, y: 400)
+            
+            ScrollView {
+                VStack(spacing: 20) {
+                    // Marketing Overview
+                    marketingOverviewSection
+                    
+                    // Active Promotions
+                    activePromotionsSection
+                    
+                    // Customer Engagement
+                    customerEngagementSection
+                    
+                    // Analytics
+                    analyticsSection
+                }
+                .padding()
+            }
+        }
+    }
+    
+    // MARK: - Marketing Overview Section
+    var marketingOverviewSection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Marketing Overview")
+                .font(.headline)
+                .foregroundColor(themeManager.textColor)
+                .padding(.leading, 8)
+            
+            HStack(spacing: 12) {
+                // Active Promotions Card
+                MetricCard(
+                    title: "Active Promotions",
+                    value: "\(promotions.filter { $0.isActive }.count)",
+                    icon: "megaphone.fill",
+                    trend: "+2",
+                    trendUp: true
+                )
                 
-                // Decorative elements
-                Circle()
-                    .fill(Color.white.opacity(0.05))
-                    .frame(width: 300, height: 300)
-                    .blur(radius: 30)
-                    .offset(x: -150, y: -100)
+                // Customer Engagement Card
+                MetricCard(
+                    title: "Engagement",
+                    value: "485",
+                    icon: "person.3.fill",
+                    trend: "+14%",
+                    trendUp: true
+                )
+            }
+            
+            HStack(spacing: 12) {
+                // Social Media Reach Card
+                MetricCard(
+                    title: "Social Reach",
+                    value: "2.4K",
+                    icon: "heart.fill",
+                    trend: "+5%",
+                    trendUp: true
+                )
                 
-                Circle()
-                    .fill(Color.white.opacity(0.08))
-                    .frame(width: 250, height: 250)
-                    .blur(radius: 20)
-                    .offset(x: 180, y: 400)
+                // Email Campaign Card
+                MetricCard(
+                    title: "Open Rate",
+                    value: "28%",
+                    icon: "envelope.fill",
+                    trend: "-2%",
+                    trendUp: false
+                )
+            }
+        }
+    }
+    
+    // MARK: - Active Promotions Section
+    var activePromotionsSection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Promotions")
+                .font(.headline)
+                .foregroundColor(themeManager.textColor)
+                .padding(.leading, 8)
+            
+            VStack(spacing: 12) {
+                ForEach(promotions) { promotion in
+                    PromotionCard(promotion: promotion)
+                }
                 
-                ScrollView {
-                    VStack(spacing: 20) {
-                        // Marketing Overview
-                        marketingOverviewSection
+                // Create Promotion Button
+                Button {
+                    // Create new promotion action
+                } label: {
+                    HStack {
+                        Image(systemName: "plus.circle.fill")
+                            .font(.title3)
+                            .foregroundColor(themeManager.primaryColor)
                         
-                        // Active Promotions
-                        activePromotionsSection
+                        Text("Create New Promotion")
+                            .font(.headline)
+                            .foregroundColor(themeManager.textColor)
                         
-                        // Customer Engagement
-                        customerEngagementSection
+                        Spacer()
+                    }
+                    .padding()
+                    .background(.ultraThinMaterial)
+                    .cornerRadius(16)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 16)
+                            .stroke(
+                                LinearGradient(
+                                    colors: [.white.opacity(0.5), .clear, .white.opacity(0.2)],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                ),
+                                lineWidth: 0.15
+                            )
+                    )
+                    .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
+                }
+            }
+        }
+    }
+    
+    // MARK: - Customer Engagement Section
+    var customerEngagementSection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Customer Engagement")
+                .font(.headline)
+                .foregroundColor(themeManager.textColor)
+                .padding(.leading, 8)
+            
+            // Engagement Chart
+            GlassCard {
+                VStack(alignment: .leading, spacing: 16) {
+                    Text("Monthly Engagement")
+                        .font(.subheadline)
+                        .fontWeight(.medium)
+                        .foregroundColor(themeManager.textColor)
+                    
+                    Chart {
+                        ForEach(engagementData) { data in
+                            BarMark(
+                                x: .value("Month", data.month),
+                                y: .value("Engagement", data.value)
+                            )
+                            .foregroundStyle(themeManager.primaryColor.gradient)
+                            .cornerRadius(6)
+                        }
+                    }
+                    .frame(height: 180)
+                    .chartYAxis {
+                        AxisMarks { value in
+                            AxisGridLine()
+                            AxisValueLabel {
+                                if let value = value.as(Double.self) {
+                                    Text("\(Int(value))")
+                                        .font(.caption2)
+                                        .foregroundColor(themeManager.textColor.opacity(0.7))
+                                }
+                            }
+                        }
+                    }
+                    .chartXAxis {
+                        AxisMarks { value in
+                            AxisValueLabel {
+                                if let month = value.as(String.self) {
+                                    Text(month)
+                                        .font(.caption2)
+                                        .foregroundColor(themeManager.textColor.opacity(0.7))
+                                }
+                            }
+                        }
+                    }
+                }
+                .padding()
+            }
+        }
+    }
+    
+    // MARK: - Analytics Section
+    var analyticsSection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Marketing Analytics")
+                .font(.headline)
+                .foregroundColor(themeManager.textColor)
+                .padding(.leading, 8)
+            
+            VStack(spacing: 12) {
+                // Channel Performance
+                AnalyticsCard(
+                    title: "Channel Performance",
+                    metrics: [
+                        ChannelMetric(channel: "Social Media", value: 42, color: .blue),
+                        ChannelMetric(channel: "Email", value: 28, color: .green),
+                        ChannelMetric(channel: "Website", value: 18, color: .orange),
+                        ChannelMetric(channel: "In-Store", value: 12, color: .purple)
+                    ]
+                )
+                
+                // Audience Demographics
+                GlassCard {
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text("Audience Demographics")
+                            .font(.subheadline)
+                            .fontWeight(.semibold)
+                            .foregroundColor(themeManager.textColor)
                         
-                        // Analytics
-                        analyticsSection
+                        HStack(spacing: 20) {
+                            // Age Groups
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text("Age Groups")
+                                    .font(.caption)
+                                    .foregroundColor(themeManager.textColor.opacity(0.7))
+                                
+                                HStack {
+                                    Text("25-34")
+                                        .font(.caption)
+                                        .foregroundColor(themeManager.textColor)
+                                    
+                                    Spacer()
+                                    
+                                    Text("38%")
+                                        .font(.caption)
+                                        .fontWeight(.semibold)
+                                        .foregroundColor(themeManager.textColor)
+                                }
+                                
+                                ProgressBar(value: 0.38, color: themeManager.primaryColor)
+                                
+                                HStack {
+                                    Text("35-44")
+                                        .font(.caption)
+                                        .foregroundColor(themeManager.textColor)
+                                    
+                                    Spacer()
+                                    
+                                    Text("32%")
+                                        .font(.caption)
+                                        .fontWeight(.semibold)
+                                        .foregroundColor(themeManager.textColor)
+                                }
+                                
+                                ProgressBar(value: 0.32, color: themeManager.secondaryColor)
+                                
+                                HStack {
+                                    Text("18-24")
+                                        .font(.caption)
+                                        .foregroundColor(themeManager.textColor)
+                                    
+                                    Spacer()
+                                    
+                                    Text("18%")
+                                        .font(.caption)
+                                        .fontWeight(.semibold)
+                                        .foregroundColor(themeManager.textColor)
+                                }
+                                
+                                ProgressBar(value: 0.18, color: Color.orange)
+                            }
+                            .frame(maxWidth: .infinity)
+                            
+                            // Gender
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text("Gender")
+                                    .font(.caption)
+                                    .foregroundColor(themeManager.textColor.opacity(0.7))
+                                
+                                HStack {
+                                    Text("Female")
+                                        .font(.caption)
+                                        .foregroundColor(themeManager.textColor)
+                                    
+                                    Spacer()
+                                    
+                                    Text("54%")
+                                        .font(.caption)
+                                        .fontWeight(.semibold)
+                                        .foregroundColor(themeManager.textColor)
+                                }
+                                
+                                ProgressBar(value: 0.54, color: Color.purple)
+                                
+                                HStack {
+                                    Text("Male")
+                                        .font(.caption)
+                                        .foregroundColor(themeManager.textColor)
+                                    
+                                    Spacer()
+                                    
+                                    Text("46%")
+                                        .font(.caption)
+                                        .fontWeight(.semibold)
+                                        .foregroundColor(themeManager.textColor)
+                                }
+                                
+                                ProgressBar(value: 0.46, color: Color.blue)
+                            }
+                            .frame(maxWidth: .infinity)
+                        }
                     }
                     .padding()
                 }
             }
-            .navigationTitle("Marketing")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbarBackground(.visible, for: .navigationBar)
-            .toolbarBackground(.ultraThinMaterial, for: .navigationBar)
-            .toolbar {
-                ToolbarItem(placement: .principal) {
-                    Text("Marketing")
-                        .font(.headline)
-                        .foregroundColor(.white)
+        }
+    }
+    
+    // MARK: - Helper Components
+    
+    struct GlassCard<Content: View>: View {
+        @EnvironmentObject private var themeManager: ThemeManager
+        @ViewBuilder let content: Content
+        
+        var body: some View {
+            content
+                .background(.ultraThinMaterial)
+                .clipShape(RoundedRectangle(cornerRadius: 16))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 16)
+                        .stroke(
+                            LinearGradient(
+                                colors: [.white.opacity(0.5), .clear, .white.opacity(0.2)],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            ),
+                            lineWidth: 0.15
+                        )
+                )
+                .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
+        }
+    }
+    
+    struct MetricCard: View {
+        @EnvironmentObject private var themeManager: ThemeManager
+        let title: String
+        let value: String
+        let icon: String
+        let trend: String
+        let trendUp: Bool
+        
+        var body: some View {
+            VStack(alignment: .leading, spacing: 12) {
+                HStack {
+                    Image(systemName: icon)
+                        .font(.title3)
+                        .foregroundColor(themeManager.primaryColor)
+                    
+                    Spacer()
+                    
+                    HStack(spacing: 2) {
+                        Image(systemName: trendUp ? "arrow.up" : "arrow.down")
+                            .font(.caption2)
+                            .foregroundColor(trendUp ? .green : .red)
+                        
+                        Text(trend)
+                            .font(.caption2)
+                            .foregroundColor(trendUp ? .green : .red)
+                    }
                 }
+                
+                Text(value)
+                    .font(.title2)
+                    .fontWeight(.bold)
+                    .foregroundColor(themeManager.textColor)
+                
+                Text(title)
+                    .font(.caption)
+                    .foregroundColor(themeManager.textColor.opacity(0.7))
             }
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
+            .padding()
+            .frame(maxWidth: .infinity)
+            .background(.ultraThinMaterial)
+            .clipShape(RoundedRectangle(cornerRadius: 16))
+            .overlay(
+                RoundedRectangle(cornerRadius: 16)
+                    .stroke(
+                        LinearGradient(
+                            colors: [.white.opacity(0.5), .clear, .white.opacity(0.2)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        ),
+                        lineWidth: 0.15
+                    )
+            )
+            .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
+        }
+    }
+    
+    struct PromotionCard: View {
+        @EnvironmentObject private var themeManager: ThemeManager
+        let promotion: PromotionData
+        
+        var body: some View {
+            VStack(alignment: .leading, spacing: 12) {
+                // Header with type badge and active status
+                HStack {
+                    PromotionTypeBadge(type: promotion.type)
+                    
+                    Spacer()
+                    
+                    // Active status toggle
+                    HStack(spacing: 6) {
+                        Circle()
+                            .fill(promotion.isActive ? .green : .gray)
+                            .frame(width: 8, height: 8)
+                        
+                        Text(promotion.isActive ? "Active" : "Inactive")
+                            .font(.caption)
+                            .foregroundColor(promotion.isActive ? .green : .gray)
+                    }
+                }
+                
+                // Title and description
+                Text(promotion.title)
+                    .font(.headline)
+                    .foregroundColor(themeManager.textColor)
+                
+                Text(promotion.description)
+                    .font(.subheadline)
+                    .foregroundColor(themeManager.textColor.opacity(0.7))
+                    .lineLimit(2)
+                
+                // Date range
+                HStack {
+                    Image(systemName: "calendar")
+                        .font(.caption)
+                        .foregroundColor(themeManager.primaryColor)
+                    
+                    Text("\(promotion.startDate) to \(promotion.endDate)")
+                        .font(.caption)
+                        .foregroundColor(themeManager.textColor.opacity(0.7))
+                }
+                
+                // Actions
+                HStack {
                     Button {
-                        // Create new promotion
+                        // Edit action
                     } label: {
-                        Text("New")
-                            .fontWeight(.medium)
-                            .foregroundColor(.white)
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 6)
+                        Text("Edit")
+                            .font(.subheadline)
+                            .foregroundColor(themeManager.textColor)
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 8)
                             .background(.ultraThinMaterial)
                             .cornerRadius(8)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 8)
-                                    .stroke(Color.black.opacity(0.3), lineWidth: 0.15)
+                                    .stroke(themeManager.textColor.opacity(0.2), lineWidth: 0.5)
                             )
                     }
-                }
-            }
-        }
-    }
-    
-    // MARK: - Glassmorphism Sections
-    
-    var marketingOverviewSection: some View {
-        HStack(spacing: 15) {
-            marketingStatView(count: "3", title: "Active Promotions", iconName: "tag.fill", color: .blue)
-            marketingStatView(count: "235", title: "Customer Engagements", iconName: "person.3.fill", color: .green)
-            marketingStatView(count: "18%", title: "Response Rate", iconName: "chart.line.uptrend.xyaxis", color: .orange)
-        }
-    }
-    
-    private func marketingStatView(count: String, title: String, iconName: String, color: Color) -> some View {
-        VStack(spacing: 8) {
-            Image(systemName: iconName)
-                .foregroundColor(.white)
-                .font(.system(size: 20))
-                .padding(8)
-                .background(color.opacity(0.3))
-                .clipShape(Circle())
-            
-            Text(count)
-                .font(.title3)
-                .fontWeight(.bold)
-                .foregroundColor(.white)
-            
-            Text(title)
-                .font(.caption)
-                .foregroundColor(.white.opacity(0.7))
-                .multilineTextAlignment(.center)
-                .lineLimit(2)
-                .fixedSize(horizontal: false, vertical: true)
-        }
-        .frame(maxWidth: .infinity, minHeight: 140, maxHeight: 140) // Fixed height of 140 to match GlassStatCard
-        .padding(.vertical, 16)
-        .padding(.horizontal, 8)
-        .background(.ultraThinMaterial)
-        .cornerRadius(16)
-        .overlay(
-            RoundedRectangle(cornerRadius: 16)
-                .stroke(
-                    LinearGradient(
-                        colors: [.black.opacity(0.6), .clear],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    ),
-                    lineWidth: 0.15
-                )
-        )
-        .shadow(color: .black.opacity(0.2), radius: 8, x: 0, y: 4)
-    }
-    
-    var activePromotionsSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            sectionHeader("Active Promotions")
-            
-            // Happy Hour
-            promotionCard(
-                title: "Happy Hour Special",
-                description: "50% off appetizers Monday-Friday",
-                dates: "Active until Jun 30",
-                status: "Active",
-                iconName: "wineglass",
-                color: .purple
-            )
-            
-            // Weekend Brunch
-            promotionCard(
-                title: "Weekend Brunch",
-                description: "Complimentary mimosa with any brunch entrée",
-                dates: "Weekends 9am-1pm",
-                status: "Active",
-                iconName: "sun.max.fill",
-                color: .orange
-            )
-            
-            // Loyalty Bonus
-            promotionCard(
-                title: "Loyalty Bonus Month",
-                description: "Double points on all purchases",
-                dates: "All month long",
-                status: "Active",
-                iconName: "star.fill",
-                color: .yellow
-            )
-            
-            Button {
-                // Create new promotion
-            } label: {
-                HStack {
-                    Spacer()
-                    Label("Add New Promotion", systemImage: "plus.circle")
-                        .foregroundColor(.white)
-                        .padding(.vertical, 10)
-                    Spacer()
-                }
-                .background(.ultraThinMaterial)
-                .cornerRadius(10)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 10)
-                        .stroke(Color.black.opacity(0.3), lineWidth: 0.15)
-                )
-                .shadow(color: Color.black.opacity(0.1), radius: 2, x: 0, y: 1)
-            }
-            .padding(.top, 8)
-        }
-        .padding()
-        .background(.ultraThinMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 16))
-        .overlay(
-            RoundedRectangle(cornerRadius: 16)
-                .stroke(
-                    LinearGradient(
-                        colors: [.black.opacity(0.7), .clear, .black.opacity(0.3)],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    ),
-                    lineWidth: 0.15
-                )
-        )
-        .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 5)
-    }
-    
-    var customerEngagementSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            sectionHeader("Customer Engagement")
-            
-            // Loyalty Program
-            engagementItemView(
-                title: "Loyalty Program",
-                description: "1,253 members enrolled",
-                iconName: "star.circle.fill",
-                color: .yellow
-            )
-            
-            // Push Notifications
-            engagementItemView(
-                title: "Push Notifications",
-                description: "Send updates to customer devices",
-                iconName: "bell.fill",
-                color: .blue
-            )
-            
-            // Email Campaign
-            engagementItemView(
-                title: "Email Campaign",
-                description: "2,485 subscribers",
-                iconName: "envelope.fill",
-                color: .green
-            )
-        }
-        .padding()
-        .background(.ultraThinMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 16))
-        .overlay(
-            RoundedRectangle(cornerRadius: 16)
-                .stroke(
-                    LinearGradient(
-                        colors: [.black.opacity(0.7), .clear, .black.opacity(0.3)],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    ),
-                    lineWidth: 0.15
-                )
-        )
-        .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 5)
-    }
-    
-    var analyticsSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            sectionHeader("Analytics")
-            
-            // Promotion Impact
-            analyticsItemView(
-                title: "Promotion Impact",
-                description: "Measure ROI of marketing efforts",
-                iconName: "chart.line.uptrend.xyaxis",
-                color: .purple,
-                value: "+32%",
-                valueLabel: "Revenue increase"
-            )
-            
-            // Customer Retention
-            analyticsItemView(
-                title: "Customer Retention",
-                description: "Track repeat customers and loyalty",
-                iconName: "person.2.fill",
-                color: .blue,
-                value: "76%",
-                valueLabel: "Return rate"
-            )
-        }
-        .padding()
-        .background(.ultraThinMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 16))
-        .overlay(
-            RoundedRectangle(cornerRadius: 16)
-                .stroke(
-                    LinearGradient(
-                        colors: [.black.opacity(0.7), .clear, .black.opacity(0.3)],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    ),
-                    lineWidth: 0.15
-                )
-        )
-        .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 5)
-    }
-    
-    // MARK: - Helper Views
-    
-    private func sectionHeader(_ title: String) -> some View {
-        Text(title)
-            .font(.headline)
-            .foregroundColor(.white)
-            .padding(.bottom, 8)
-    }
-    
-    private func promotionCard(title: String, description: String, dates: String, status: String, iconName: String, color: Color) -> some View {
-        NavigationLink(destination: Text("Edit Promotion")) {
-            HStack(alignment: .top, spacing: 12) {
-                Image(systemName: iconName)
-                    .foregroundColor(.white)
-                    .font(.system(size: 16))
-                    .padding(10)
-                    .background(color.opacity(0.3))
-                    .clipShape(Circle())
-                
-                VStack(alignment: .leading, spacing: 6) {
-                    Text(title)
-                        .font(.headline)
-                        .foregroundColor(.white)
                     
-                    Text(description)
-                        .font(.subheadline)
-                        .foregroundColor(.white.opacity(0.7))
-                    
-                    HStack {
-                        Text(dates)
-                            .font(.caption)
-                            .foregroundColor(.green)
-                            .padding(4)
-                            .background(.white)
-                            .clipShape(RoundedRectangle(cornerRadius: 12))
-                        
-                        Spacer()
-                        
-                        Text(status)
-                            .font(.caption)
-                            .foregroundColor(.white)
-                            .padding(.horizontal, 8)
-                            .padding(.vertical, 3)
-                            .background(Color.green.opacity(0.3))
-                            .cornerRadius(4)
+                    Button {
+                        // Duplicate action
+                    } label: {
+                        Text("Duplicate")
+                            .font(.subheadline)
+                            .foregroundColor(themeManager.textColor)
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 8)
+                            .background(.ultraThinMaterial)
+                            .cornerRadius(8)
                             .overlay(
-                                RoundedRectangle(cornerRadius: 4)
-                                    .stroke(Color.black.opacity(0.5), lineWidth: 0.15)
+                                RoundedRectangle(cornerRadius: 8)
+                                    .stroke(themeManager.textColor.opacity(0.2), lineWidth: 0.5)
                             )
                     }
-                }
-                
-                Spacer()
-                
-                Image(systemName: "chevron.right")
-                    .font(.caption)
-                    .foregroundColor(.white.opacity(0.7))
-            }
-            .padding()
-            .background(.ultraThinMaterial)
-            .cornerRadius(12)
-            .overlay(
-                RoundedRectangle(cornerRadius: 12)
-                    .stroke(
-                        LinearGradient(
-                            colors: [.black.opacity(0.6), .clear],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        ),
-                        lineWidth: 0.15
-                    )
-            )
-            .shadow(color: .black.opacity(0.2), radius: 2, x: 0, y: 3)
-        }
-        .buttonStyle(PlainButtonStyle())
-    }
-    
-    private func engagementItemView(title: String, description: String, iconName: String, color: Color) -> some View {
-        NavigationLink(destination: Text(title)) {
-            HStack(spacing: 12) {
-                Image(systemName: iconName)
-                    .foregroundColor(.white)
-                    .font(.system(size: 20))
-                    .padding(8)
-                    .background(color.opacity(0.3))
-                    .clipShape(Circle())
-                
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(title)
-                        .font(.headline)
-                        .foregroundColor(.white)
                     
-                    Text(description)
-                        .font(.subheadline)
-                        .foregroundColor(.white.opacity(0.7))
-                }
-                
-                Spacer()
-                
-                Image(systemName: "chevron.right")
-                    .font(.caption)
-                    .foregroundColor(.white.opacity(0.7))
-            }
-            .padding()
-            .background(.ultraThinMaterial)
-            .cornerRadius(12)
-            .overlay(
-                RoundedRectangle(cornerRadius: 12)
-                    .stroke(
-                        LinearGradient(
-                            colors: [.black.opacity(0.6), .clear],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        ),
-                        lineWidth: 0.15
-                    )
-            )
-            .shadow(color: .black.opacity(0.2), radius: 2, x: 0, y: 3)
-        }
-        .buttonStyle(PlainButtonStyle())
-    }
-    
-    private func analyticsItemView(title: String, description: String, iconName: String, color: Color, value: String, valueLabel: String) -> some View {
-        NavigationLink(destination: Text(title)) {
-            HStack {
-                VStack(alignment: .leading, spacing: 8) {
-                    HStack(spacing: 12) {
-                        Image(systemName: iconName)
-                            .foregroundColor(.white)
-                            .font(.system(size: 16))
-                            .padding(8)
-                            .background(color.opacity(0.3))
-                            .clipShape(Circle())
-                        
-                        Text(title)
-                            .font(.headline)
-                            .foregroundColor(.white)
+                    Spacer()
+                    
+                    // Toggle button (for active/inactive)
+                    if promotion.isActive {
+                        Button {
+                            // Pause action
+                        } label: {
+                            Text("Pause")
+                                .font(.subheadline)
+                                .foregroundColor(.white)
+                                .padding(.horizontal, 16)
+                                .padding(.vertical, 8)
+                                .background(Color.orange)
+                                .cornerRadius(8)
+                                .shadow(color: Color.orange.opacity(0.3), radius: 5, x: 0, y: 2)
+                        }
+                    } else {
+                        Button {
+                            // Activate action
+                        } label: {
+                            Text("Activate")
+                                .font(.subheadline)
+                                .foregroundColor(.white)
+                                .padding(.horizontal, 16)
+                                .padding(.vertical, 8)
+                                .background(Color.green)
+                                .cornerRadius(8)
+                                .shadow(color: Color.green.opacity(0.3), radius: 5, x: 0, y: 2)
+                        }
                     }
-                    
-                    Text(description)
-                        .font(.subheadline)
-                        .foregroundColor(.white.opacity(0.7))
-                }
-                
-                Spacer()
-                
-                VStack(alignment: .trailing, spacing: 4) {
-                    Text(value)
-                        .font(.title3)
-                        .fontWeight(.bold)
-                        .foregroundColor(.white)
-                    
-                    Text(valueLabel)
-                        .font(.caption)
-                        .foregroundColor(.white.opacity(0.7))
                 }
             }
             .padding()
             .background(.ultraThinMaterial)
-            .cornerRadius(12)
+            .cornerRadius(16)
             .overlay(
-                RoundedRectangle(cornerRadius: 12)
+                RoundedRectangle(cornerRadius: 16)
                     .stroke(
                         LinearGradient(
-                            colors: [.black.opacity(0.6), .clear],
+                            colors: [.white.opacity(0.5), .clear, .white.opacity(0.2)],
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
                         ),
                         lineWidth: 0.15
                     )
             )
-            .shadow(color: .black.opacity(0.2), radius: 5, x: 0, y: 3)
+            .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
         }
-        .buttonStyle(PlainButtonStyle())
     }
+    
+    struct PromotionTypeBadge: View {
+        let type: PromotionType
+        
+        var body: some View {
+            HStack(spacing: 4) {
+                Image(systemName: type.icon)
+                    .font(.caption2)
+                    .foregroundColor(type.color)
+                
+                Text(type.rawValue)
+                    .font(.caption)
+                    .fontWeight(.medium)
+                    .foregroundColor(type.color)
+            }
+            .padding(.horizontal, 8)
+            .padding(.vertical, 4)
+            .background(type.color.opacity(0.1))
+            .cornerRadius(8)
+        }
+    }
+    
+    struct AnalyticsCard: View {
+        @EnvironmentObject private var themeManager: ThemeManager
+        let title: String
+        let metrics: [ChannelMetric]
+        
+        var body: some View {
+            GlassCard {
+                VStack(alignment: .leading, spacing: 16) {
+                    Text(title)
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+                        .foregroundColor(themeManager.textColor)
+                    
+                    // Horizontal stacked bar
+                    GeometryReader { geometry in
+                        HStack(spacing: 0) {
+                            ForEach(metrics) { metric in
+                                Rectangle()
+                                    .fill(metric.color)
+                                    .frame(width: CGFloat(metric.value) / 100 * geometry.size.width)
+                            }
+                        }
+                        .cornerRadius(8)
+                        .frame(height: 24)
+                    }
+                    .frame(height: 24)
+                    
+                    // Legend
+                    VStack(spacing: 8) {
+                        ForEach(metrics) { metric in
+                            HStack {
+                                Circle()
+                                    .fill(metric.color)
+                                    .frame(width: 10, height: 10)
+                                
+                                Text(metric.channel)
+                                    .font(.caption)
+                                    .foregroundColor(themeManager.textColor)
+                                
+                                Spacer()
+                                
+                                Text("\(metric.value)%")
+                                    .font(.caption)
+                                    .fontWeight(.semibold)
+                                    .foregroundColor(themeManager.textColor)
+                            }
+                        }
+                    }
+                }
+                .padding()
+            }
+        }
+    }
+    
+    struct ProgressBar: View {
+        let value: Double
+        let color: Color
+        
+        var body: some View {
+            GeometryReader { geometry in
+                ZStack(alignment: .leading) {
+                    Rectangle()
+                        .fill(color.opacity(0.2))
+                        .cornerRadius(4)
+                    
+                    Rectangle()
+                        .fill(color)
+                        .frame(width: min(CGFloat(value) * geometry.size.width, geometry.size.width))
+                        .cornerRadius(4)
+                }
+            }
+            .frame(height: 8)
+        }
+    }
+}
+
+// MARK: - Supporting Types
+
+struct PromotionData: Identifiable {
+    let id: String
+    let title: String
+    let description: String
+    let startDate: String
+    let endDate: String
+    let type: PromotionType
+    let isActive: Bool
+}
+
+enum PromotionType: String {
+    case discount = "Discount"
+    case event = "Event"
+    case seasonal = "Seasonal"
+    case loyalty = "Loyalty"
+    case happyHour = "Happy Hour"
+    
+    var icon: String {
+        switch self {
+        case .discount: return "percent"
+        case .event: return "calendar"
+        case .seasonal: return "leaf"
+        case .loyalty: return "heart"
+        case .happyHour: return "wineglass"
+        }
+    }
+    
+    var color: Color {
+        switch self {
+        case .discount: return .blue
+        case .event: return .purple
+        case .seasonal: return .green
+        case .loyalty: return .pink
+        case .happyHour: return .orange
+        }
+    }
+}
+
+struct EngagementData: Identifiable {
+    let id = UUID()
+    let month: String
+    let value: Double
+}
+
+struct ChannelMetric: Identifiable {
+    let id = UUID()
+    let channel: String
+    let value: Int
+    let color: Color
 }

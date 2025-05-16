@@ -226,6 +226,9 @@ struct CustomerView: View {
         }
     }
     
+    // ContentView/After Login/Customer/CustomerView.swift
+    // Update the SideBarMenuView function
+
     @ViewBuilder
     func SideBarMenuView(_ safeArea: UIEdgeInsets) -> some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -278,6 +281,11 @@ struct CustomerView: View {
             
             Spacer()
             
+            // Theme Selector
+            ThemeSelector()
+                .padding(.horizontal, 15)
+                .padding(.bottom, 20)
+            
             // Reviews Button
             NavigationLink(destination: ReviewsView()) {
                 HStack(spacing: 12) {
@@ -325,6 +333,83 @@ struct CustomerView: View {
             // Fade in the new view
             withAnimation(.easeIn(duration: 0.25)) {
                 isChangingView = false
+            }
+        }
+    }
+    
+    // Add the ThemeSelector view
+    struct ThemeSelector: View {
+        @EnvironmentObject private var themeManager: ThemeManager
+        @State private var showThemes = false
+        
+        var body: some View {
+            VStack(alignment: .leading) {
+                Button {
+                    withAnimation {
+                        showThemes.toggle()
+                    }
+                } label: {
+                    HStack(spacing: 12) {
+                        Image(systemName: "paintbrush.fill")
+                            .font(.title3)
+                            .frame(width: 30)
+                        
+                        Text("Theme")
+                            .font(.headline)
+                        
+                        Spacer()
+                        
+                        Image(systemName: showThemes ? "chevron.up" : "chevron.down")
+                            .font(.caption)
+                    }
+                    .foregroundColor(.white)
+                    .padding(.vertical, 12)
+                    .padding(.horizontal, 15)
+                }
+                
+                if showThemes {
+                    VStack(alignment: .leading, spacing: 8) {
+                        ForEach(ThemeManager.AppTheme.allCases) { theme in
+                            Button {
+                                themeManager.currentTheme = theme
+                            } label: {
+                                HStack {
+                                    Image(systemName: theme.icon)
+                                        .foregroundColor(themeColor(for: theme))
+                                    
+                                    Text(theme.rawValue)
+                                        .font(.subheadline)
+                                    
+                                    Spacer()
+                                    
+                                    if themeManager.currentTheme == theme {
+                                        Image(systemName: "checkmark")
+                                            .font(.caption)
+                                    }
+                                }
+                                .foregroundColor(.white)
+                                .padding(.vertical, 8)
+                                .padding(.horizontal, 15)
+                                .padding(.leading, 20)
+                            }
+                        }
+                    }
+                    .padding(.vertical, 8)
+                    .background(.ultraThinMaterial.opacity(0.4))
+                    .cornerRadius(10)
+                    .transition(.scale(scale: 0.9).combined(with: .opacity))
+                }
+            }
+        }
+        
+        private func themeColor(for theme: ThemeManager.AppTheme) -> Color {
+            switch theme {
+            case .blue: return Color(hex: "1a73e8")
+            case .dark: return Color(hex: "424242")
+            case .light: return Color(hex: "BDBDBD")
+            case .red: return Color(hex: "E53935")
+            case .brown: return Color(hex: "8D6E63")
+            case .green: return Color(hex: "43A047")
             }
         }
     }

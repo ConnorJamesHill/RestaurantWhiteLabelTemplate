@@ -1,3 +1,4 @@
+// Misc/Restaurant_TemplateApp.swift
 import SwiftUI
 import FirebaseCore
 import FirebaseAppCheck
@@ -6,6 +7,7 @@ import FirebaseAppCheck
 struct Restaurant_TemplateApp: App {
     @StateObject private var restaurantConfig = RestaurantConfiguration.shared
     @StateObject private var authViewModel = MainViewViewModel.shared
+    @StateObject private var themeManager = ThemeManager.shared
     
     init() {
         // Configure App Check for development
@@ -32,6 +34,7 @@ struct Restaurant_TemplateApp: App {
                 }
             }
             .environmentObject(restaurantConfig)
+            .environmentObject(themeManager)
         }
     }
 }

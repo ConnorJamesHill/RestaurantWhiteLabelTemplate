@@ -124,13 +124,6 @@ struct Reservation: Identifiable {
     }
 }
 
-enum ReservationStatus: String {
-    case pending = "Pending"
-    case confirmed = "Confirmed"
-    case cancelled = "Cancelled"
-    case completed = "Completed"
-}
-
 // MARK: - Models
 
 struct RevenueData: Identifiable {

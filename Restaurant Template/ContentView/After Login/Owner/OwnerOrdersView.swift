@@ -2,288 +2,404 @@ import Foundation
 import SwiftUI
 
 struct OwnerOrdersView: View {
-    @State private var selectedOrderType = 0
-    private let orderTypes = ["Active", "Completed", "All"]
+    @EnvironmentObject private var themeManager: ThemeManager
     @State private var searchText = ""
-    @Environment(\.colorScheme) private var colorScheme
+    @State private var orderTypeSelection = 0 // 0 = All, 1 = Delivery, 2 = Pickup
     
-    // Blue gradient background - matching other owner views
-    var backgroundGradient: LinearGradient {
-        LinearGradient(
-            gradient: Gradient(colors: [
-                Color(hex: "1a73e8"), // Vibrant blue
-                Color(hex: "0d47a1"), // Deep blue
-                Color(hex: "002171"), // Dark blue
-                Color(hex: "002984")  // Navy blue
-            ]),
-            startPoint: .topLeading,
-            endPoint: .bottomTrailing
+    // Sample order data
+    let orders = [
+        OrderData(
+            id: "1234",
+            type: .delivery,
+            customerName: "John Smith",
+            items: 3,
+            total: 42.95,
+            status: .pending,
+            time: "12:15 PM"
+        ),
+        OrderData(
+            id: "1235",
+            type: .pickup,
+            customerName: "Sarah Johnson",
+            items: 2,
+            total: 28.50,
+            status: .inProgress,
+            time: "12:30 PM"
+        ),
+        OrderData(
+            id: "1236",
+            type: .delivery,
+            customerName: "David Lee",
+            items: 4,
+            total: 53.80,
+            status: .completed,
+            time: "11:45 AM"
+        ),
+        OrderData(
+            id: "1237",
+            type: .pickup,
+            customerName: "Emily Chen",
+            items: 1,
+            total: 15.99,
+            status: .pending,
+            time: "1:00 PM"
+        ),
+        OrderData(
+            id: "1238",
+            type: .delivery,
+            customerName: "Michael Brown",
+            items: 5,
+            total: 67.25,
+            status: .inProgress,
+            time: "1:15 PM"
         )
-    }
-
-    var body: some View {
-        NavigationStack {
-            ZStack {
-                // Background gradient
-                backgroundGradient
-                    .ignoresSafeArea()
-                
-                // Decorative elements
-                Circle()
-                    .fill(Color.white.opacity(0.05))
-                    .frame(width: 300, height: 300)
-                    .blur(radius: 30)
-                    .offset(x: -150, y: -100)
-                
-                Circle()
-                    .fill(Color.white.opacity(0.08))
-                    .frame(width: 250, height: 250)
-                    .blur(radius: 20)
-                    .offset(x: 180, y: 400)
-                
-                VStack(spacing: 16) {
-                    // Search Bar
-                    searchBarSection
-                    
-                    // Order Type Picker
-                    orderTypeSection
-                    
-                    // Orders List
-                    ordersListSection
-                }
-                .padding(.horizontal)
+    ]
+    
+    var filteredOrders: [OrderData] {
+        var filtered = orders
+        
+        // Filter by search text
+        if !searchText.isEmpty {
+            filtered = filtered.filter { order in
+                order.id.lowercased().contains(searchText.lowercased()) ||
+                order.customerName.lowercased().contains(searchText.lowercased())
             }
-            .navigationTitle("Orders")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbarBackground(.visible, for: .navigationBar)
-            .toolbarBackground(.ultraThinMaterial, for: .navigationBar)
-            .toolbar {
-                ToolbarItem(placement: .principal) {
-                    Text("Orders")
-                        .font(.headline)
-                        .foregroundColor(.white)
-                }
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button {
-                        // Refresh orders
-                    } label: {
-                        Image(systemName: "arrow.clockwise")
-                            .foregroundColor(.white)
-                            .padding(8)
-                            .background(.ultraThinMaterial)
-                            .clipShape(Circle())
-                            .overlay(
-                                Circle()
-                                    .stroke(Color.black.opacity(0.3), lineWidth: 0.15)
-                            )
-                    }
+        }
+        
+        // Filter by order type
+        if orderTypeSelection != 0 {
+            filtered = filtered.filter { order in
+                if orderTypeSelection == 1 {
+                    return order.type == .delivery
+                } else {
+                    return order.type == .pickup
                 }
             }
         }
+        
+        return filtered
     }
     
-    // MARK: - Glassmorphism Sections
+    var body: some View {
+        VStack(spacing: 16) {
+            // Search Bar
+            searchBarSection
+            
+            // Order Type Picker
+            orderTypeSection
+            
+            // Orders List
+            ordersListSection
+        }
+        .padding(.horizontal)
+    }
     
+    // MARK: - Search Bar Section
     var searchBarSection: some View {
         HStack {
             Image(systemName: "magnifyingglass")
-                .foregroundColor(.white.opacity(0.7))
+                .foregroundColor(themeManager.textColor.opacity(0.7))
             
-            TextField("Search orders...", text: $searchText)
-                .font(.subheadline)
-                .foregroundColor(.white)
-                .accentColor(.white.opacity(0.8))
-        }
-        .padding()
-        .background(.ultraThinMaterial)
-        .cornerRadius(10)
-        .overlay(
-            RoundedRectangle(cornerRadius: 10)
-                .stroke(
-                    LinearGradient(
-                        colors: [.black.opacity(0.6), .clear],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    ),
-                    lineWidth: 0.15
-                )
-        )
-        .shadow(color: Color.black.opacity(0.15), radius: 5, x: 0, y: 2)
-        .padding(.top)
-    }
-    
-    var orderTypeSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("Filter Orders")
-                .font(.headline)
-                .foregroundColor(.white)
-                .padding(.leading, 4)
+            TextField("Search by order # or customer", text: $searchText)
+                .foregroundColor(themeManager.textColor)
             
-            Picker("Order Type", selection: $selectedOrderType) {
-                ForEach(0..<orderTypes.count, id: \.self) { index in
-                    Text(orderTypes[index])
+            if !searchText.isEmpty {
+                Button {
+                    searchText = ""
+                } label: {
+                    Image(systemName: "xmark.circle.fill")
+                        .foregroundColor(themeManager.textColor.opacity(0.7))
                 }
             }
-            .pickerStyle(SegmentedPickerStyle())
-            .padding(8)
         }
-        .padding()
+        .padding(12)
         .background(.ultraThinMaterial)
         .cornerRadius(12)
         .overlay(
             RoundedRectangle(cornerRadius: 12)
                 .stroke(
                     LinearGradient(
-                        colors: [.black.opacity(0.7), .clear, .black.opacity(0.3)],
+                        colors: [.white.opacity(0.5), .clear, .white.opacity(0.2)],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     ),
                     lineWidth: 0.15
                 )
         )
-        .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 5)
+        .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
     }
     
+    // MARK: - Order Type Selection
+    var orderTypeSection: some View {
+        HStack(spacing: 0) {
+            ForEach(["All Orders", "Delivery", "Pickup"], id: \.self) { option in
+                Button {
+                    withAnimation {
+                        orderTypeSelection = ["All Orders", "Delivery", "Pickup"].firstIndex(of: option) ?? 0
+                    }
+                } label: {
+                    Text(option)
+                        .font(.subheadline)
+                        .fontWeight(orderTypeSelection == ["All Orders", "Delivery", "Pickup"].firstIndex(of: option) ? .semibold : .regular)
+                        .padding(.vertical, 10)
+                        .padding(.horizontal, 20)
+                        .frame(maxWidth: .infinity)
+                        .background(
+                            orderTypeSelection == ["All Orders", "Delivery", "Pickup"].firstIndex(of: option) ?
+                            themeManager.primaryColor.opacity(0.2) : Color.clear
+                        )
+                        .foregroundColor(
+                            orderTypeSelection == ["All Orders", "Delivery", "Pickup"].firstIndex(of: option) ?
+                            themeManager.primaryColor : themeManager.textColor.opacity(0.7)
+                        )
+                }
+            }
+        }
+        .background(.ultraThinMaterial)
+        .cornerRadius(12)
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(
+                    LinearGradient(
+                        colors: [.white.opacity(0.5), .clear, .white.opacity(0.2)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    lineWidth: 0.15
+                )
+        )
+        .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
+    }
+    
+    // MARK: - Orders List
     var ordersListSection: some View {
         ScrollView {
-            LazyVStack(spacing: 12) {
-                // Summary Stats
-                ordersSummarySection
-                
-                // Order Items
-                ForEach(1...10, id: \.self) { index in
-                    NavigationLink(destination: Text("Order Details")) {
-                        orderItemView(index: index)
+            VStack(spacing: 12) {
+                if filteredOrders.isEmpty {
+                    VStack(spacing: 8) {
+                        Image(systemName: "doc.text.magnifyingglass")
+                            .font(.largeTitle)
+                            .foregroundColor(themeManager.textColor.opacity(0.5))
+                            .padding(.bottom, 4)
+                        
+                        Text("No orders found")
+                            .font(.headline)
+                            .foregroundColor(themeManager.textColor.opacity(0.7))
+                        
+                        Text("Try adjusting your search or filters")
+                            .font(.subheadline)
+                            .foregroundColor(themeManager.textColor.opacity(0.5))
+                            .multilineTextAlignment(.center)
                     }
-                    .buttonStyle(PlainButtonStyle())
+                    .padding()
+                    .frame(maxWidth: .infinity)
+                    .background(.ultraThinMaterial)
+                    .cornerRadius(16)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 16)
+                            .stroke(
+                                LinearGradient(
+                                    colors: [.white.opacity(0.5), .clear, .white.opacity(0.2)],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                ),
+                                lineWidth: 0.15
+                            )
+                    )
+                    .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
+                    .padding(.top, 20)
+                } else {
+                    ForEach(filteredOrders) { order in
+                        OrderRow(order: order)
+                    }
                 }
             }
         }
     }
     
-    private var ordersSummarySection: some View {
-        HStack(spacing: 15) {
-            glassOrderStatView(count: "8", title: "Active", iconName: "clock.fill", color: .blue)
-            glassOrderStatView(count: "12", title: "Today", iconName: "calendar", color: .green)
-            glassOrderStatView(count: "3", title: "Issues", iconName: "exclamationmark.triangle.fill", color: .orange)
-        }
-        .padding(.vertical, 8)
-    }
-    
-    private func glassOrderStatView(count: String, title: String, iconName: String, color: Color) -> some View {
-        VStack(spacing: 8) {
-            Image(systemName: iconName)
-                .foregroundColor(.white)
-                .font(.system(size: 20))
-                .padding(8)
-                .background(color.opacity(0.3))
-                .clipShape(Circle())
-            
-            Text(count)
-                .font(.title3)
-                .fontWeight(.bold)
-                .foregroundColor(.white)
-            
-            Text(title)
-                .font(.caption)
-                .foregroundColor(.white.opacity(0.7))
-        }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 16)
-        .padding(.horizontal, 8)
-        .background(.ultraThinMaterial)
-        .cornerRadius(16)
-        .overlay(
-            RoundedRectangle(cornerRadius: 16)
-                .stroke(
-                    LinearGradient(
-                        colors: [.black.opacity(0.6), .clear],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    ),
-                    lineWidth: 0.15
-                )
-        )
-        .shadow(color: color.opacity(0.2), radius: 8, x: 0, y: 4)
-    }
-    
-    private func orderItemView(index: Int) -> some View {
-        let status = ["Pending", "Preparing", "Ready", "Delivered"].randomElement()!
-        let statusColor: Color = {
-            switch status {
-            case "Pending": return .orange
-            case "Preparing": return .blue
-            case "Ready": return .green
-            case "Delivered": return .gray
-            default: return .primary
-            }
-        }()
+    // MARK: - Order Row
+    struct OrderRow: View {
+        @EnvironmentObject private var themeManager: ThemeManager
+        let order: OrderData
         
-        return VStack(alignment: .leading, spacing: 12) {
-            HStack {
-                Text("Order #\(1000 + index)")
-                    .font(.headline)
-                    .foregroundColor(.white)
+        var body: some View {
+            VStack(alignment: .leading, spacing: 12) {
+                // Header row with order ID and status
+                HStack {
+                    Text("Order #\(order.id)")
+                        .font(.headline)
+                        .foregroundColor(themeManager.textColor)
+                    
+                    Spacer()
+                    
+                    StatusChip(status: order.status)
+                }
                 
-                Spacer()
+                Divider()
+                    .background(themeManager.textColor.opacity(0.2))
                 
-                Text("$\(Double.random(in: 25...150), specifier: "%.2f")")
-                    .font(.headline)
-                    .fontWeight(.semibold)
-                    .foregroundColor(.white)
+                // Customer and order details
+                HStack {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(order.customerName)
+                            .font(.subheadline)
+                            .fontWeight(.medium)
+                            .foregroundColor(themeManager.textColor)
+                        
+                        HStack(spacing: 4) {
+                            Image(systemName: order.type == .delivery ? "shippingbox.fill" : "bag.fill")
+                                .font(.caption2)
+                                .foregroundColor(themeManager.primaryColor)
+                            
+                            Text(order.type == .delivery ? "Delivery" : "Pickup")
+                                .font(.caption)
+                                .foregroundColor(themeManager.textColor.opacity(0.7))
+                            
+                            Text("•")
+                                .font(.caption)
+                                .foregroundColor(themeManager.textColor.opacity(0.5))
+                            
+                            Text("\(order.items) items")
+                                .font(.caption)
+                                .foregroundColor(themeManager.textColor.opacity(0.7))
+                        }
+                    }
+                    
+                    Spacer()
+                    
+                    VStack(alignment: .trailing, spacing: 4) {
+                        Text("$\(String(format: "%.2f", order.total))")
+                            .font(.subheadline)
+                            .fontWeight(.semibold)
+                            .foregroundColor(themeManager.textColor)
+                        
+                        Text(order.time)
+                            .font(.caption)
+                            .foregroundColor(themeManager.textColor.opacity(0.7))
+                    }
+                }
+                
+                Divider()
+                    .background(themeManager.textColor.opacity(0.2))
+                
+                // Action buttons
+                HStack(spacing: 12) {
+                    Button {
+                        // View order details
+                    } label: {
+                        Text("View Details")
+                            .font(.subheadline)
+                            .fontWeight(.medium)
+                            .foregroundColor(themeManager.textColor)
+                            .padding(.vertical, 8)
+                            .padding(.horizontal, 16)
+                            .background(.ultraThinMaterial)
+                            .cornerRadius(8)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 8)
+                                    .stroke(themeManager.textColor.opacity(0.2), lineWidth: 0.5)
+                            )
+                    }
+                    
+                    Spacer()
+                    
+                    if order.status == .pending {
+                        Button {
+                            // Accept order action
+                        } label: {
+                            Text("Accept")
+                                .font(.subheadline)
+                                .fontWeight(.medium)
+                                .foregroundColor(.white)
+                                .padding(.vertical, 8)
+                                .padding(.horizontal, 16)
+                                .background(themeManager.primaryColor)
+                                .cornerRadius(8)
+                                .shadow(color: themeManager.primaryColor.opacity(0.3), radius: 5, x: 0, y: 2)
+                        }
+                    } else if order.status == .inProgress {
+                        Button {
+                            // Complete order action
+                        } label: {
+                            Text("Complete")
+                                .font(.subheadline)
+                                .fontWeight(.medium)
+                                .foregroundColor(.white)
+                                .padding(.vertical, 8)
+                                .padding(.horizontal, 16)
+                                .background(Color.green)
+                                .cornerRadius(8)
+                                .shadow(color: Color.green.opacity(0.3), radius: 5, x: 0, y: 2)
+                        }
+                    }
+                }
             }
-            
-            Divider()
-                .background(Color.white.opacity(0.3))
-            
-            HStack {
-                Image(systemName: "person.fill")
-                    .foregroundColor(.white.opacity(0.7))
-                    .font(.caption)
-                Text("Customer: John Doe")
-                    .font(.subheadline)
-                    .foregroundColor(.white)
-                
-                Spacer()
-                
-                Image(systemName: "clock.fill")
-                    .foregroundColor(.white.opacity(0.7))
-                    .font(.caption)
-                Text(Date(), style: .time)
-                    .font(.caption)
-                    .foregroundColor(.white.opacity(0.7))
-            }
-            
-            HStack {
-                GlassStatusPill(status: status, color: statusColor)
-                
-                Spacer()
-                
-                Text("\(Int.random(in: 1...6)) items")
-                    .font(.caption)
-                    .foregroundColor(.white.opacity(0.7))
-                    .padding(.trailing, 4)
-                
-                Image(systemName: "chevron.right")
-                    .font(.caption)
-                    .foregroundColor(.white.opacity(0.7))
-            }
+            .padding()
+            .background(.ultraThinMaterial)
+            .cornerRadius(16)
+            .overlay(
+                RoundedRectangle(cornerRadius: 16)
+                    .stroke(
+                        LinearGradient(
+                            colors: [.white.opacity(0.5), .clear, .white.opacity(0.2)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        ),
+                        lineWidth: 0.15
+                    )
+            )
+            .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
         }
-        .padding()
-        .background(.ultraThinMaterial)
-        .cornerRadius(16)
-        .overlay(
-            RoundedRectangle(cornerRadius: 16)
-                .stroke(
-                    LinearGradient(
-                        colors: [.black.opacity(0.7), .clear, .black.opacity(0.3)],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    ),
-                    lineWidth: 0.15
-                )
-        )
-        .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 5)
+    }
+    
+    struct StatusChip: View {
+        @EnvironmentObject private var themeManager: ThemeManager
+        let status: OrderStatus
+        
+        var body: some View {
+            Text(status.rawValue)
+                .font(.caption)
+                .fontWeight(.semibold)
+                .foregroundColor(status.textColor)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 5)
+                .background(status.backgroundColor)
+                .cornerRadius(12)
+        }
+    }
+}
+
+// MARK: - Supporting Types
+
+struct OrderData: Identifiable {
+    let id: String
+    let type: OrderType
+    let customerName: String
+    let items: Int
+    let total: Double
+    let status: OrderStatus
+    let time: String
+}
+
+enum OrderStatus: String {
+    case pending = "Pending"
+    case inProgress = "In Progress"
+    case completed = "Completed"
+    
+    var backgroundColor: Color {
+        switch self {
+        case .pending: return Color.orange.opacity(0.2)
+        case .inProgress: return Color.blue.opacity(0.2)
+        case .completed: return Color.green.opacity(0.2)
+        }
+    }
+    
+    var textColor: Color {
+        switch self {
+        case .pending: return .orange
+        case .inProgress: return .blue
+        case .completed: return .green
+        }
     }
 }
 

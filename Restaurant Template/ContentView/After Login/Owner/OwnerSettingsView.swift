@@ -2,89 +2,45 @@
 //  OwnerSettingsView.swift
 //  Restaurant Template
 //
-//  Created by Connor Hill on 5/11/25.
+//  Created by Connor Hill on 5/12/25.
 //
 
-import Foundation
 import SwiftUI
 
 struct OwnerSettingsView: View {
-    @StateObject private var viewModel = OwnerDashboardViewViewModel()
-    @State private var appVersion = "1.0.0"
-    @Environment(\.colorScheme) private var colorScheme
-    
-    // Blue gradient background - matching other owner views
-    var backgroundGradient: LinearGradient {
-        LinearGradient(
-            gradient: Gradient(colors: [
-                Color(hex: "1a73e8"), // Vibrant blue
-                Color(hex: "0d47a1"), // Deep blue
-                Color(hex: "002171"), // Dark blue
-                Color(hex: "002984")  // Navy blue
-            ]),
-            startPoint: .topLeading,
-            endPoint: .bottomTrailing
-        )
-    }
+    @EnvironmentObject private var restaurant: RestaurantConfiguration
+    @EnvironmentObject private var themeManager: ThemeManager
+    @StateObject private var viewModel = OwnerSettingsViewModel()
     
     var body: some View {
-        NavigationStack {
-            ZStack {
-                // Background gradient
-                backgroundGradient
-                    .ignoresSafeArea()
+        ScrollView {
+            VStack(spacing: 20) {
+                // Profile header
+                profileHeader
                 
-                // Decorative elements
-                Circle()
-                    .fill(Color.white.opacity(0.05))
-                    .frame(width: 300, height: 300)
-                    .blur(radius: 30)
-                    .offset(x: -150, y: -100)
+                // Restaurant Profile
+                restaurantProfileSection
                 
-                Circle()
-                    .fill(Color.white.opacity(0.08))
-                    .frame(width: 250, height: 250)
-                    .blur(radius: 20)
-                    .offset(x: 180, y: 400)
+                // Staff Management
+                staffManagementSection
                 
-                ScrollView {
-                    VStack(spacing: 20) {
-                        profileHeader
-                        
-                        // Restaurant Profile
-                        restaurantProfileSection
-                        
-                        // Staff Management
-                        staffManagementSection
-                        
-                        // System Settings
-                        systemSection
-                        
-                        // Account Actions
-                        accountActionsSection
-                        
-                        // App Info
-                        appInfoSection
-                    }
-                    .padding()
-                }
+                // System Settings
+                systemSection
+                
+                // Theme Selection
+                themeSelectionSection
+                
+                // Account Actions
+                accountActionsSection
+                
+                // App Info
+                appInfoSection
             }
-            .navigationTitle("Settings")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbarBackground(.visible, for: .navigationBar)
-            .toolbarBackground(.ultraThinMaterial, for: .navigationBar)
-            .toolbar {
-                ToolbarItem(placement: .principal) {
-                    Text("Settings")
-                        .font(.headline)
-                        .foregroundColor(.white)
-                }
-            }
+            .padding()
         }
     }
     
-    // MARK: - Glassmorphism Sections
-    
+    // MARK: - Profile Header
     var profileHeader: some View {
         VStack(spacing: 16) {
             Image("restaurant_logo")
@@ -94,328 +50,539 @@ struct OwnerSettingsView: View {
                 .clipShape(Circle())
                 .overlay(
                     Circle()
-                        .stroke(Color.black.opacity(0.3), lineWidth: 0.15)
+                        .stroke(themeManager.primaryColor, lineWidth: 2)
                 )
-                .shadow(color: Color.black.opacity(0.2), radius: 8, x: 0, y: 4)
+                .shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: 5)
             
-            Text("Owner Account")
-                .font(.headline)
-                .foregroundColor(.white)
+            VStack(spacing: 4) {
+                Text(restaurant.name)
+                    .font(.title2)
+                    .fontWeight(.bold)
+                    .foregroundColor(themeManager.textColor)
+                
+                Text("Owner Account")
+                    .font(.subheadline)
+                    .foregroundColor(themeManager.textColor.opacity(0.7))
+            }
             
-            Text("admin@restaurant.com")
-                .font(.subheadline)
-                .foregroundColor(.white.opacity(0.7))
+            GlassButton(title: "Edit Profile", icon: "pencil", action: {
+                // Edit profile action
+            })
         }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 24)
-        .padding(.horizontal)
+        .padding()
         .background(.ultraThinMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .cornerRadius(16)
         .overlay(
             RoundedRectangle(cornerRadius: 16)
                 .stroke(
                     LinearGradient(
-                        colors: [.black.opacity(0.7), .clear, .black.opacity(0.3)],
+                        colors: [.white.opacity(0.5), .clear, .white.opacity(0.2)],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     ),
                     lineWidth: 0.15
                 )
         )
-        .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 5)
+        .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
     }
     
+    // MARK: - Restaurant Profile Section
     var restaurantProfileSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            sectionHeader("Restaurant Profile")
+        VStack(alignment: .leading, spacing: 16) {
+            SectionHeader(title: "Restaurant Profile", icon: "building.2")
             
-            settingsItemLink(
-                title: "Restaurant Information",
-                description: "Edit name, cuisine, description",
-                iconName: "building.2",
-                iconColor: .blue
-            )
-            
-            settingsItemLink(
-                title: "Business Hours",
-                description: "Set open & close times",
-                iconName: "clock",
-                iconColor: .orange
-            )
-            
-            settingsItemLink(
-                title: "Location",
-                description: "Address and map settings",
-                iconName: "mappin.and.ellipse",
-                iconColor: .red
-            )
-        }
-        .padding()
-        .background(.ultraThinMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 16))
-        .overlay(
-            RoundedRectangle(cornerRadius: 16)
-                .stroke(
-                    LinearGradient(
-                        colors: [.black.opacity(0.7), .clear, .black.opacity(0.3)],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    ),
-                    lineWidth: 0.15
-                )
-        )
-        .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 5)
-    }
-    
-    var staffManagementSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            sectionHeader("Staff Management")
-            
-            settingsItemLink(
-                title: "Staff Accounts",
-                description: "Manage staff profiles",
-                iconName: "person.3",
-                iconColor: .green
-            )
-            
-            settingsItemLink(
-                title: "Permissions",
-                description: "Access control settings",
-                iconName: "lock.shield",
-                iconColor: .purple
-            )
-            
-            Button {
-                // Add new staff
-            } label: {
-                HStack {
-                    Spacer()
-                    Label("Add Staff Member", systemImage: "person.badge.plus")
-                        .foregroundColor(.white)
-                        .padding(.vertical, 10)
-                    Spacer()
-                }
-                .background(.ultraThinMaterial)
-                .cornerRadius(10)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 10)
-                        .stroke(Color.black.opacity(0.3), lineWidth: 0.15)
-                )
-                .shadow(color: Color.black.opacity(0.1), radius: 2, x: 0, y: 1)
-            }
-            .padding(.top, 8)
-        }
-        .padding()
-        .background(.ultraThinMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 16))
-        .overlay(
-            RoundedRectangle(cornerRadius: 16)
-                .stroke(
-                    LinearGradient(
-                        colors: [.black.opacity(0.7), .clear, .black.opacity(0.3)],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    ),
-                    lineWidth: 0.15
-                )
-        )
-        .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 5)
-    }
-    
-    var systemSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            sectionHeader("System")
-            
-            settingsItemLink(
-                title: "Payment Settings",
-                description: "Manage payment methods",
-                iconName: "creditcard",
-                iconColor: .purple
-            )
-            
-            settingsItemLink(
-                title: "Notification Settings",
-                description: "Configure alerts & reminders",
-                iconName: "bell.badge",
-                iconColor: .blue
-            )
-            
-            settingsItemLink(
-                title: "App Settings",
-                description: "Theme and preferences",
-                iconName: "gear",
-                iconColor: .gray
-            )
-        }
-        .padding()
-        .background(.ultraThinMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 16))
-        .overlay(
-            RoundedRectangle(cornerRadius: 16)
-                .stroke(
-                    LinearGradient(
-                        colors: [.black.opacity(0.7), .clear, .black.opacity(0.3)],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    ),
-                    lineWidth: 0.15
-                )
-        )
-        .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 5)
-    }
-    
-    var accountActionsSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            sectionHeader("Account")
-            
-            Button(action: {
-                viewModel.signOut()
-            }) {
-                HStack {
-                    Image(systemName: "rectangle.portrait.and.arrow.right")
-                        .foregroundColor(.white)
-                        .font(.system(size: 20))
-                        .padding(8)
-                        .background(Color.red.opacity(0.3))
-                        .clipShape(Circle())
-                    
-                    Text("Sign Out")
-                        .foregroundColor(.white)
-                        .font(.headline)
-                    
-                    Spacer()
-                }
-                .padding()
-                .background(.ultraThinMaterial)
-                .cornerRadius(12)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 12)
-                        .stroke(
-                            LinearGradient(
-                                colors: [.black.opacity(0.6), .clear],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            ),
-                            lineWidth: 0.15
-                        )
-                )
-                .shadow(color: Color.red.opacity(0.2), radius: 5, x: 0, y: 3)
-            }
-            .buttonStyle(PlainButtonStyle())
-        }
-        .padding()
-        .background(.ultraThinMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 16))
-        .overlay(
-            RoundedRectangle(cornerRadius: 16)
-                .stroke(
-                    LinearGradient(
-                        colors: [.black.opacity(0.7), .clear, .black.opacity(0.3)],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    ),
-                    lineWidth: 0.15
-                )
-        )
-        .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 5)
-    }
-    
-    var appInfoSection: some View {
-        VStack(alignment: .center, spacing: 12) {
-            Text("Restaurant Manager App")
-                .font(.caption)
-                .foregroundColor(.white)
-            
-            Text("Version \(appVersion)")
-                .font(.caption2)
-                .foregroundColor(.white.opacity(0.7))
-            
-            HStack(spacing: 16) {
-                Link(destination: URL(string: "https://terms.example.com")!) {
-                    Text("Terms of Service")
-                        .font(.caption)
-                        .foregroundColor(.white.opacity(0.9))
-                        .underline()
-                }
-                
-                Link(destination: URL(string: "https://privacy.example.com")!) {
-                    Text("Privacy Policy")
-                        .font(.caption)
-                        .foregroundColor(.white.opacity(0.9))
-                        .underline()
-                }
-            }
-        }
-        .frame(maxWidth: .infinity)
-        .padding()
-        .background(.ultraThinMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 16))
-        .overlay(
-            RoundedRectangle(cornerRadius: 16)
-                .stroke(
-                    LinearGradient(
-                        colors: [.black.opacity(0.7), .clear, .black.opacity(0.3)],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    ),
-                    lineWidth: 0.15
-                )
-        )
-        .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 5)
-    }
-    
-    // MARK: - Helper Views
-    
-    private func sectionHeader(_ title: String) -> some View {
-        Text(title)
-            .font(.headline)
-            .foregroundColor(.white)
-            .padding(.bottom, 8)
-    }
-    
-    private func settingsItemLink(title: String, description: String, iconName: String, iconColor: Color) -> some View {
-        NavigationLink(destination: Text(title)) {
-            HStack(spacing: 12) {
-                Image(systemName: iconName)
-                    .foregroundColor(.white)
-                    .font(.system(size: 20))
-                    .padding(8)
-                    .background(iconColor.opacity(0.3))
-                    .clipShape(Circle())
-                
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(title)
-                        .font(.subheadline)
-                        .fontWeight(.medium)
-                        .foregroundColor(.white)
-                    
-                    Text(description)
-                        .font(.caption)
-                        .foregroundColor(.white.opacity(0.7))
-                }
-                
-                Spacer()
-                
-                Image(systemName: "chevron.right")
-                    .font(.caption)
-                    .foregroundColor(.white.opacity(0.7))
+            VStack(spacing: 16) {
+                InfoField(label: "Restaurant Name", value: restaurant.name)
+                InfoField(label: "Phone Number", value: restaurant.phoneNumber)
+                InfoField(label: "Email", value: restaurant.emailAddress)
+                InfoField(label: "Website", value: restaurant.websiteURL)
+                InfoField(label: "Address", value: restaurant.address)
             }
             .padding()
             .background(.ultraThinMaterial)
-            .cornerRadius(12)
+            .cornerRadius(16)
             .overlay(
-                RoundedRectangle(cornerRadius: 12)
+                RoundedRectangle(cornerRadius: 16)
                     .stroke(
                         LinearGradient(
-                            colors: [.black.opacity(0.6), .clear],
+                            colors: [.white.opacity(0.5), .clear, .white.opacity(0.2)],
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
                         ),
                         lineWidth: 0.15
                     )
             )
-            .shadow(color: iconColor.opacity(0.2), radius: 5, x: 0, y: 3)
+            .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
+            
+            GlassButton(title: "Edit Restaurant Info", icon: "pencil", action: {
+                // Edit restaurant info action
+            })
         }
-        .buttonStyle(PlainButtonStyle())
+    }
+    
+    // MARK: - Staff Management Section
+    var staffManagementSection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            SectionHeader(title: "Staff Management", icon: "person.3")
+            
+            VStack(spacing: 0) {
+                ForEach(viewModel.staffMembers) { staff in
+                    StaffMemberRow(staff: staff)
+                    
+                    if staff.id != viewModel.staffMembers.last?.id {
+                        Divider()
+                            .background(themeManager.textColor.opacity(0.2))
+                            .padding(.leading, 56)
+                    }
+                }
+            }
+            .padding()
+            .background(.ultraThinMaterial)
+            .cornerRadius(16)
+            .overlay(
+                RoundedRectangle(cornerRadius: 16)
+                    .stroke(
+                        LinearGradient(
+                            colors: [.white.opacity(0.5), .clear, .white.opacity(0.2)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        ),
+                        lineWidth: 0.15
+                    )
+            )
+            .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
+            
+            GlassButton(title: "Add Staff Member", icon: "person.badge.plus", action: {
+                // Add staff member action
+            })
+        }
+    }
+    
+    // MARK: - System Settings Section
+    var systemSection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            SectionHeader(title: "System Settings", icon: "gearshape.2")
+            
+            VStack(spacing: 0) {
+                ToggleSetting(title: "Push Notifications", description: "Receive alerts for new orders and reservations", isOn: $viewModel.pushNotificationsEnabled)
+                
+                Divider()
+                    .background(themeManager.textColor.opacity(0.2))
+                    .padding(.leading, 56)
+                
+                ToggleSetting(title: "Email Notifications", description: "Receive daily and weekly reports via email", isOn: $viewModel.emailNotificationsEnabled)
+                
+                Divider()
+                    .background(themeManager.textColor.opacity(0.2))
+                    .padding(.leading, 56)
+                
+                ToggleSetting(title: "Sound Alerts", description: "Play sound for new orders and messages", isOn: $viewModel.soundAlertsEnabled)
+                
+                Divider()
+                    .background(themeManager.textColor.opacity(0.2))
+                    .padding(.leading, 56)
+                
+                ToggleSetting(title: "Auto Updates", description: "Automatically update menu prices across platforms", isOn: $viewModel.autoUpdatesEnabled)
+            }
+            .padding()
+            .background(.ultraThinMaterial)
+            .cornerRadius(16)
+            .overlay(
+                RoundedRectangle(cornerRadius: 16)
+                    .stroke(
+                        LinearGradient(
+                            colors: [.white.opacity(0.5), .clear, .white.opacity(0.2)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        ),
+                        lineWidth: 0.15
+                    )
+            )
+            .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
+        }
+    }
+    
+    // MARK: - Theme Selection Section
+    var themeSelectionSection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            SectionHeader(title: "Theme", icon: "paintbrush")
+            
+            VStack(alignment: .leading, spacing: 12) {
+                Text("Select a theme for your restaurant app")
+                    .font(.subheadline)
+                    .foregroundColor(themeManager.textColor.opacity(0.7))
+                    .padding(.horizontal)
+                
+                // Theme grid
+                LazyVGrid(columns: [
+                    GridItem(.adaptive(minimum: 80, maximum: 100), spacing: 16)
+                ], spacing: 16) {
+                    ForEach(ThemeManager.AppTheme.allCases) { theme in
+                        ThemeOption(theme: theme, isSelected: themeManager.currentTheme == theme)
+                            .onTapGesture {
+                                themeManager.currentTheme = theme
+                            }
+                    }
+                }
+                .padding()
+            }
+            .padding(.vertical)
+            .background(.ultraThinMaterial)
+            .cornerRadius(16)
+            .overlay(
+                RoundedRectangle(cornerRadius: 16)
+                    .stroke(
+                        LinearGradient(
+                            colors: [.white.opacity(0.5), .clear, .white.opacity(0.2)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        ),
+                        lineWidth: 0.15
+                    )
+            )
+            .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
+        }
+    }
+    
+    // MARK: - Account Actions Section
+    var accountActionsSection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            SectionHeader(title: "Account Actions", icon: "lock.shield")
+            
+            VStack(spacing: 16) {
+                ActionButton(title: "Change Password", icon: "key", color: themeManager.primaryColor) {
+                    // Change password action
+                }
+                
+                ActionButton(title: "Export Data", icon: "square.and.arrow.up", color: themeManager.secondaryColor) {
+                    // Export data action
+                }
+                
+                ActionButton(title: "Sign Out", icon: "rectangle.portrait.and.arrow.right", color: .red) {
+                    viewModel.signOut()
+                }
+            }
+        }
+    }
+    
+    // MARK: - App Info Section
+    var appInfoSection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            SectionHeader(title: "App Information", icon: "info.circle")
+            
+            VStack(spacing: 12) {
+                InfoRow(title: "Version", value: "1.0.0 (Build 42)")
+                InfoRow(title: "Release Date", value: "June 15, 2023")
+                InfoRow(title: "Support", value: "support@restaurantapp.com")
+                InfoRow(title: "Terms of Service", value: "View", isLink: true)
+                InfoRow(title: "Privacy Policy", value: "View", isLink: true)
+            }
+            .padding()
+            .background(.ultraThinMaterial)
+            .cornerRadius(16)
+            .overlay(
+                RoundedRectangle(cornerRadius: 16)
+                    .stroke(
+                        LinearGradient(
+                            colors: [.white.opacity(0.5), .clear, .white.opacity(0.2)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        ),
+                        lineWidth: 0.15
+                    )
+            )
+            .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
+        }
+        .padding(.bottom, 60) // Extra padding at bottom
+    }
+    
+    // MARK: - Supporting Components
+    
+    struct SectionHeader: View {
+        @EnvironmentObject private var themeManager: ThemeManager
+        let title: String
+        let icon: String
+        
+        var body: some View {
+            HStack(spacing: 12) {
+                Image(systemName: icon)
+                    .font(.headline)
+                    .foregroundColor(themeManager.primaryColor)
+                
+                Text(title)
+                    .font(.headline)
+                    .foregroundColor(themeManager.textColor)
+            }
+            .padding(.leading, 8)
+        }
+    }
+    
+    struct InfoField: View {
+        @EnvironmentObject private var themeManager: ThemeManager
+        let label: String
+        let value: String
+        
+        var body: some View {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(label)
+                    .font(.caption)
+                    .foregroundColor(themeManager.textColor.opacity(0.7))
+                
+                Text(value)
+                    .font(.body)
+                    .foregroundColor(themeManager.textColor)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+    }
+    
+    struct StaffMemberRow: View {
+        @EnvironmentObject private var themeManager: ThemeManager
+        let staff: StaffMember
+        
+        var body: some View {
+            HStack(spacing: 16) {
+                Image(systemName: "person.circle.fill")
+                    .font(.title2)
+                    .foregroundColor(themeManager.primaryColor)
+                
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(staff.name)
+                        .font(.body)
+                        .foregroundColor(themeManager.textColor)
+                    
+                    Text(staff.role)
+                        .font(.caption)
+                        .foregroundColor(themeManager.textColor.opacity(0.7))
+                }
+                
+                Spacer()
+                
+                Circle()
+                    .fill(staff.isActive ? .green : .gray)
+                    .frame(width: 10, height: 10)
+            }
+            .padding(.vertical, 12)
+        }
+    }
+    
+    struct ToggleSetting: View {
+        @EnvironmentObject private var themeManager: ThemeManager
+        let title: String
+        let description: String
+        @Binding var isOn: Bool
+        
+        var body: some View {
+            HStack(spacing: 16) {
+                RoundedRectangle(cornerRadius: 8)
+                    .fill(themeManager.primaryColor.opacity(0.2))
+                    .frame(width: 40, height: 40)
+                    .overlay(
+                        Image(systemName: isOn ? "checkmark.circle.fill" : "circle")
+                            .foregroundColor(isOn ? themeManager.primaryColor : themeManager.textColor.opacity(0.5))
+                    )
+                
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(title)
+                        .font(.body)
+                        .foregroundColor(themeManager.textColor)
+                    
+                    Text(description)
+                        .font(.caption)
+                        .foregroundColor(themeManager.textColor.opacity(0.7))
+                        .lineLimit(2)
+                }
+                
+                Spacer()
+                
+                Toggle("", isOn: $isOn)
+                    .labelsHidden()
+                    .toggleStyle(SwitchToggleStyle(tint: themeManager.primaryColor))
+            }
+            .padding(.vertical, 12)
+        }
+    }
+    
+    struct InfoRow: View {
+        @EnvironmentObject private var themeManager: ThemeManager
+        let title: String
+        let value: String
+        var isLink: Bool = false
+        
+        var body: some View {
+            HStack {
+                Text(title)
+                    .font(.subheadline)
+                    .foregroundColor(themeManager.textColor)
+                
+                Spacer()
+                
+                Text(value)
+                    .font(.subheadline)
+                    .foregroundColor(isLink ? themeManager.primaryColor : themeManager.textColor.opacity(0.7))
+            }
+        }
+    }
+    
+    struct GlassButton: View {
+        @EnvironmentObject private var themeManager: ThemeManager
+        let title: String
+        let icon: String
+        let action: () -> Void
+        
+        var body: some View {
+            Button(action: action) {
+                HStack(spacing: 8) {
+                    Image(systemName: icon)
+                        .font(.subheadline)
+                    
+                    Text(title)
+                        .font(.subheadline)
+                        .fontWeight(.medium)
+                }
+                .foregroundColor(themeManager.textColor)
+                .padding(.vertical, 12)
+                .frame(maxWidth: .infinity)
+                .background(.ultraThinMaterial)
+                .cornerRadius(12)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(themeManager.textColor.opacity(0.2), lineWidth: 0.5)
+                )
+                .shadow(color: Color.black.opacity(0.1), radius: 6, x: 0, y: 3)
+            }
+        }
+    }
+    
+    struct ActionButton: View {
+        let title: String
+        let icon: String
+        let color: Color
+        let action: () -> Void
+        
+        var body: some View {
+            Button(action: action) {
+                HStack(spacing: 12) {
+                    Image(systemName: icon)
+                        .font(.headline)
+                        .foregroundColor(.white)
+                        .frame(width: 36, height: 36)
+                        .background(color)
+                        .clipShape(Circle())
+                    
+                    Text(title)
+                        .font(.body)
+                        .foregroundColor(color)
+                    
+                    Spacer()
+                    
+                    Image(systemName: "chevron.right")
+                        .font(.caption)
+                        .foregroundColor(color.opacity(0.5))
+                }
+                .padding()
+                .background(.ultraThinMaterial)
+                .cornerRadius(16)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 16)
+                        .stroke(
+                            LinearGradient(
+                                colors: [color.opacity(0.3), .clear, color.opacity(0.1)],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            ),
+                            lineWidth: 0.5
+                        )
+                )
+                .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
+            }
+        }
+    }
+    
+    struct ThemeOption: View {
+        @EnvironmentObject private var themeManager: ThemeManager
+        let theme: ThemeManager.AppTheme
+        let isSelected: Bool
+        
+        // Theme color mapping function
+        private func themeColor(for theme: ThemeManager.AppTheme) -> Color {
+            switch theme {
+            case .blue: return Color(hex: "1a73e8")
+            case .dark: return Color(hex: "424242")
+            case .light: return Color(hex: "BDBDBD")
+            case .red: return Color(hex: "E53935")
+            case .brown: return Color(hex: "8D6E63")
+            case .green: return Color(hex: "43A047")
+            }
+        }
+        
+        var body: some View {
+            VStack(spacing: 8) {
+                Circle()
+                    .fill(themeColor(for: theme))
+                    .frame(width: 50, height: 50)
+                    .overlay(
+                        ZStack {
+                            if isSelected {
+                                Circle()
+                                    .strokeBorder(Color.white, lineWidth: 2)
+                                    .padding(2)
+                                
+                                Image(systemName: "checkmark")
+                                    .foregroundColor(.white)
+                                    .font(.system(size: 14, weight: .bold))
+                            }
+                        }
+                    )
+                    .shadow(color: themeColor(for: theme).opacity(0.5), radius: isSelected ? 8 : 2, x: 0, y: 2)
+                
+                Text(theme.rawValue)
+                    .font(.caption)
+                    .foregroundColor(themeManager.textColor)
+            }
+            .padding(.vertical, 4)
+            .frame(height: 90)
+        }
+    }
+}
+
+// MARK: - View Model
+
+class OwnerSettingsViewModel: ObservableObject {
+    @Published var pushNotificationsEnabled = true
+    @Published var emailNotificationsEnabled = true
+    @Published var soundAlertsEnabled = true
+    @Published var autoUpdatesEnabled = false
+    
+    // Sample staff data
+    let staffMembers = [
+        StaffMember(id: 1, name: "John Smith", role: "Head Chef", isActive: true),
+        StaffMember(id: 2, name: "Sarah Johnson", role: "Server", isActive: true),
+        StaffMember(id: 3, name: "Mike Wilson", role: "Bartender", isActive: false),
+        StaffMember(id: 4, name: "Emily Chen", role: "Host", isActive: true)
+    ]
+    
+    func signOut() {
+        MainViewViewModel.shared.signOut()
+    }
+}
+
+// MARK: - Supporting Types
+
+struct StaffMember: Identifiable {
+    let id: Int
+    let name: String
+    let role: String
+    let isActive: Bool
+}
+
+// MARK: - Preview Provider
+
+struct OwnerSettingsView_Previews: PreviewProvider {
+    static var previews: some View {
+        OwnerSettingsView()
+            .environmentObject(RestaurantConfiguration.shared)
+            .environmentObject(ThemeManager.shared)
+            .background(ThemeManager.shared.backgroundGradient)
     }
 }
