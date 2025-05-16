@@ -10,29 +10,16 @@ import FirebaseAuth
 
 struct LoginView: View {
     @EnvironmentObject private var restaurant: RestaurantConfiguration
+    @EnvironmentObject private var themeManager: ThemeManager
     @StateObject private var viewModel = LoginViewViewModel()
     @State private var showingRegister = false
     @Environment(\.colorScheme) private var colorScheme
     
-    // Enhanced blue gradient background
-    private var backgroundGradient: LinearGradient {
-        LinearGradient(
-            gradient: Gradient(colors: [
-                Color(hex: "1a73e8"), // Vibrant blue
-                Color(hex: "0d47a1"), // Deep blue
-                Color(hex: "002171"), // Dark blue
-                Color(hex: "002984")  // Navy blue
-            ]),
-            startPoint: .topLeading,
-            endPoint: .bottomTrailing
-        )
-    }
-    
     var body: some View {
         NavigationStack {
             ZStack {
-                // Background gradient
-                backgroundGradient
+                // Background gradient from ThemeManager
+                themeManager.backgroundGradient
                     .ignoresSafeArea()
                 
                 // Decorative elements
@@ -60,11 +47,11 @@ struct LoginView: View {
                         Text(restaurant.name)
                             .font(.title)
                             .fontWeight(.bold)
-                            .foregroundColor(.white)
+                            .foregroundColor(themeManager.textColor)
                         
                         Text("Welcome Back")
                             .font(.title2)
-                            .foregroundColor(.white.opacity(0.8))
+                            .foregroundColor(themeManager.textColor.opacity(0.8))
                     }
                     
                     // Login Form
@@ -79,10 +66,12 @@ struct LoginView: View {
                         TextField("Email Address", text: $viewModel.email)
                             .textFieldStyle(RoundedBorderTextFieldStyle())
                             .autocapitalization(.none)
+                            .foregroundColor(themeManager.currentTheme == .light ? .black : themeManager.textColor)
                             .padding(.horizontal)
                         
                         SecureField("Password", text: $viewModel.password)
                             .textFieldStyle(RoundedBorderTextFieldStyle())
+                            .foregroundColor(themeManager.currentTheme == .light ? .black : themeManager.textColor)
                             .padding(.horizontal)
                         
                         Button(action: {
@@ -90,10 +79,10 @@ struct LoginView: View {
                         }) {
                             Text("Log In")
                                 .font(.headline)
-                                .foregroundColor(.white)
+                                .foregroundColor(themeManager.textColor)
                                 .frame(maxWidth: .infinity)
                                 .padding()
-                                .background(Color.white.opacity(0.2))
+                                .background(themeManager.primaryColor.opacity(0.2))
                                 .cornerRadius(10)
                                 .overlay(
                                     RoundedRectangle(cornerRadius: 10)
@@ -130,16 +119,16 @@ struct LoginView: View {
                     // Register Link
                     VStack(spacing: 12) {
                         Text("New to \(restaurant.name)?")
-                            .foregroundColor(.white.opacity(0.8))
+                            .foregroundColor(themeManager.textColor.opacity(0.8))
                         
                         Button("Create an Account") {
                             showingRegister = true
                         }
                         .font(.headline)
-                        .foregroundColor(.white)
+                        .foregroundColor(themeManager.textColor)
                         .padding(.vertical, 12)
                         .padding(.horizontal, 24)
-                        .background(Color.white.opacity(0.2))
+                        .background(themeManager.primaryColor.opacity(0.2))
                         .cornerRadius(10)
                         .overlay(
                             RoundedRectangle(cornerRadius: 10)
@@ -161,6 +150,7 @@ struct LoginView: View {
             .navigationBarHidden(true)
             .sheet(isPresented: $showingRegister) {
                 RegisterView()
+                    .environmentObject(themeManager)
             }
         }
     }

@@ -9,21 +9,8 @@ import SwiftUI
 
 struct HomeView: View {
     @EnvironmentObject private var restaurant: RestaurantConfiguration
+    @EnvironmentObject private var themeManager: ThemeManager
     var onMenuButtonTap: (() -> Void)?
-    
-    // Enhanced blue gradient background
-    private var backgroundGradient: LinearGradient {
-        LinearGradient(
-            gradient: Gradient(colors: [
-                Color(hex: "1a73e8"), // Vibrant blue
-                Color(hex: "0d47a1"), // Deep blue
-                Color(hex: "002171"), // Dark blue
-                Color(hex: "002984")  // Navy blue
-            ]),
-            startPoint: .topLeading,
-            endPoint: .bottomTrailing
-        )
-    }
     
     let featuredItems = [
         FeaturedItem(
@@ -69,8 +56,8 @@ struct HomeView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                // Background gradient
-                backgroundGradient
+                // Background gradient from ThemeManager
+                themeManager.backgroundGradient
                     .ignoresSafeArea()
                 
                 // Decorative elements
@@ -111,19 +98,31 @@ struct HomeView: View {
             }
             .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
+            .toolbarBackground(themeManager.tabBarColor, for: .navigationBar)
             .toolbarBackground(.visible, for: .navigationBar)
-            .toolbarBackground(.ultraThinMaterial, for: .navigationBar)
+            .toolbarColorScheme(themeManager.currentTheme == .light ? .dark : .light, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .principal) {
-                        VStack {
-                            Text(restaurant.name)
-                                .font(.headline)
-                                .foregroundColor(.white)
-                            Text(restaurant.tagline)
-                                .font(.caption)
-                                .foregroundColor(.white.opacity(0.7))
+                    VStack {
+                        Text(restaurant.name)
+                            .font(.headline)
+                            .foregroundColor(themeManager.textColor)
+                        Text(restaurant.tagline)
+                            .font(.caption)
+                            .foregroundColor(themeManager.textColor.opacity(0.7))
+                    }
+                }
+                
+                if let onMenuButtonTap = onMenuButtonTap {
+                    ToolbarItem(placement: .navigationBarLeading) {
+                        Button {
+                            onMenuButtonTap()
+                        } label: {
+                            Image(systemName: "line.3.horizontal")
+                                .foregroundColor(themeManager.textColor)
                         }
                     }
+                }
             }
         }
     }
@@ -164,7 +163,7 @@ struct HomeView: View {
         VStack(alignment: .leading, spacing: 16) {
             Text("Featured Items")
                 .font(.headline)
-                .foregroundColor(.white)
+                .foregroundColor(themeManager.textColor)
                 .padding(.horizontal)
             
             ScrollView(.horizontal, showsIndicators: false) {
@@ -185,7 +184,7 @@ struct HomeView: View {
         VStack(alignment: .leading, spacing: 16) {
             Text("Upcoming Events")
                 .font(.headline)
-                .foregroundColor(.white)
+                .foregroundColor(themeManager.textColor)
                 .padding(.horizontal)
             
             ScrollView(.horizontal, showsIndicators: false) {
@@ -203,12 +202,12 @@ struct HomeView: View {
         VStack(alignment: .leading, spacing: 16) {
             Text("About Us")
                 .font(.headline)
-                .foregroundColor(.white)
+                .foregroundColor(themeManager.textColor)
                 .padding(.horizontal)
             
             Text(restaurant.welcomeMessage)
                 .font(.body)
-                .foregroundColor(.white.opacity(0.9))
+                .foregroundColor(themeManager.textColor.opacity(0.9))
                 .fixedSize(horizontal: false, vertical: true)
                 .padding()
                 .background(.ultraThinMaterial)
@@ -232,7 +231,7 @@ struct HomeView: View {
                     .foregroundColor(.white)
                     .padding(.vertical, 12)
                     .padding(.horizontal, 24)
-                    .background(Color.primary)
+                    .background(themeManager.primaryColor)
                     .cornerRadius(12)
                     .shadow(color: Color.black.opacity(0.2), radius: 8, x: 0, y: 4)
             }
@@ -244,23 +243,23 @@ struct HomeView: View {
         VStack(alignment: .leading, spacing: 16) {
             Text("Today's Hours")
                 .font(.headline)
-                .foregroundColor(.white)
+                .foregroundColor(themeManager.textColor)
                 .padding(.horizontal)
             
             HStack {
                 Image(systemName: "clock")
-                    .foregroundColor(.white)
+                    .foregroundColor(themeManager.textColor)
                 
                 Text("Open today: \(restaurant.todayHours)")
                     .font(.subheadline)
-                    .foregroundColor(.white.opacity(0.9))
+                    .foregroundColor(themeManager.textColor.opacity(0.9))
                 
                 Spacer()
                 
                 NavigationLink(destination: InfoView()) {
                     Text("Full Hours")
                         .font(.subheadline)
-                        .foregroundColor(.white)
+                        .foregroundColor(themeManager.primaryColor)
                 }
             }
             .padding()
@@ -285,6 +284,7 @@ struct HomeView: View {
 // MARK: - Supporting Views
 
 struct ActionButton: View {
+    @EnvironmentObject private var themeManager: ThemeManager
     let title: String
     let iconName: String
     let destination: AnyView
@@ -294,11 +294,11 @@ struct ActionButton: View {
             VStack(spacing: 8) {
                 Image(systemName: iconName)
                     .font(.system(size: 24))
-                    .foregroundColor(.white)
+                    .foregroundColor(themeManager.textColor)
                 
                 Text(title)
                     .font(.callout)
-                    .foregroundColor(.white)
+                    .foregroundColor(themeManager.textColor)
             }
             .frame(maxWidth: .infinity)
             .padding(.vertical, 16)
@@ -321,6 +321,7 @@ struct ActionButton: View {
 }
 
 struct FeaturedItemCard: View {
+    @EnvironmentObject private var themeManager: ThemeManager
     let item: FeaturedItem
     
     var body: some View {
@@ -341,12 +342,12 @@ struct FeaturedItemCard: View {
             // Title and description
             Text(item.name)
                 .font(.headline)
-                .foregroundColor(.white)
+                .foregroundColor(themeManager.textColor)
                 .lineLimit(1)
             
             Text(item.description)
                 .font(.caption)
-                .foregroundColor(.white.opacity(0.7))
+                .foregroundColor(themeManager.textColor.opacity(0.7))
                 .lineLimit(2)
                 .frame(height: 36)
             
@@ -354,7 +355,7 @@ struct FeaturedItemCard: View {
             Text("$\(String(format: "%.2f", item.price))")
                 .font(.subheadline)
                 .fontWeight(.semibold)
-                .foregroundColor(.white)
+                .foregroundColor(themeManager.primaryColor)
         }
         .frame(width: 200)
         .padding(12)
@@ -376,6 +377,7 @@ struct FeaturedItemCard: View {
 }
 
 struct EventCard: View {
+    @EnvironmentObject private var themeManager: ThemeManager
     let event: Event
     let dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
@@ -419,12 +421,12 @@ struct EventCard: View {
             // Title and description
             Text(event.title)
                 .font(.headline)
-                .foregroundColor(.white)
+                .foregroundColor(themeManager.textColor)
                 .lineLimit(1)
             
             Text(event.description)
                 .font(.caption)
-                .foregroundColor(.white.opacity(0.7))
+                .foregroundColor(themeManager.textColor.opacity(0.7))
                 .lineLimit(2)
                 .frame(height: 36)
         }

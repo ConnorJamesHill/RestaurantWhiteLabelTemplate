@@ -1,8 +1,16 @@
+//
+//  InfoView.swift
+//  Restaurant Template
+//
+//  Created by Connor Hill on 5/4/25.
+//
+
 import SwiftUI
 import MapKit
 
 struct InfoView: View {
     @EnvironmentObject private var restaurant: RestaurantConfiguration
+    @EnvironmentObject private var themeManager: ThemeManager
     @StateObject private var authViewModel = MainViewViewModel.shared
     
     // Default coordinate - will be updated from restaurant config in onAppear
@@ -13,26 +21,13 @@ struct InfoView: View {
         span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
     )
     @State private var showingFullMap = false
-    
-    // Blue gradient background - matching other views
-    private var backgroundGradient: LinearGradient {
-        LinearGradient(
-            gradient: Gradient(colors: [
-                Color(hex: "1a73e8"), // Vibrant blue
-                Color(hex: "0d47a1"), // Deep blue
-                Color(hex: "002171"), // Dark blue
-                Color(hex: "002984")  // Navy blue
-            ]),
-            startPoint: .topLeading,
-            endPoint: .bottomTrailing
-        )
-    }
+    @State private var selectedTabIndex = 0
     
     var body: some View {
         NavigationStack {
             ZStack {
                 // Background gradient
-                backgroundGradient
+                themeManager.backgroundGradient
                     .ignoresSafeArea()
                 
                 // Decorative elements
@@ -77,12 +72,13 @@ struct InfoView: View {
             .navigationTitle("About Us")
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(.visible, for: .navigationBar)
-            .toolbarBackground(.ultraThinMaterial, for: .navigationBar)
+            .toolbarBackground(themeManager.tabBarColor, for: .navigationBar)
+            .toolbarColorScheme(themeManager.currentTheme == .light ? .dark : .light, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .principal) {
                     Text("About Us")
                         .font(.headline)
-                        .foregroundColor(.white)
+                        .foregroundColor(themeManager.currentTheme == .light ? .black : .white)
                 }
             }
             .sheet(isPresented: $showingFullMap) {
@@ -96,48 +92,7 @@ struct InfoView: View {
                 )
                 
                 // Force tab bar appearance when the view appears
-                DispatchQueue.main.async {
-                    let appearance = UITabBarAppearance()
-                    
-                    // Start with transparent background for material effect
-                    appearance.configureWithTransparentBackground()
-                    
-                    // Apply ultraThinMaterial effect
-                    appearance.backgroundEffect = UIBlurEffect(style: .systemThinMaterialDark)
-                    
-                    // Create a gradient-like effect with a semi-transparent overlay
-                    // Top color: lighter blue
-                    let topColor = UIColor(Color(hex: "1a73e8").opacity(0.85))
-                    // Bottom color: darker blue
-                    let bottomColor = UIColor(Color(hex: "002171").opacity(0.85))
-                    
-                    // Use the average color for the backgroundColor with material effect
-                    appearance.backgroundColor = UIColor(
-                        red: (topColor.cgColor.components![0] + bottomColor.cgColor.components![0]) / 2,
-                        green: (topColor.cgColor.components![1] + bottomColor.cgColor.components![1]) / 2,
-                        blue: (topColor.cgColor.components![2] + bottomColor.cgColor.components![2]) / 2,
-                        alpha: 0.85
-                    )
-                    
-                    // Style the tab items
-                    appearance.stackedLayoutAppearance.normal.iconColor = UIColor.white.withAlphaComponent(0.5)
-                    appearance.stackedLayoutAppearance.normal.titleTextAttributes = [.foregroundColor: UIColor.white.withAlphaComponent(0.5)]
-                    appearance.stackedLayoutAppearance.selected.iconColor = .white
-                    appearance.stackedLayoutAppearance.selected.titleTextAttributes = [.foregroundColor: UIColor.white]
-                    
-                    // Apply shadow to tab bar
-                    appearance.shadowColor = UIColor.black.withAlphaComponent(0.2)
-                    
-                    // Apply this appearance to the tab bar
-                    UITabBar.appearance().standardAppearance = appearance
-                    UITabBar.appearance().scrollEdgeAppearance = appearance
-                    UITabBar.appearance().tintColor = .white
-                    
-                    // Enhance the tab bar with a subtle border
-                    UITabBar.appearance().layer.borderWidth = 0.2
-                    UITabBar.appearance().layer.borderColor = UIColor.white.withAlphaComponent(0.2).cgColor
-                }
-                
+                themeManager.updateAppearance()
             }
         }
     }
@@ -160,7 +115,7 @@ struct InfoView: View {
             Text(restaurant.name)
                 .font(.title)
                 .fontWeight(.bold)
-                .foregroundColor(.white)
+                .foregroundColor(themeManager.textColor)
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 24)
@@ -186,7 +141,7 @@ struct InfoView: View {
             
             Text(restaurant.description)
                 .font(.body)
-                .foregroundColor(.white.opacity(0.9))
+                .foregroundColor(themeManager.textColor.opacity(0.9))
                 .fixedSize(horizontal: false, vertical: true)
                 .padding()
                 .background(.ultraThinMaterial)
@@ -216,12 +171,12 @@ struct InfoView: View {
                         Text(day)
                             .font(.subheadline)
                             .fontWeight(.medium)
-                            .foregroundColor(.white)
+                            .foregroundColor(themeManager.textColor)
                             .frame(width: 100, alignment: .leading)
                         
                         Text(hours)
                             .font(.subheadline)
-                            .foregroundColor(.white.opacity(0.7))
+                            .foregroundColor(themeManager.textColor.opacity(0.7))
                     }
                     .padding(.vertical, 6)
                 }
@@ -250,20 +205,21 @@ struct InfoView: View {
             
             Text(restaurant.address)
                 .font(.subheadline)
-                .foregroundColor(.white.opacity(0.9))
+                .foregroundColor(themeManager.textColor.opacity(0.9))
                 .padding(.bottom, 4)
             
             // Custom map wrapper to preserve tab bar appearance
             MapWithConsistentTabBar(
                 region: $region,
                 coordinate: restaurant.location,
-                title: restaurant.name
+                title: restaurant.name,
+                themeManager: themeManager
             )
             .frame(height: 180)
             .clipShape(RoundedRectangle(cornerRadius: 12))
             .overlay(
                 RoundedRectangle(cornerRadius: 12)
-                    .stroke(Color.white.opacity(0.3), lineWidth: 0.15)
+                    .stroke(themeManager.textColor.opacity(0.3), lineWidth: 0.15)
             )
             .shadow(color: Color.black.opacity(0.2), radius: 8, x: 0, y: 4)
             .onTapGesture {
@@ -276,7 +232,7 @@ struct InfoView: View {
             } label: {
                 Label("Get Directions", systemImage: "location.fill")
                     .font(.subheadline)
-                    .foregroundColor(.white)
+                    .foregroundColor(themeManager.textColor)
                     .frame(maxWidth: .infinity)
                     .padding()
                     .background(.ultraThinMaterial)
@@ -340,7 +296,8 @@ struct InfoView: View {
                 ForEach(restaurant.socialMedia, id: \.0) { platform, handle in
                     SocialMediaButton(
                         platform: platform,
-                        handle: handle
+                        handle: handle,
+                        themeManager: themeManager
                     ) {
                         openSocialMedia(platform: platform, handle: handle)
                     }
@@ -377,20 +334,20 @@ struct InfoView: View {
                 HStack {
                     Image(systemName: "rectangle.portrait.and.arrow.right")
                         .font(.system(size: 16))
-                        .foregroundColor(.white)
+                        .foregroundColor(themeManager.textColor)
                         .frame(width: 32, height: 32)
                         .background(Color.red.opacity(0.2))
                         .clipShape(Circle())
                     
                     Text("Sign Out")
                         .font(.subheadline)
-                        .foregroundColor(.white)
+                        .foregroundColor(themeManager.textColor)
                     
                     Spacer()
                     
                     Image(systemName: "chevron.right")
                         .font(.caption)
-                        .foregroundColor(.white.opacity(0.7))
+                        .foregroundColor(themeManager.textColor.opacity(0.7))
                 }
                 .padding()
                 .background(.ultraThinMaterial)
@@ -415,26 +372,28 @@ struct InfoView: View {
         NavigationStack {
             ZStack {
                 // Background gradient for the map view too
-                backgroundGradient.ignoresSafeArea()
+                themeManager.backgroundGradient.ignoresSafeArea()
                 
                 // Use custom map here too to preserve tab bar appearance
                 MapWithConsistentTabBar(
                     region: $region,
                     coordinate: restaurant.location,
-                    title: restaurant.name
+                    title: restaurant.name,
+                    themeManager: themeManager
                 )
             }
             .edgesIgnoringSafeArea(.all)
             .navigationTitle(restaurant.name)
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(.visible, for: .navigationBar)
-            .toolbarBackground(.ultraThinMaterial, for: .navigationBar)
+            .toolbarBackground(themeManager.tabBarColor, for: .navigationBar)
+            .toolbarColorScheme(themeManager.currentTheme == .light ? .dark : .light, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Done") {
                         showingFullMap = false
                     }
-                    .foregroundColor(.white)
+                    .foregroundColor(themeManager.currentTheme == .light ? .black : .white)
                 }
                 
                 ToolbarItem(placement: .bottomBar) {
@@ -443,7 +402,7 @@ struct InfoView: View {
                     } label: {
                         Label("Get Directions", systemImage: "location.fill")
                             .frame(maxWidth: .infinity)
-                            .foregroundColor(.white)
+                            .foregroundColor(themeManager.textColor)
                             .padding()
                             .background(.ultraThinMaterial)
                             .cornerRadius(12)
@@ -471,7 +430,7 @@ struct InfoView: View {
     private func sectionHeader(_ title: String) -> some View {
         Text(title)
             .font(.headline)
-            .foregroundColor(.white)
+            .foregroundColor(themeManager.textColor)
             .padding(.vertical, 4)
             .shadow(color: Color.black.opacity(0.2), radius: 2, x: 0, y: 1)
     }
@@ -481,27 +440,27 @@ struct InfoView: View {
             HStack {
                 Image(systemName: icon)
                     .font(.system(size: 16))
-                    .foregroundColor(.white)
+                    .foregroundColor(themeManager.textColor)
                     .frame(width: 32, height: 32)
-                    .background(Color.primary.opacity(0.2))
+                    .background(themeManager.primaryColor.opacity(0.2))
                     .clipShape(Circle())
                 
                 Text(text)
                     .font(.subheadline)
-                    .foregroundColor(.white)
+                    .foregroundColor(themeManager.textColor)
                 
                 Spacer()
                 
                 Image(systemName: "chevron.right")
                     .font(.caption)
-                    .foregroundColor(.white.opacity(0.7))
+                    .foregroundColor(themeManager.textColor.opacity(0.7))
             }
             .padding()
             .background(.ultraThinMaterial)
             .cornerRadius(12)
             .overlay(
                 RoundedRectangle(cornerRadius: 12)
-                    .stroke(Color.white.opacity(0.2), lineWidth: 0.15)
+                    .stroke(themeManager.textColor.opacity(0.2), lineWidth: 0.15)
             )
         }
         .shadow(color: Color.black.opacity(0.2), radius: 6, x: 0, y: 3)
@@ -576,9 +535,8 @@ struct MapWithConsistentTabBar: UIViewRepresentable {
     @Binding var region: MKCoordinateRegion
     let coordinate: CLLocationCoordinate2D
     let title: String
+    let themeManager: ThemeManager
     
-    // In MapWithConsistentTabBar, update the makeUIView method:
-
     func makeUIView(context: Context) -> MKMapView {
         let mapView = MKMapView()
         mapView.delegate = context.coordinator
@@ -589,21 +547,9 @@ struct MapWithConsistentTabBar: UIViewRepresentable {
         annotation.title = title
         mapView.addAnnotation(annotation)
         
-        // Apply the same tab bar appearance that worked well
+        // Apply the theme-based tab bar appearance
         DispatchQueue.main.async {
-            let appearance = UITabBarAppearance()
-            appearance.configureWithTransparentBackground()
-            appearance.backgroundEffect = UIBlurEffect(style: .systemThinMaterialDark)
-            appearance.backgroundColor = UIColor(Color(hex: "0d47a1").opacity(0.7))
-            
-            appearance.stackedLayoutAppearance.normal.iconColor = UIColor.white.withAlphaComponent(0.5)
-            appearance.stackedLayoutAppearance.normal.titleTextAttributes = [.foregroundColor: UIColor.white.withAlphaComponent(0.5)]
-            appearance.stackedLayoutAppearance.selected.iconColor = .white
-            appearance.stackedLayoutAppearance.selected.titleTextAttributes = [.foregroundColor: UIColor.white]
-            
-            UITabBar.appearance().standardAppearance = appearance
-            UITabBar.appearance().scrollEdgeAppearance = appearance
-            UITabBar.appearance().tintColor = .white
+            themeManager.updateAppearance()
         }
         
         return mapView
@@ -625,6 +571,7 @@ struct MapWithConsistentTabBar: UIViewRepresentable {
 struct SocialMediaButton: View {
     let platform: String
     let handle: String
+    let themeManager: ThemeManager
     let action: () -> Void
     
     var body: some View {
@@ -641,13 +588,13 @@ struct SocialMediaButton: View {
                     )
                     .overlay(
                         Circle()
-                            .stroke(Color.white.opacity(0.3), lineWidth: 0.15)
+                            .stroke(themeManager.textColor.opacity(0.3), lineWidth: 0.15)
                     )
                     .shadow(color: Color.black.opacity(0.2), radius: 4, x: 0, y: 2)
                 
                 Text(handle)
                     .font(.caption)
-                    .foregroundColor(.white.opacity(0.8))
+                    .foregroundColor(themeManager.textColor.opacity(0.8))
             }
         }
     }

@@ -1,21 +1,15 @@
+//
+//  MenuView.swift
+//  Restaurant Template
+//
+//  Created by Connor Hill on 5/4/25.
+//
+
 import SwiftUI
 
 struct MenuView: View {
     @EnvironmentObject private var restaurant: RestaurantConfiguration
-
-    // Blue gradient background
-    private var backgroundGradient: LinearGradient {
-        LinearGradient(
-            gradient: Gradient(colors: [
-                Color(hex: "1a73e8"),
-                Color(hex: "0d47a1"),
-                Color(hex: "002171"),
-                Color(hex: "002984")
-            ]),
-            startPoint: .topLeading,
-            endPoint: .bottomTrailing
-        )
-    }
+    @EnvironmentObject private var themeManager: ThemeManager
 
     @State private var categories = [
         MenuCategory(id: UUID(), name: "Appetizers", items: [
@@ -42,8 +36,8 @@ struct MenuView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                // Gradient background
-                backgroundGradient.ignoresSafeArea()
+                // Gradient background from ThemeManager
+                themeManager.backgroundGradient.ignoresSafeArea()
 
                 // Decorative blurred circles
                 Circle()
@@ -76,15 +70,16 @@ struct MenuView: View {
                 ToolbarItem(placement: .principal) {
                     Text("\(restaurant.name) Menu")
                         .font(.headline)
-                        .foregroundColor(.white)
+                        .foregroundColor(themeManager.currentTheme == .light ? .black : .white)
                 }
             }
             .toolbarBackground(.visible, for: .navigationBar)
-            .toolbarBackground(.ultraThinMaterial, for: .navigationBar)
+            .toolbarBackground(themeManager.tabBarColor, for: .navigationBar)
+            .toolbarColorScheme(themeManager.currentTheme == .light ? .dark : .light, for: .navigationBar)
             .sheet(isPresented: $showingItemDetail) {
                 if let item = selectedItem {
                     MenuItemDetailView(item: item)
-                        .background(backgroundGradient.ignoresSafeArea())
+                        .environmentObject(themeManager)
                         .presentationDetents([.medium, .large])
                 }
             }
@@ -113,6 +108,7 @@ struct MenuView: View {
                             }
                         }
                     )
+                    .environmentObject(themeManager)
                 }
             }
             .padding(.horizontal)
@@ -140,7 +136,7 @@ struct MenuView: View {
         Text(selectedCategory?.name ?? categories.first?.name ?? "Menu")
             .font(.title2)
             .fontWeight(.bold)
-            .foregroundColor(.white)
+            .foregroundColor(themeManager.textColor)
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.horizontal)
             .padding(.top, 24)
@@ -158,6 +154,7 @@ struct MenuView: View {
             ) {
                 ForEach(currentItems) { item in
                     MenuItemCard(item: item)
+                        .environmentObject(themeManager)
                         .onTapGesture {
                             selectedItem = item
                             withAnimation {
@@ -178,12 +175,13 @@ struct MenuView: View {
                     VStack(alignment: .leading, spacing: 0) {
                         Text(category.name)
                             .font(.headline)
-                            .foregroundColor(.white)
+                            .foregroundColor(themeManager.textColor)
                             .padding(.horizontal)
                             .padding(.top, 8)
                         VStack(spacing: 12) {
                             ForEach(category.items) { item in
                                 FullMenuItemRow(item: item)
+                                    .environmentObject(themeManager)
                                     .onTapGesture {
                                         selectedItem = item
                                         showingItemDetail = true
@@ -225,7 +223,7 @@ struct MenuView: View {
                 Text(showingFullMenu ? "Grid View" : "Full Menu")
             }
             .font(.subheadline.bold())
-            .foregroundColor(.white)
+            .foregroundColor(themeManager.textColor)
             .padding(.vertical, 8)
             .padding(.horizontal, 16)
             .background(.ultraThinMaterial)
@@ -251,6 +249,7 @@ struct MenuView: View {
 
 struct FullMenuItemRow: View {
     let item: MenuItem
+    @EnvironmentObject private var themeManager: ThemeManager
 
     var body: some View {
         HStack(spacing: 24) {
@@ -264,10 +263,10 @@ struct FullMenuItemRow: View {
             VStack(alignment: .leading, spacing: 4) {
                 Text(item.name)
                     .font(.headline)
-                    .foregroundColor(.white)
+                    .foregroundColor(themeManager.textColor)
                 Text(item.description)
                     .font(.caption)
-                    .foregroundColor(.white.opacity(0.7))
+                    .foregroundColor(themeManager.textColor.opacity(0.7))
                     .lineLimit(2)
                     .fixedSize(horizontal: false, vertical: true)
             }
@@ -277,7 +276,7 @@ struct FullMenuItemRow: View {
             Text("$\(String(format: "%.2f", item.price))")
                 .font(.subheadline)
                 .fontWeight(.bold)
-                .foregroundColor(.white)
+                .foregroundColor(themeManager.primaryColor)
                 .padding(.leading, 4)
         }
         .padding(.horizontal, 4)
@@ -305,16 +304,17 @@ struct CategoryButton: View {
     let isSelected: Bool
     let namespace: Namespace.ID
     let action: () -> Void
+    @EnvironmentObject private var themeManager: ThemeManager
 
     var body: some View {
         Button(action: action) {
             VStack(spacing: 6) {
                 Text(category.name)
                     .fontWeight(isSelected ? .bold : .medium)
-                    .foregroundColor(isSelected ? .white : .white.opacity(0.7))
+                    .foregroundColor(isSelected ? themeManager.textColor : themeManager.textColor.opacity(0.7))
                 if isSelected {
                     Rectangle()
-                        .fill(Color.white)
+                        .fill(themeManager.primaryColor)
                         .frame(height: 3)
                         .matchedGeometryEffect(id: "categoryIndicator", in: namespace)
                 } else {
@@ -334,6 +334,7 @@ struct CategoryButton: View {
 
 struct MenuItemCard: View {
     let item: MenuItem
+    @EnvironmentObject private var themeManager: ThemeManager
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -368,10 +369,10 @@ struct MenuItemCard: View {
             HStack(spacing: 2) {
                 Text("$")
                     .font(.caption.bold())
-                    .foregroundColor(.white.opacity(0.7))
+                    .foregroundColor(themeManager.textColor.opacity(0.7))
                 Text(String(format: "%.2f", item.price))
                     .font(.system(.body, design: .rounded).bold())
-                    .foregroundColor(.white)
+                    .foregroundColor(themeManager.textColor)
             }
             .padding(.horizontal, 10)
             .padding(.vertical, 6)
@@ -379,7 +380,7 @@ struct MenuItemCard: View {
             .cornerRadius(16)
             .overlay(
                 RoundedRectangle(cornerRadius: 16)
-                    .stroke(Color.white.opacity(0.3), lineWidth: 0.15)
+                    .stroke(themeManager.textColor.opacity(0.3), lineWidth: 0.15)
             )
             .padding(10)
             .shadow(color: Color.black.opacity(0.15), radius: 4, x: 0, y: 2)
@@ -390,11 +391,11 @@ struct MenuItemCard: View {
         VStack(alignment: .leading, spacing: 4) {
             Text(item.name)
                 .font(.headline)
-                .foregroundColor(.white)
+                .foregroundColor(themeManager.textColor)
                 .lineLimit(1)
             Text(item.description)
                 .font(.caption)
-                .foregroundColor(.white.opacity(0.7))
+                .foregroundColor(themeManager.textColor.opacity(0.7))
                 .lineLimit(2)
                 .fixedSize(horizontal: false, vertical: true)
         }
@@ -406,26 +407,13 @@ struct MenuItemCard: View {
 struct MenuItemDetailView: View {
     let item: MenuItem
     @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject private var themeManager: ThemeManager
     @State private var quantity = 1
-
-    // Use the same gradient as the main view
-    private var backgroundGradient: LinearGradient {
-        LinearGradient(
-            gradient: Gradient(colors: [
-                Color(hex: "1a73e8"),
-                Color(hex: "0d47a1"),
-                Color(hex: "002171"),
-                Color(hex: "002984")
-            ]),
-            startPoint: .topLeading,
-            endPoint: .bottomTrailing
-        )
-    }
 
     var body: some View {
         NavigationStack {
             ZStack {
-                backgroundGradient.ignoresSafeArea()
+                themeManager.backgroundGradient.ignoresSafeArea()
                 ScrollView {
                     VStack(alignment: .leading, spacing: 20) {
                         Image(item.imageName)
@@ -462,16 +450,16 @@ struct MenuItemDetailView: View {
                         VStack(alignment: .leading, spacing: 16) {
                             Text("Description")
                                 .font(.headline)
-                                .foregroundColor(.white)
+                                .foregroundColor(themeManager.textColor)
                             Text(item.description)
                                 .font(.body)
-                                .foregroundColor(.white.opacity(0.8))
+                                .foregroundColor(themeManager.textColor.opacity(0.8))
                                 .fixedSize(horizontal: false, vertical: true)
-                            Divider().background(Color.white.opacity(0.2))
+                            Divider().background(themeManager.textColor.opacity(0.2))
                             HStack {
                                 Text("Quantity")
                                     .font(.headline)
-                                    .foregroundColor(.white)
+                                    .foregroundColor(themeManager.textColor)
                                 Spacer()
                                 HStack(spacing: 18) {
                                     Button {
@@ -479,20 +467,20 @@ struct MenuItemDetailView: View {
                                     } label: {
                                         Image(systemName: "minus.circle.fill")
                                             .font(.title3)
-                                            .foregroundColor(quantity > 1 ? .white : .gray)
+                                            .foregroundColor(quantity > 1 ? themeManager.primaryColor : .gray)
                                     }
                                     .shadow(color: Color.black.opacity(0.1), radius: 2, x: 0, y: 1)
                                     Text("\(quantity)")
                                         .font(.title3)
                                         .fontWeight(.semibold)
-                                        .foregroundColor(.white)
+                                        .foregroundColor(themeManager.textColor)
                                         .frame(minWidth: 30)
                                     Button {
                                         if quantity < 10 { quantity += 1 }
                                     } label: {
                                         Image(systemName: "plus.circle.fill")
                                             .font(.title3)
-                                            .foregroundColor(.white)
+                                            .foregroundColor(themeManager.primaryColor)
                                     }
                                     .shadow(color: Color.black.opacity(0.1), radius: 2, x: 0, y: 1)
                                 }
@@ -502,7 +490,7 @@ struct MenuItemDetailView: View {
                             } label: {
                                 Text("Add to Order - $\(String(format: "%.2f", item.price * Double(quantity)))")
                                     .font(.headline)
-                                    .foregroundColor(.white)
+                                    .foregroundColor(themeManager.textColor)
                                     .frame(maxWidth: .infinity)
                                     .padding()
                                     .background(.ultraThinMaterial)
@@ -546,11 +534,14 @@ struct MenuItemDetailView: View {
                     Button(action: { dismiss() }) {
                         Image(systemName: "xmark.circle.fill")
                             .font(.title3)
-                            .foregroundColor(.white)
+                            .foregroundColor(themeManager.textColor)
                             .shadow(color: Color.black.opacity(0.2), radius: 2, x: 0, y: 1)
                     }
                 }
             }
+            .toolbarBackground(themeManager.tabBarColor, for: .navigationBar)
+            .toolbarBackground(.visible, for: .navigationBar)
+            .toolbarColorScheme(themeManager.currentTheme == .light ? .dark : .light, for: .navigationBar)
         }
     }
 }

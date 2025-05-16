@@ -6,33 +6,21 @@
 //
 
 import SwiftUI
+import FirebaseAuth
 
 struct RegisterView: View {
     @EnvironmentObject private var restaurant: RestaurantConfiguration
+    @EnvironmentObject private var themeManager: ThemeManager
     @StateObject private var viewModel = RegisterViewViewModel()
     @Environment(\.dismiss) private var dismiss
     @State private var isLoading = false
     @Environment(\.colorScheme) private var colorScheme
     
-    // Enhanced blue gradient background
-    private var backgroundGradient: LinearGradient {
-        LinearGradient(
-            gradient: Gradient(colors: [
-                Color(hex: "1a73e8"), // Vibrant blue
-                Color(hex: "0d47a1"), // Deep blue
-                Color(hex: "002171"), // Dark blue
-                Color(hex: "002984")  // Navy blue
-            ]),
-            startPoint: .topLeading,
-            endPoint: .bottomTrailing
-        )
-    }
-    
     var body: some View {
         NavigationStack {
             ZStack {
-                // Background gradient
-                backgroundGradient
+                // Background gradient from ThemeManager
+                themeManager.backgroundGradient
                     .ignoresSafeArea()
                 
                 // Decorative elements
@@ -54,7 +42,7 @@ struct RegisterView: View {
                         Text("Create Account")
                             .font(.title)
                             .fontWeight(.bold)
-                            .foregroundColor(.white)
+                            .foregroundColor(themeManager.textColor)
                             .padding(.top, 50)
                         
                         // Registration Form
@@ -69,15 +57,19 @@ struct RegisterView: View {
                             TextField("Full Name", text: $viewModel.name)
                                 .textFieldStyle(RoundedBorderTextFieldStyle())
                                 .autocapitalization(.words)
+                                .foregroundColor(themeManager.currentTheme == .light ? .black : themeManager.textColor)
                                 .padding(.horizontal)
                             
                             TextField("Email Address", text: $viewModel.email)
                                 .textFieldStyle(RoundedBorderTextFieldStyle())
                                 .autocapitalization(.none)
+                                .keyboardType(.emailAddress)
+                                .foregroundColor(themeManager.currentTheme == .light ? .black : themeManager.textColor)
                                 .padding(.horizontal)
                             
                             SecureField("Password", text: $viewModel.password)
                                 .textFieldStyle(RoundedBorderTextFieldStyle())
+                                .foregroundColor(themeManager.currentTheme == .light ? .black : themeManager.textColor)
                                 .padding(.horizontal)
                             
                             Button(action: {
@@ -86,16 +78,16 @@ struct RegisterView: View {
                             }) {
                                 if isLoading {
                                     ProgressView()
-                                        .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                                        .progressViewStyle(CircularProgressViewStyle(tint: themeManager.textColor))
                                 } else {
                                     Text("Create Account")
                                 }
                             }
                             .font(.headline)
-                            .foregroundColor(.white)
+                            .foregroundColor(themeManager.textColor)
                             .frame(maxWidth: .infinity)
                             .padding()
-                            .background(Color.white.opacity(0.2))
+                            .background(themeManager.primaryColor.opacity(0.2))
                             .cornerRadius(10)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 10)
@@ -113,7 +105,7 @@ struct RegisterView: View {
                             .padding(.horizontal)
                             
                             Text("Or")
-                                .foregroundColor(.white.opacity(0.8))
+                                .foregroundColor(themeManager.textColor.opacity(0.8))
                                 .padding(.vertical, 8)
                             
                             Button(action: {
@@ -122,16 +114,16 @@ struct RegisterView: View {
                             }) {
                                 if isLoading {
                                     ProgressView()
-                                        .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                                        .progressViewStyle(CircularProgressViewStyle(tint: themeManager.textColor))
                                 } else {
                                     Text("Continue as Guest")
                                 }
                             }
                             .font(.headline)
-                            .foregroundColor(.white)
+                            .foregroundColor(themeManager.textColor)
                             .frame(maxWidth: .infinity)
                             .padding()
-                            .background(Color.black.opacity(0.2))
+                            .background(themeManager.secondaryColor.opacity(0.2))
                             .cornerRadius(10)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 10)
@@ -172,13 +164,14 @@ struct RegisterView: View {
             }
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(.visible, for: .navigationBar)
-            .toolbarBackground(.ultraThinMaterial, for: .navigationBar)
+            .toolbarBackground(themeManager.tabBarColor, for: .navigationBar)
+            .toolbarColorScheme(themeManager.currentTheme == .light ? .dark : .light, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button("Cancel") {
                         dismiss()
                     }
-                    .foregroundColor(.white)
+                    .foregroundColor(themeManager.currentTheme == .light ? .black : .white)
                 }
             }
         }

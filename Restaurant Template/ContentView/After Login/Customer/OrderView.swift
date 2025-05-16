@@ -1,3 +1,10 @@
+//
+//  OrderView.swift
+//  Restaurant Template
+//
+//  Created by Connor Hill on 5/4/25.
+//
+
 import SwiftUI
 import PassKit
 
@@ -18,6 +25,7 @@ struct SubscriptionPlan: Identifiable {
 
 struct OrderView: View {
     @EnvironmentObject private var restaurant: RestaurantConfiguration
+    @EnvironmentObject private var themeManager: ThemeManager
     @State private var cart: [OrderItem] = []
     @State private var orderMode: OrderMode = .shop
     @State private var showingCheckout = false
@@ -25,20 +33,6 @@ struct OrderView: View {
     @State private var selectedItem: MenuItem? = nil
     @State private var showingItemDetail = false
     @Environment(\.colorScheme) private var colorScheme
-    
-    // Enhanced blue gradient background
-    private var backgroundGradient: LinearGradient {
-        LinearGradient(
-            gradient: Gradient(colors: [
-                Color(hex: "1a73e8"), // Vibrant blue
-                Color(hex: "0d47a1"), // Deep blue
-                Color(hex: "002171"), // Dark blue
-                Color(hex: "002984")  // Navy blue
-            ]),
-            startPoint: .topLeading,
-            endPoint: .bottomTrailing
-        )
-    }
     
     private let subscriptionPlans = [
         SubscriptionPlan(
@@ -91,8 +85,8 @@ struct OrderView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                // Background gradient
-                backgroundGradient
+                // Background gradient from ThemeManager
+                themeManager.backgroundGradient
                     .ignoresSafeArea()
                 
                 // Decorative elements
@@ -125,12 +119,13 @@ struct OrderView: View {
             .navigationTitle("Order Online")
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(.visible, for: .navigationBar)
-            .toolbarBackground(.ultraThinMaterial, for: .navigationBar)
+            .toolbarBackground(themeManager.tabBarColor, for: .navigationBar)
+            .toolbarColorScheme(themeManager.currentTheme == .light ? .dark : .light, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .principal) {
                     Text("Order Online")
                         .font(.headline)
-                        .foregroundColor(.white)
+                        .foregroundColor(themeManager.currentTheme == .light ? .black : .white)
                 }
             }
             .sheet(isPresented: $showingCheckout) {
@@ -139,6 +134,7 @@ struct OrderView: View {
                     onDismiss: { showingCheckout = false },
                     onPayment: { showingPaymentSheet = true }
                 )
+                .environmentObject(themeManager)
             }
             .sheet(isPresented: $showingPaymentSheet) {
                 PaymentView(
@@ -146,6 +142,7 @@ struct OrderView: View {
                     onDismiss: { showingPaymentSheet = false },
                     onSuccess: handlePaymentSuccess
                 )
+                .environmentObject(themeManager)
             }
             .sheet(item: $selectedItem) { item in
                 OrderItemDetailView(
@@ -154,6 +151,7 @@ struct OrderView: View {
                         cart.append(orderItem)
                     }
                 )
+                .environmentObject(themeManager)
             }
         }
     }
@@ -191,13 +189,14 @@ struct OrderView: View {
                         Text(category.name)
                             .font(.title2)
                             .fontWeight(.bold)
-                            .foregroundColor(.white)
+                            .foregroundColor(themeManager.textColor)
                             .padding(.horizontal)
                         
                         ForEach(category.items) { item in
                             MenuItemRow(item: item) {
                                 selectedItem = item
                             }
+                            .environmentObject(themeManager)
                         }
                     }
                     .padding(.vertical, 8)
@@ -214,6 +213,7 @@ struct OrderView: View {
                     SubscriptionPlanCard(plan: plan) {
                         showingCheckout = true
                     }
+                    .environmentObject(themeManager)
                 }
             }
             .padding()
@@ -223,17 +223,17 @@ struct OrderView: View {
     private var cartSummary: some View {
         VStack(spacing: 0) {
             Divider()
-                .background(Color.white.opacity(0.2))
+                .background(themeManager.textColor.opacity(0.2))
             
             HStack {
                 VStack(alignment: .leading) {
                     Text("\(totalItems) \(totalItems == 1 ? "item" : "items")")
                         .font(.subheadline)
-                        .foregroundColor(.white.opacity(0.8))
+                        .foregroundColor(themeManager.textColor.opacity(0.8))
                     
                     Text("$\(String(format: "%.2f", cartTotal))")
                         .font(.headline)
-                        .foregroundColor(.white)
+                        .foregroundColor(themeManager.textColor)
                 }
                 
                 Spacer()
@@ -243,10 +243,10 @@ struct OrderView: View {
                 } label: {
                     Text("Checkout")
                         .font(.headline)
-                        .foregroundColor(.white)
+                        .foregroundColor(themeManager.textColor)
                         .padding(.horizontal, 24)
                         .padding(.vertical, 12)
-                        .background(Color.white.opacity(0.2))
+                        .background(themeManager.primaryColor.opacity(0.2))
                         .cornerRadius(8)
                         .overlay(
                             RoundedRectangle(cornerRadius: 8)
@@ -289,6 +289,7 @@ struct OrderView: View {
 struct MenuItemRow: View {
     let item: MenuItem
     let onAdd: () -> Void
+    @EnvironmentObject private var themeManager: ThemeManager
     
     var body: some View {
         HStack(spacing: 16) {
@@ -302,17 +303,17 @@ struct MenuItemRow: View {
             VStack(alignment: .leading, spacing: 4) {
                 Text(item.name)
                     .font(.headline)
-                    .foregroundColor(.white)
+                    .foregroundColor(themeManager.textColor)
                 
                 Text(item.description)
                     .font(.subheadline)
-                    .foregroundColor(.white.opacity(0.7))
+                    .foregroundColor(themeManager.textColor.opacity(0.7))
                     .lineLimit(2)
                 
                 Text("$\(String(format: "%.2f", item.price))")
                     .font(.subheadline)
                     .fontWeight(.semibold)
-                    .foregroundColor(.white)
+                    .foregroundColor(themeManager.primaryColor)
             }
             
             Spacer()
@@ -320,7 +321,7 @@ struct MenuItemRow: View {
             Button(action: onAdd) {
                 Image(systemName: "plus.circle.fill")
                     .font(.title2)
-                    .foregroundColor(.white)
+                    .foregroundColor(themeManager.primaryColor)
             }
         }
         .padding(.horizontal)
@@ -346,6 +347,7 @@ struct MenuItemRow: View {
 struct SubscriptionPlanCard: View {
     let plan: SubscriptionPlan
     let onSubscribe: () -> Void
+    @EnvironmentObject private var themeManager: ThemeManager
     
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -354,11 +356,11 @@ struct SubscriptionPlanCard: View {
                     Text(plan.name)
                         .font(.title2)
                         .fontWeight(.bold)
-                        .foregroundColor(.white)
+                        .foregroundColor(themeManager.textColor)
                     
                     Text(plan.description)
                         .font(.subheadline)
-                        .foregroundColor(.white.opacity(0.7))
+                        .foregroundColor(themeManager.textColor.opacity(0.7))
                 }
                 
                 Spacer()
@@ -367,11 +369,11 @@ struct SubscriptionPlanCard: View {
                     Text("$\(String(format: "%.2f", plan.price))")
                         .font(.title3)
                         .fontWeight(.bold)
-                        .foregroundColor(.white)
+                        .foregroundColor(themeManager.primaryColor)
                     
                     Text(plan.frequency)
                         .font(.caption)
-                        .foregroundColor(.white.opacity(0.7))
+                        .foregroundColor(themeManager.textColor.opacity(0.7))
                 }
             }
             
@@ -382,7 +384,7 @@ struct SubscriptionPlanCard: View {
                             .foregroundColor(.green)
                         Text(benefit)
                             .font(.subheadline)
-                            .foregroundColor(.white)
+                            .foregroundColor(themeManager.textColor)
                     }
                 }
             }
@@ -390,10 +392,10 @@ struct SubscriptionPlanCard: View {
             Button(action: onSubscribe) {
                 Text("Subscribe Now")
                     .font(.headline)
-                    .foregroundColor(.white)
+                    .foregroundColor(themeManager.textColor)
                     .frame(maxWidth: .infinity)
                     .padding()
-                    .background(Color.white.opacity(0.2))
+                    .background(themeManager.primaryColor.opacity(0.2))
                     .cornerRadius(10)
                     .overlay(
                         RoundedRectangle(cornerRadius: 10)
@@ -430,31 +432,18 @@ struct SubscriptionPlanCard: View {
 struct OrderItemDetailView: View {
     let item: MenuItem
     let onAdd: (OrderItem) -> Void
+    @EnvironmentObject private var themeManager: ThemeManager
     
     @Environment(\.dismiss) private var dismiss
     @State private var quantity = 1
     @State private var specialInstructions = ""
     @State private var selectedCustomizations: [Customization] = []
     
-    // Enhanced blue gradient background
-    private var backgroundGradient: LinearGradient {
-        LinearGradient(
-            gradient: Gradient(colors: [
-                Color(hex: "1a73e8"), // Vibrant blue
-                Color(hex: "0d47a1"), // Deep blue
-                Color(hex: "002171"), // Dark blue
-                Color(hex: "002984")  // Navy blue
-            ]),
-            startPoint: .topLeading,
-            endPoint: .bottomTrailing
-        )
-    }
-    
     var body: some View {
         NavigationStack {
             ZStack {
-                // Background gradient
-                backgroundGradient
+                // Background gradient from ThemeManager
+                themeManager.backgroundGradient
                     .ignoresSafeArea()
                 
                 // Decorative elements
@@ -485,15 +474,15 @@ struct OrderItemDetailView: View {
                             Text(item.name)
                                 .font(.title2)
                                 .fontWeight(.bold)
-                                .foregroundColor(.white)
+                                .foregroundColor(themeManager.textColor)
                             
                             Text(item.description)
                                 .font(.body)
-                                .foregroundColor(.white.opacity(0.8))
+                                .foregroundColor(themeManager.textColor.opacity(0.8))
                             
                             Text("$\(String(format: "%.2f", item.price))")
                                 .font(.headline)
-                                .foregroundColor(.white)
+                                .foregroundColor(themeManager.primaryColor)
                         }
                         .padding(.horizontal)
                         
@@ -501,7 +490,7 @@ struct OrderItemDetailView: View {
                         VStack(alignment: .leading, spacing: 12) {
                             Text("Quantity")
                                 .font(.headline)
-                                .foregroundColor(.white)
+                                .foregroundColor(themeManager.textColor)
                             
                             HStack(spacing: 20) {
                                 Button {
@@ -511,13 +500,13 @@ struct OrderItemDetailView: View {
                                 } label: {
                                     Image(systemName: "minus.circle.fill")
                                         .font(.title2)
-                                        .foregroundColor(.white)
+                                        .foregroundColor(themeManager.primaryColor)
                                 }
                                 
                                 Text("\(quantity)")
                                     .font(.title3)
                                     .fontWeight(.semibold)
-                                    .foregroundColor(.white)
+                                    .foregroundColor(themeManager.textColor)
                                     .frame(minWidth: 30)
                                 
                                 Button {
@@ -525,7 +514,7 @@ struct OrderItemDetailView: View {
                                 } label: {
                                     Image(systemName: "plus.circle.fill")
                                         .font(.title2)
-                                        .foregroundColor(.white)
+                                        .foregroundColor(themeManager.primaryColor)
                                 }
                             }
                         }
@@ -550,19 +539,19 @@ struct OrderItemDetailView: View {
                         VStack(alignment: .leading, spacing: 12) {
                             Text("Special Instructions")
                                 .font(.headline)
-                                .foregroundColor(.white)
+                                .foregroundColor(themeManager.textColor)
                             
                             ZStack(alignment: .topLeading) {
                                 TextField("Add note (optional)", text: $specialInstructions, axis: .vertical)
                                     .padding(10)
-                                    .background(Color.white.opacity(0.2))
+                                    .background(themeManager.primaryColor.opacity(0.1))
                                     .cornerRadius(8)
-                                    .foregroundColor(.white)
+                                    .foregroundColor(themeManager.textColor)
                                     .lineLimit(3)
                                 
                                 if specialInstructions.isEmpty {
                                     Text("Add note (optional)")
-                                        .foregroundColor(.white.opacity(0.6))
+                                        .foregroundColor(themeManager.textColor.opacity(0.6))
                                         .padding(.horizontal, 16)
                                         .padding(.vertical, 10)
                                         .allowsHitTesting(false)
@@ -591,7 +580,8 @@ struct OrderItemDetailView: View {
             }
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(.visible, for: .navigationBar)
-            .toolbarBackground(.ultraThinMaterial, for: .navigationBar)
+            .toolbarBackground(themeManager.tabBarColor, for: .navigationBar)
+            .toolbarColorScheme(themeManager.currentTheme == .light ? .dark : .light, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Add to Cart") {
@@ -605,7 +595,7 @@ struct OrderItemDetailView: View {
                         onAdd(orderItem)
                         dismiss()
                     }
-                    .foregroundColor(.white)
+                    .foregroundColor(themeManager.currentTheme == .light ? .black : .white)
                     .fontWeight(.semibold)
                 }
                 
@@ -613,7 +603,7 @@ struct OrderItemDetailView: View {
                     Button("Cancel") {
                         dismiss()
                     }
-                    .foregroundColor(.white)
+                    .foregroundColor(themeManager.currentTheme == .light ? .black : .white)
                 }
             }
         }
@@ -624,6 +614,7 @@ struct CheckoutView: View {
     @Binding var cart: [OrderItem]
     let onDismiss: () -> Void
     let onPayment: () -> Void
+    @EnvironmentObject private var themeManager: ThemeManager
     
     @State private var deliveryAddress = ""
     @State private var deliveryInstructions = ""
@@ -632,20 +623,6 @@ struct CheckoutView: View {
     @State private var customerPhone = ""
     @State private var customerEmail = ""
     @State private var orderType: OrderType = .pickup
-    
-    // Enhanced blue gradient background
-    private var backgroundGradient: LinearGradient {
-        LinearGradient(
-            gradient: Gradient(colors: [
-                Color(hex: "1a73e8"), // Vibrant blue
-                Color(hex: "0d47a1"), // Deep blue
-                Color(hex: "002171"), // Dark blue
-                Color(hex: "002984")  // Navy blue
-            ]),
-            startPoint: .topLeading,
-            endPoint: .bottomTrailing
-        )
-    }
     
     private var subtotal: Double {
         cart.reduce(0) { total, item in
@@ -674,8 +651,8 @@ struct CheckoutView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                // Background gradient
-                backgroundGradient
+                // Background gradient from ThemeManager
+                themeManager.backgroundGradient
                     .ignoresSafeArea()
                 
                 // Decorative elements
@@ -697,21 +674,24 @@ struct CheckoutView: View {
                         VStack(alignment: .leading, spacing: 16) {
                             Text("Contact Information")
                                 .font(.headline)
-                                .foregroundColor(.white)
+                                .foregroundColor(themeManager.textColor)
                                 .padding(.horizontal, 16)
                             
                             VStack(spacing: 12) {
                                 TextField("Name", text: $customerName)
                                     .textFieldStyle(RoundedBorderTextFieldStyle())
+                                    .foregroundColor(themeManager.currentTheme == .light ? .black : themeManager.textColor)
                                 
                                 TextField("Phone", text: $customerPhone)
                                     .keyboardType(.phonePad)
                                     .textFieldStyle(RoundedBorderTextFieldStyle())
+                                    .foregroundColor(themeManager.currentTheme == .light ? .black : themeManager.textColor)
                                 
                                 TextField("Email", text: $customerEmail)
                                     .keyboardType(.emailAddress)
                                     .textContentType(.emailAddress)
                                     .textFieldStyle(RoundedBorderTextFieldStyle())
+                                    .foregroundColor(themeManager.currentTheme == .light ? .black : themeManager.textColor)
                             }
                             .padding(.horizontal)
                         }
@@ -735,7 +715,7 @@ struct CheckoutView: View {
                         VStack(alignment: .leading, spacing: 16) {
                             Text("Order Type")
                                 .font(.headline)
-                                .foregroundColor(.white)
+                                .foregroundColor(themeManager.textColor)
                                 .padding(.horizontal, 16)
                             
                             VStack(spacing: 16) {
@@ -751,10 +731,12 @@ struct CheckoutView: View {
                                         TextField("Delivery Address", text: $deliveryAddress, axis: .vertical)
                                             .textFieldStyle(RoundedBorderTextFieldStyle())
                                             .lineLimit(3...6)
+                                            .foregroundColor(themeManager.currentTheme == .light ? .black : themeManager.textColor)
                                         
                                         TextField("Delivery Instructions (Optional)", text: $deliveryInstructions, axis: .vertical)
                                             .textFieldStyle(RoundedBorderTextFieldStyle())
                                             .lineLimit(2...4)
+                                            .foregroundColor(themeManager.currentTheme == .light ? .black : themeManager.textColor)
                                     }
                                     .padding(.horizontal)
                                 } else {
@@ -764,9 +746,10 @@ struct CheckoutView: View {
                                         in: Date()...,
                                         displayedComponents: [.hourAndMinute]
                                     )
-                                    .foregroundColor(.white)
+                                    .foregroundColor(themeManager.textColor)
                                     .padding(.horizontal)
-                                    .colorScheme(.dark)
+                                    .colorScheme(themeManager.currentTheme == .light ? .light : .dark)
+                                    .accentColor(themeManager.primaryColor)
                                 }
                             }
                         }
@@ -790,7 +773,7 @@ struct CheckoutView: View {
                         VStack(alignment: .leading, spacing: 16) {
                             Text("Order Summary (\(totalItems) \(totalItems == 1 ? "item" : "items"))")
                                 .font(.headline)
-                                .foregroundColor(.white)
+                                .foregroundColor(themeManager.textColor)
                                 .padding(.horizontal, 16)
                             
                             VStack(spacing: 16) {
@@ -800,47 +783,48 @@ struct CheckoutView: View {
                                             cart.remove(at: index)
                                         }
                                     }
+                                    .environmentObject(themeManager)
                                 }
                                 
                                 VStack(spacing: 12) {
                                     HStack {
                                         Text("Subtotal")
-                                            .foregroundColor(.white)
+                                            .foregroundColor(themeManager.textColor)
                                         Spacer()
                                         Text("$\(String(format: "%.2f", subtotal))")
-                                            .foregroundColor(.white)
+                                            .foregroundColor(themeManager.textColor)
                                     }
                                     
                                     HStack {
                                         Text("Tax")
-                                            .foregroundColor(.white)
+                                            .foregroundColor(themeManager.textColor)
                                         Spacer()
                                         Text("$\(String(format: "%.2f", tax))")
-                                            .foregroundColor(.white)
+                                            .foregroundColor(themeManager.textColor)
                                     }
                                     
                                     if orderType == .delivery {
                                         HStack {
                                             Text("Delivery Fee")
-                                                .foregroundColor(.white)
+                                                .foregroundColor(themeManager.textColor)
                                             Spacer()
                                             Text("$\(String(format: "%.2f", deliveryFee))")
-                                                .foregroundColor(.white)
+                                                .foregroundColor(themeManager.textColor)
                                         }
                                     }
                                     
                                     Divider()
-                                        .background(Color.white.opacity(0.3))
+                                        .background(themeManager.textColor.opacity(0.3))
                                         .padding(.vertical, 4)
                                     
                                     HStack {
                                         Text("Total")
                                             .font(.headline)
-                                            .foregroundColor(.white)
+                                            .foregroundColor(themeManager.textColor)
                                         Spacer()
                                         Text("$\(String(format: "%.2f", total))")
                                             .font(.headline)
-                                            .foregroundColor(.white)
+                                            .foregroundColor(themeManager.primaryColor)
                                     }
                                 }
                                 .padding()
@@ -885,8 +869,8 @@ struct CheckoutView: View {
                             }
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 12)
-                            .background(isFormValid ? Color.white.opacity(0.2) : Color.gray.opacity(0.3))
-                            .foregroundColor(.white)
+                            .background(isFormValid ? themeManager.primaryColor.opacity(0.8) : Color.gray.opacity(0.3))
+                            .foregroundColor(themeManager.textColor)
                             .cornerRadius(12)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 12)
@@ -910,18 +894,19 @@ struct CheckoutView: View {
             .navigationTitle("Checkout")
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(.visible, for: .navigationBar)
-            .toolbarBackground(.ultraThinMaterial, for: .navigationBar)
+            .toolbarBackground(themeManager.tabBarColor, for: .navigationBar)
+            .toolbarColorScheme(themeManager.currentTheme == .light ? .dark : .light, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .principal) {
                     Text("Checkout")
                         .font(.headline)
-                        .foregroundColor(.white)
+                        .foregroundColor(themeManager.currentTheme == .light ? .black : .white)
                 }
             }
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button("Cancel", action: onDismiss)
-                        .foregroundColor(.white)
+                        .foregroundColor(themeManager.currentTheme == .light ? .black : .white)
                 }
             }
         }
@@ -941,19 +926,20 @@ struct CheckoutView: View {
 struct OrderItemRow: View {
     let item: OrderItem
     let onDelete: () -> Void
+    @EnvironmentObject private var themeManager: ThemeManager
     
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             HStack {
                 Text("\(item.quantity)x")
-                    .foregroundColor(.white.opacity(0.7))
+                    .foregroundColor(themeManager.textColor.opacity(0.7))
                 Text(item.menuItem.name)
                     .font(.headline)
-                    .foregroundColor(.white)
+                    .foregroundColor(themeManager.textColor)
                 Spacer()
                 Text("$\(String(format: "%.2f", item.menuItem.price * Double(item.quantity)))")
                     .fontWeight(.semibold)
-                    .foregroundColor(.white)
+                    .foregroundColor(themeManager.primaryColor)
                 
                 Button(action: onDelete) {
                     Image(systemName: "trash")
@@ -967,11 +953,11 @@ struct OrderItemRow: View {
                         HStack {
                             Text("• \(customization.name): \(option.name)")
                                 .font(.caption)
-                                .foregroundColor(.white.opacity(0.7))
+                                .foregroundColor(themeManager.textColor.opacity(0.7))
                             Spacer()
                             Text("+$\(String(format: "%.2f", option.price))")
                                 .font(.caption)
-                                .foregroundColor(.white.opacity(0.7))
+                                .foregroundColor(themeManager.textColor.opacity(0.7))
                         }
                     }
                 }
@@ -980,7 +966,7 @@ struct OrderItemRow: View {
             if !item.specialInstructions.isEmpty {
                 Text("Note: \(item.specialInstructions)")
                     .font(.caption)
-                    .foregroundColor(.white.opacity(0.7))
+                    .foregroundColor(themeManager.textColor.opacity(0.7))
             }
         }
         .padding(.vertical, 8)
@@ -1007,26 +993,13 @@ struct PaymentView: View {
     let amount: Double
     let onDismiss: () -> Void
     let onSuccess: () -> Void
-    
-    // Enhanced blue gradient background
-    private var backgroundGradient: LinearGradient {
-        LinearGradient(
-            gradient: Gradient(colors: [
-                Color(hex: "1a73e8"), // Vibrant blue
-                Color(hex: "0d47a1"), // Deep blue
-                Color(hex: "002171"), // Dark blue
-                Color(hex: "002984")  // Navy blue
-            ]),
-            startPoint: .topLeading,
-            endPoint: .bottomTrailing
-        )
-    }
+    @EnvironmentObject private var themeManager: ThemeManager
     
     var body: some View {
         NavigationStack {
             ZStack {
-                // Background gradient
-                backgroundGradient
+                // Background gradient from ThemeManager
+                themeManager.backgroundGradient
                     .ignoresSafeArea()
                 
                 // Decorative elements
@@ -1046,11 +1019,11 @@ struct PaymentView: View {
                     VStack(spacing: 10) {
                         Text("Total Amount")
                             .font(.headline)
-                            .foregroundColor(.white.opacity(0.8))
+                            .foregroundColor(themeManager.textColor.opacity(0.8))
                         
                         Text("$\(String(format: "%.2f", amount))")
                             .font(.system(size: 40, weight: .bold))
-                            .foregroundColor(.white)
+                            .foregroundColor(themeManager.textColor)
                     }
                     .padding()
                     
@@ -1065,8 +1038,8 @@ struct PaymentView: View {
                             }
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 16)
-                            .background(Color.white.opacity(0.2))
-                            .foregroundColor(.white)
+                            .background(themeManager.primaryColor.opacity(0.2))
+                            .foregroundColor(themeManager.textColor)
                             .cornerRadius(16)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 16)
@@ -1092,8 +1065,8 @@ struct PaymentView: View {
                             }
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 16)
-                            .background(Color.white.opacity(0.2))
-                            .foregroundColor(.white)
+                            .background(themeManager.primaryColor.opacity(0.2))
+                            .foregroundColor(themeManager.textColor)
                             .cornerRadius(16)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 16)
@@ -1130,18 +1103,19 @@ struct PaymentView: View {
             .navigationTitle("Payment")
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(.visible, for: .navigationBar)
-            .toolbarBackground(.ultraThinMaterial, for: .navigationBar)
+            .toolbarBackground(themeManager.tabBarColor, for: .navigationBar)
+            .toolbarColorScheme(themeManager.currentTheme == .light ? .dark : .light, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .principal) {
                     Text("Payment")
                         .font(.headline)
-                        .foregroundColor(.white)
+                        .foregroundColor(themeManager.currentTheme == .light ? .black : .white)
                 }
             }
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button("Cancel", action: onDismiss)
-                        .foregroundColor(.white)
+                        .foregroundColor(themeManager.currentTheme == .light ? .black : .white)
                 }
             }
         }

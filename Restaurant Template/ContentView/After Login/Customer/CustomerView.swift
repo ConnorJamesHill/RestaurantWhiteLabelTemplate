@@ -1,5 +1,5 @@
 //
-//  ContentView.swift
+//  CustomerView.swift
 //  Restaurant Template
 //
 //  Created by Connor Hill on 5/2/25.
@@ -9,6 +9,7 @@ import SwiftUI
 
 struct CustomerView: View {
     @EnvironmentObject private var restaurant: RestaurantConfiguration
+    @EnvironmentObject private var themeManager: ThemeManager
     @State private var showMenu: Bool = false
     @State private var selectedTab = Tab.home
     @State private var isChangingView = false // Track view change state
@@ -31,68 +32,8 @@ struct CustomerView: View {
         }
     }
     
-    // Blue gradient background for sidebar
-    private var backgroundGradient: LinearGradient {
-        LinearGradient(
-            gradient: Gradient(colors: [
-                Color(hex: "1a73e8"),
-                Color(hex: "0d47a1"),
-                Color(hex: "002171"),
-                Color(hex: "002984")
-            ]),
-            startPoint: .topLeading,
-            endPoint: .bottomTrailing
-        )
-    }
-    
     init() {
-        // Create a tab bar with ultraThinMaterial and blue tint
-        let appearance = UITabBarAppearance()
-        
-        // Start with a clean transparent background
-        appearance.configureWithTransparentBackground()
-        
-        // Use ultraThinMaterial for the glassy effect
-        appearance.backgroundEffect = UIBlurEffect(style: .systemThinMaterialDark)
-        
-        // Add a semi-transparent blue tint
-        appearance.backgroundColor = UIColor(Color(hex: "0d47a1").opacity(0.7))
-        
-        // Style the tab items
-        appearance.stackedLayoutAppearance.normal.iconColor = UIColor.white.withAlphaComponent(0.5)
-        appearance.stackedLayoutAppearance.normal.titleTextAttributes = [.foregroundColor: UIColor.white.withAlphaComponent(0.5)]
-        appearance.stackedLayoutAppearance.selected.iconColor = .white
-        appearance.stackedLayoutAppearance.selected.titleTextAttributes = [.foregroundColor: UIColor.white]
-        
-        // Apply to all layout appearances for consistency
-        appearance.inlineLayoutAppearance.normal.iconColor = UIColor.white.withAlphaComponent(0.5)
-        appearance.inlineLayoutAppearance.normal.titleTextAttributes = [.foregroundColor: UIColor.white.withAlphaComponent(0.5)]
-        appearance.inlineLayoutAppearance.selected.iconColor = .white
-        appearance.inlineLayoutAppearance.selected.titleTextAttributes = [.foregroundColor: UIColor.white]
-        
-        appearance.compactInlineLayoutAppearance.normal.iconColor = UIColor.white.withAlphaComponent(0.5)
-        appearance.compactInlineLayoutAppearance.normal.titleTextAttributes = [.foregroundColor: UIColor.white.withAlphaComponent(0.5)]
-        appearance.compactInlineLayoutAppearance.selected.iconColor = .white
-        appearance.compactInlineLayoutAppearance.selected.titleTextAttributes = [.foregroundColor: UIColor.white]
-        
-        // Apply this appearance to the tab bar
-        UITabBar.appearance().standardAppearance = appearance
-        UITabBar.appearance().scrollEdgeAppearance = appearance
-        UITabBar.appearance().tintColor = .white
-        
-        // Configure the navigation bar appearance
-        let navBarAppearance = UINavigationBarAppearance()
-        navBarAppearance.configureWithTransparentBackground()
-        navBarAppearance.backgroundEffect = UIBlurEffect(style: .systemThinMaterialDark)
-        navBarAppearance.backgroundColor = UIColor(Color(hex: "0d47a1").opacity(0.7))
-        navBarAppearance.titleTextAttributes = [.foregroundColor: UIColor.white]
-        
-        // Remove the shadow (line underneath the navigation bar)
-        navBarAppearance.shadowColor = .clear
-        
-        // Apply the appearance to all navigation bars
-        UINavigationBar.appearance().standardAppearance = navBarAppearance
-        UINavigationBar.appearance().scrollEdgeAppearance = navBarAppearance
+        // No UIKit appearance code - ThemeManager handles this
     }
     
     var body: some View {
@@ -105,8 +46,8 @@ struct CustomerView: View {
         ) { safeArea in
             NavigationStack {
                 ZStack {
-                    // Background gradient visible during transitions
-                    backgroundGradient.ignoresSafeArea()
+                    // Background gradient from ThemeManager
+                    themeManager.backgroundGradient.ignoresSafeArea()
                     
                     // Main content with transitions
                     Group {
@@ -136,6 +77,10 @@ struct CustomerView: View {
                     }
                 }
                 .navigationBarTitleDisplayMode(.inline)
+                // Apply the theme to the navigation bar using SwiftUI modifiers
+                .toolbarBackground(themeManager.tabBarColor, for: .navigationBar)
+                .toolbarBackground(.visible, for: .navigationBar)
+                .toolbarColorScheme(themeManager.currentTheme == .light ? .dark : .light, for: .navigationBar)
                 .toolbar {
                     ToolbarItem(placement: .navigationBarLeading) {
                         Button {
@@ -144,21 +89,21 @@ struct CustomerView: View {
                             }
                         } label: {
                             Image(systemName: "line.3.horizontal")
-                                .foregroundColor(.white)
+                                .foregroundColor(themeManager.textColor)
                         }
                     }
                     
                     ToolbarItem(placement: .principal) {
                         Text(getTitleForTab(selectedTab))
                             .font(.headline)
-                            .foregroundColor(.white)
+                            .foregroundColor(themeManager.textColor)
                     }
                 }
             }
         } menuView: { safeArea in
             SideBarMenuView(safeArea)
         } background: {
-            backgroundGradient.ignoresSafeArea()
+            themeManager.backgroundGradient.ignoresSafeArea()
         }
     }
     
@@ -180,6 +125,7 @@ struct CustomerView: View {
     
     // Custom tab bar
     struct CustomTabBar: View {
+        @EnvironmentObject private var themeManager: ThemeManager
         @Binding var selectedTab: Tab
         @Binding var isChangingView: Bool
         
@@ -198,11 +144,12 @@ struct CustomerView: View {
                         }
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 8)
-                        .foregroundColor(selectedTab == tab ? .white : .white.opacity(0.5))
+                        .foregroundColor(selectedTab == tab ? themeManager.textColor : themeManager.textColor.opacity(0.5))
                     }
                 }
             }
-            .background(Color(hex: "0d47a1").opacity(0.7))
+            // Use the themeManager's tabBarColor directly for the tab bar background
+            .background(themeManager.tabBarColor)
         }
         
         private func handleTabSelection(_ tab: Tab) {
@@ -226,9 +173,6 @@ struct CustomerView: View {
         }
     }
     
-    // ContentView/After Login/Customer/CustomerView.swift
-    // Update the SideBarMenuView function
-
     @ViewBuilder
     func SideBarMenuView(_ safeArea: UIEdgeInsets) -> some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -243,7 +187,7 @@ struct CustomerView: View {
                 Text(restaurant.name)
                     .font(.title3)
                     .fontWeight(.bold)
-                    .foregroundColor(.white)
+                    .foregroundColor(themeManager.textColor)
                 
                 Spacer()
             }
@@ -265,7 +209,7 @@ struct CustomerView: View {
                             Text(tab.rawValue)
                                 .font(.headline)
                         }
-                        .foregroundColor(selectedTab == tab ? .white : .white.opacity(0.7))
+                        .foregroundColor(selectedTab == tab ? themeManager.textColor : themeManager.textColor.opacity(0.7))
                         .padding(.vertical, 12)
                         .padding(.horizontal, 15)
                         .background(
@@ -296,7 +240,7 @@ struct CustomerView: View {
                     Text("Reviews")
                         .font(.headline)
                 }
-                .foregroundColor(.white)
+                .foregroundColor(themeManager.textColor)
                 .padding(.vertical, 12)
                 .padding(.horizontal, 15)
             }
@@ -304,6 +248,83 @@ struct CustomerView: View {
             .padding(.bottom, safeArea.bottom + 15)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
+    }
+    
+    // Theme Selector View
+    struct ThemeSelector: View {
+        @EnvironmentObject private var themeManager: ThemeManager
+        @State private var showThemes = false
+        
+        var body: some View {
+            VStack(alignment: .leading) {
+                Button {
+                    withAnimation {
+                        showThemes.toggle()
+                    }
+                } label: {
+                    HStack(spacing: 12) {
+                        Image(systemName: "paintbrush.fill")
+                            .font(.title3)
+                            .frame(width: 30)
+                        
+                        Text("Theme")
+                            .font(.headline)
+                        
+                        Spacer()
+                        
+                        Image(systemName: showThemes ? "chevron.up" : "chevron.down")
+                            .font(.caption)
+                    }
+                    .foregroundColor(themeManager.textColor)
+                    .padding(.vertical, 12)
+                    .padding(.horizontal, 15)
+                }
+                
+                if showThemes {
+                    VStack(alignment: .leading, spacing: 8) {
+                        ForEach(ThemeManager.AppTheme.allCases) { theme in
+                            Button {
+                                themeManager.currentTheme = theme
+                            } label: {
+                                HStack {
+                                    Image(systemName: theme.icon)
+                                        .foregroundColor(themeColor(for: theme))
+                                    
+                                    Text(theme.rawValue)
+                                        .font(.subheadline)
+                                    
+                                    Spacer()
+                                    
+                                    if themeManager.currentTheme == theme {
+                                        Image(systemName: "checkmark")
+                                            .font(.caption)
+                                    }
+                                }
+                                .foregroundColor(themeManager.textColor)
+                                .padding(.vertical, 8)
+                                .padding(.horizontal, 15)
+                                .padding(.leading, 20)
+                            }
+                        }
+                    }
+                    .padding(.vertical, 8)
+                    .background(.ultraThinMaterial.opacity(0.4))
+                    .cornerRadius(10)
+                    .transition(.scale(scale: 0.9).combined(with: .opacity))
+                }
+            }
+        }
+        
+        private func themeColor(for theme: ThemeManager.AppTheme) -> Color {
+            switch theme {
+            case .blue: return Color(hex: "1a73e8")
+            case .dark: return Color(hex: "424242")
+            case .light: return Color(hex: "BDBDBD")
+            case .red: return Color(hex: "E53935")
+            case .brown: return Color(hex: "8D6E63")
+            case .green: return Color(hex: "43A047")
+            }
+        }
     }
     
     // Coordinate sidebar navigation with proper transitions
@@ -337,113 +358,49 @@ struct CustomerView: View {
         }
     }
     
-    // Add the ThemeSelector view
-    struct ThemeSelector: View {
-        @EnvironmentObject private var themeManager: ThemeManager
-        @State private var showThemes = false
-        
-        var body: some View {
-            VStack(alignment: .leading) {
-                Button {
-                    withAnimation {
-                        showThemes.toggle()
-                    }
-                } label: {
-                    HStack(spacing: 12) {
-                        Image(systemName: "paintbrush.fill")
-                            .font(.title3)
-                            .frame(width: 30)
-                        
-                        Text("Theme")
-                            .font(.headline)
-                        
-                        Spacer()
-                        
-                        Image(systemName: showThemes ? "chevron.up" : "chevron.down")
-                            .font(.caption)
-                    }
-                    .foregroundColor(.white)
-                    .padding(.vertical, 12)
-                    .padding(.horizontal, 15)
-                }
-                
-                if showThemes {
-                    VStack(alignment: .leading, spacing: 8) {
-                        ForEach(ThemeManager.AppTheme.allCases) { theme in
-                            Button {
-                                themeManager.currentTheme = theme
-                            } label: {
-                                HStack {
-                                    Image(systemName: theme.icon)
-                                        .foregroundColor(themeColor(for: theme))
-                                    
-                                    Text(theme.rawValue)
-                                        .font(.subheadline)
-                                    
-                                    Spacer()
-                                    
-                                    if themeManager.currentTheme == theme {
-                                        Image(systemName: "checkmark")
-                                            .font(.caption)
-                                    }
-                                }
-                                .foregroundColor(.white)
-                                .padding(.vertical, 8)
-                                .padding(.horizontal, 15)
-                                .padding(.leading, 20)
-                            }
-                        }
-                    }
-                    .padding(.vertical, 8)
-                    .background(.ultraThinMaterial.opacity(0.4))
-                    .cornerRadius(10)
-                    .transition(.scale(scale: 0.9).combined(with: .opacity))
-                }
-            }
-        }
-        
-        private func themeColor(for theme: ThemeManager.AppTheme) -> Color {
-            switch theme {
-            case .blue: return Color(hex: "1a73e8")
-            case .dark: return Color(hex: "424242")
-            case .light: return Color(hex: "BDBDBD")
-            case .red: return Color(hex: "E53935")
-            case .brown: return Color(hex: "8D6E63")
-            case .green: return Color(hex: "43A047")
-            }
-        }
-    }
-    
     // Wrapper views
     struct HomeWrapper: View {
-        @EnvironmentObject private var restaurant: RestaurantConfiguration
+        @EnvironmentObject private var themeManager: ThemeManager
         
         var body: some View {
             HomeView(onMenuButtonTap: nil) // No need for menu button in individual views
+                .environmentObject(themeManager)
         }
     }
     
     struct MenuWrapper: View {
+        @EnvironmentObject private var themeManager: ThemeManager
+        
         var body: some View {
             MenuView()
+                .environmentObject(themeManager)
         }
     }
     
     struct ReservationWrapper: View {
+        @EnvironmentObject private var themeManager: ThemeManager
+        
         var body: some View {
             ReservationView()
+                .environmentObject(themeManager)
         }
     }
     
     struct OrderWrapper: View {
+        @EnvironmentObject private var themeManager: ThemeManager
+        
         var body: some View {
             OrderView()
+                .environmentObject(themeManager)
         }
     }
     
     struct InfoWrapper: View {
+        @EnvironmentObject private var themeManager: ThemeManager
+        
         var body: some View {
             InfoView()
+                .environmentObject(themeManager)
         }
     }
 }

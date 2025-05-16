@@ -143,11 +143,11 @@ struct OwnerDashboardView: View {
                             }
                         }
                     } else {
-                        ToolbarItem(placement: .navigationBarTrailing) {
-                            Button {
-                                viewModel.signOut()
-                            } label: {
-                                Image(systemName: "rectangle.portrait.and.arrow.right")
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button {
+                    viewModel.signOut()
+                } label: {
+                    Image(systemName: "rectangle.portrait.and.arrow.right")
                                     .foregroundColor(themeManager.textColor)
                             }
                         }

@@ -63,48 +63,48 @@ struct OwnerMarketingView: View {
     ]
     
     var body: some View {
-        ZStack {
+            ZStack {
             // Background gradient from ThemeManager
             themeManager.backgroundGradient
-                .ignoresSafeArea()
-            
-            // Decorative elements
-            Circle()
-                .fill(Color.white.opacity(0.05))
-                .frame(width: 300, height: 300)
-                .blur(radius: 30)
-                .offset(x: -150, y: -100)
-            
-            Circle()
-                .fill(Color.white.opacity(0.08))
-                .frame(width: 250, height: 250)
-                .blur(radius: 20)
-                .offset(x: 180, y: 400)
-            
-            ScrollView {
-                VStack(spacing: 20) {
-                    // Marketing Overview
-                    marketingOverviewSection
-                    
-                    // Active Promotions
-                    activePromotionsSection
-                    
-                    // Customer Engagement
-                    customerEngagementSection
-                    
-                    // Analytics
-                    analyticsSection
+                    .ignoresSafeArea()
+                
+                // Decorative elements
+                Circle()
+                    .fill(Color.white.opacity(0.05))
+                    .frame(width: 300, height: 300)
+                    .blur(radius: 30)
+                    .offset(x: -150, y: -100)
+                
+                Circle()
+                    .fill(Color.white.opacity(0.08))
+                    .frame(width: 250, height: 250)
+                    .blur(radius: 20)
+                    .offset(x: 180, y: 400)
+                
+                ScrollView {
+                    VStack(spacing: 20) {
+                        // Marketing Overview
+                        marketingOverviewSection
+                        
+                        // Active Promotions
+                        activePromotionsSection
+                        
+                        // Customer Engagement
+                        customerEngagementSection
+                        
+                        // Analytics
+                        analyticsSection
+                    }
+                    .padding()
                 }
-                .padding()
             }
-        }
     }
     
     // MARK: - Marketing Overview Section
     var marketingOverviewSection: some View {
         VStack(alignment: .leading, spacing: 16) {
             Text("Marketing Overview")
-                .font(.headline)
+                        .font(.headline)
                 .foregroundColor(themeManager.textColor)
                 .padding(.leading, 8)
             
@@ -179,19 +179,19 @@ struct OwnerMarketingView: View {
                         Spacer()
                     }
                     .padding()
-                    .background(.ultraThinMaterial)
-                    .cornerRadius(16)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 16)
-                            .stroke(
-                                LinearGradient(
+        .background(.ultraThinMaterial)
+        .cornerRadius(16)
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .stroke(
+                    LinearGradient(
                                     colors: [.white.opacity(0.5), .clear, .white.opacity(0.2)],
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
-                                ),
-                                lineWidth: 0.15
-                            )
-                    )
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    lineWidth: 0.15
+                )
+        )
                     .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
                 }
             }
@@ -389,19 +389,19 @@ struct OwnerMarketingView: View {
         
         var body: some View {
             content
-                .background(.ultraThinMaterial)
-                .clipShape(RoundedRectangle(cornerRadius: 16))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 16)
-                        .stroke(
-                            LinearGradient(
+        .background(.ultraThinMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .stroke(
+                    LinearGradient(
                                 colors: [.white.opacity(0.5), .clear, .white.opacity(0.2)],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            ),
-                            lineWidth: 0.15
-                        )
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    lineWidth: 0.15
                 )
+        )
                 .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
         }
     }
@@ -488,7 +488,7 @@ struct OwnerMarketingView: View {
                 
                 // Title and description
                 Text(promotion.title)
-                    .font(.headline)
+                        .font(.headline)
                     .foregroundColor(themeManager.textColor)
                 
                 Text(promotion.description)
@@ -529,7 +529,7 @@ struct OwnerMarketingView: View {
                         // Duplicate action
                     } label: {
                         Text("Duplicate")
-                            .font(.subheadline)
+                        .font(.subheadline)
                             .foregroundColor(themeManager.textColor)
                             .padding(.horizontal, 16)
                             .padding(.vertical, 8)
@@ -539,10 +539,10 @@ struct OwnerMarketingView: View {
                                 RoundedRectangle(cornerRadius: 8)
                                     .stroke(themeManager.textColor.opacity(0.2), lineWidth: 0.5)
                             )
-                    }
-                    
-                    Spacer()
-                    
+                }
+                
+                Spacer()
+                
                     // Toggle button (for active/inactive)
                     if promotion.isActive {
                         Button {
@@ -620,7 +620,7 @@ struct OwnerMarketingView: View {
         var body: some View {
             GlassCard {
                 VStack(alignment: .leading, spacing: 16) {
-                    Text(title)
+                        Text(title)
                         .font(.subheadline)
                         .fontWeight(.semibold)
                         .foregroundColor(themeManager.textColor)
@@ -650,9 +650,9 @@ struct OwnerMarketingView: View {
                                 Text(metric.channel)
                                     .font(.caption)
                                     .foregroundColor(themeManager.textColor)
-                                
-                                Spacer()
-                                
+                
+                Spacer()
+                
                                 Text("\(metric.value)%")
                                     .font(.caption)
                                     .fontWeight(.semibold)

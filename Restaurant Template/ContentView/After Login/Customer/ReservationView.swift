@@ -1,3 +1,10 @@
+//
+//  ReservationView.swift
+//  Restaurant Template
+//
+//  Created by Connor Hill on 5/4/25.
+//
+
 import SwiftUI
 
 struct ReservationView: View {
@@ -13,21 +20,8 @@ struct ReservationView: View {
     // UI state
     @State private var showingConfirmation = false
     @State private var isSubmitting = false
+    @EnvironmentObject private var themeManager: ThemeManager
     @Environment(\.colorScheme) private var colorScheme
-    
-    // Enhanced blue gradient background - same as OwnerAnalyticsView
-    private var backgroundGradient: LinearGradient {
-        LinearGradient(
-            gradient: Gradient(colors: [
-                Color(hex: "1a73e8"), // Vibrant blue
-                Color(hex: "0d47a1"), // Deep blue
-                Color(hex: "002171"), // Dark blue
-                Color(hex: "002984")  // Navy blue
-            ]),
-            startPoint: .topLeading,
-            endPoint: .bottomTrailing
-        )
-    }
     
     // Available time slots
     let availableTimes = stride(from: 11, to: 22, by: 0.5).map { hour -> Date in
@@ -50,11 +44,11 @@ struct ReservationView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                // Background gradient
-                backgroundGradient
+                // Background gradient from ThemeManager
+                themeManager.backgroundGradient
                     .ignoresSafeArea()
                 
-                // Decorative elements - using black instead of white
+                // Decorative elements
                 Circle()
                     .fill(Color.black.opacity(0.05))
                     .frame(width: 300, height: 300)
@@ -76,12 +70,12 @@ struct ReservationView: View {
                             DatePicker("Date", selection: $date, in: Date()..., displayedComponents: .date)
                                 .datePickerStyle(GraphicalDatePickerStyle())
                                 .padding()
-                                .colorScheme(.dark) // Better visualization on dark background
-                                .accentColor(.white)
+                                .colorScheme(themeManager.currentTheme == .light ? .light : .dark)
+                                .accentColor(themeManager.primaryColor)
                             
                             HStack {
                                 Text("Time")
-                                    .foregroundColor(.white)
+                                    .foregroundColor(themeManager.textColor)
                                 Spacer()
                                 Picker("Time", selection: $time) {
                                     ForEach(availableTimes, id: \.self) { time in
@@ -89,18 +83,18 @@ struct ReservationView: View {
                                     }
                                 }
                                 .pickerStyle(.menu)
-                                .accentColor(.white)
-                                .foregroundColor(.white)
+                                .accentColor(themeManager.primaryColor)
+                                .foregroundColor(themeManager.textColor)
                             }
                             
                             HStack {
                                 Text("Party Size: \(partySize) \(partySize == 1 ? "person" : "people")")
-                                    .foregroundColor(.white)
+                                    .foregroundColor(themeManager.textColor)
                                 Spacer()
                                 Stepper("", value: $partySize, in: 1...20)
-                                    .colorScheme(.dark)
-                                    .accentColor(.white)
-                                    .foregroundColor(.white)
+                                    .colorScheme(themeManager.currentTheme == .light ? .light : .dark)
+                                    .accentColor(themeManager.primaryColor)
+                                    .foregroundColor(themeManager.textColor)
                             }
                         }
                         .padding()
@@ -126,17 +120,20 @@ struct ReservationView: View {
                             TextField("Name", text: $name)
                                 .textContentType(.name)
                                 .textFieldStyle(RoundedBorderTextFieldStyle())
+                                .foregroundColor(themeManager.currentTheme == .light ? .black : themeManager.textColor)
                             
                             TextField("Email", text: $email)
                                 .textContentType(.emailAddress)
                                 .keyboardType(.emailAddress)
                                 .autocapitalization(.none)
                                 .textFieldStyle(RoundedBorderTextFieldStyle())
+                                .foregroundColor(themeManager.currentTheme == .light ? .black : themeManager.textColor)
                             
                             TextField("Phone Number", text: $phoneNumber)
                                 .textContentType(.telephoneNumber)
                                 .keyboardType(.phonePad)
                                 .textFieldStyle(RoundedBorderTextFieldStyle())
+                                .foregroundColor(themeManager.currentTheme == .light ? .black : themeManager.textColor)
                         }
                         .padding()
                         .background(.ultraThinMaterial)
@@ -163,6 +160,7 @@ struct ReservationView: View {
                                     .frame(minHeight: 100)
                                     .background(Color.white.opacity(0.8))
                                     .cornerRadius(8)
+                                    .foregroundColor(.black)
                                 
                                 if specialRequests.isEmpty {
                                     Text("Ex. Dietary restrictions, seating preferences, or special occasions...")
@@ -204,8 +202,8 @@ struct ReservationView: View {
                         }
                         .disabled(isSubmitting || !isFormValid)
                         .padding()
-                        .background(isFormValid ? Color.white.opacity(0.2) : Color.gray.opacity(0.3))
-                        .foregroundColor(.white)
+                        .background(isFormValid ? themeManager.primaryColor.opacity(0.8) : Color.gray.opacity(0.3))
+                        .foregroundColor(themeManager.textColor)
                         .cornerRadius(16)
                         .overlay(
                             RoundedRectangle(cornerRadius: 16)
@@ -226,12 +224,13 @@ struct ReservationView: View {
             .navigationTitle("Reservation")
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(.visible, for: .navigationBar)
-            .toolbarBackground(.ultraThinMaterial, for: .navigationBar)
+            .toolbarBackground(themeManager.tabBarColor, for: .navigationBar)
+            .toolbarColorScheme(themeManager.currentTheme == .light ? .dark : .light, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .principal) {
                     Text("Reservation")
                         .font(.headline)
-                        .foregroundColor(.white)
+                        .foregroundColor(themeManager.currentTheme == .light ? .black : .white)
                 }
             }
             .sheet(isPresented: $showingConfirmation) {
@@ -243,7 +242,7 @@ struct ReservationView: View {
     private func sectionHeader(_ title: String) -> some View {
         Text(title)
             .font(.headline)
-            .foregroundColor(.white)
+            .foregroundColor(themeManager.textColor)
     }
     
     private var isFormValid: Bool {
@@ -262,6 +261,7 @@ struct ReservationView: View {
             Text("Reservation Confirmed!")
                 .font(.title)
                 .fontWeight(.bold)
+                .foregroundColor(themeManager.textColor)
             
             VStack(alignment: .leading, spacing: 16) {
                 reservationDetailRow(icon: "person.fill", label: "Name", value: name)
@@ -296,29 +296,29 @@ struct ReservationView: View {
                     .foregroundColor(.white)
                     .frame(maxWidth: .infinity)
                     .padding()
-                    .background(Color.blue)
+                    .background(themeManager.primaryColor)
                     .cornerRadius(12)
                     .padding(.horizontal)
                     .shadow(radius: 5)
             }
             .padding(.bottom, 40)
         }
-        .background(backgroundGradient.ignoresSafeArea())
+        .background(themeManager.backgroundGradient.ignoresSafeArea())
     }
     
     private func reservationDetailRow(icon: String, label: String, value: String) -> some View {
         HStack(spacing: 12) {
             Image(systemName: icon)
                 .frame(width: 24, height: 24)
-                .foregroundColor(.white)
+                .foregroundColor(themeManager.textColor)
             
             VStack(alignment: .leading) {
                 Text(label)
                     .font(.caption)
-                    .foregroundColor(.white.opacity(0.7))
+                    .foregroundColor(themeManager.textColor.opacity(0.7))
                 Text(value)
                     .font(.body)
-                    .foregroundColor(.white)
+                    .foregroundColor(themeManager.textColor)
             }
         }
     }
@@ -382,4 +382,16 @@ extension Date {
         components.minute = 0
         return calendar.date(from: components) ?? self
     }
+}
+
+// Model for Reservation
+struct Reservation: Identifiable {
+    let id: UUID
+    let name: String
+    let email: String
+    let phoneNumber: String
+    let date: Date
+    let time: Date
+    let partySize: Int
+    let specialRequests: String
 }

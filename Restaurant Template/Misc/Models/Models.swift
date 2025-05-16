@@ -89,40 +89,7 @@ struct Review: Identifiable {
     }
 }
 
-// MARK: - Reservation Model
-struct Reservation: Identifiable {
-    let id: UUID
-    var name: String
-    var email: String
-    var phoneNumber: String
-    var date: Date
-    var time: Date
-    var partySize: Int
-    var specialRequests: String
-    var status: ReservationStatus
-    
-    init(
-        id: UUID = UUID(),
-        name: String = "",
-        email: String = "",
-        phoneNumber: String = "",
-        date: Date = Date(),
-        time: Date = Date(),
-        partySize: Int = 2,
-        specialRequests: String = "",
-        status: ReservationStatus = .pending
-    ) {
-        self.id = id
-        self.name = name
-        self.email = email
-        self.phoneNumber = phoneNumber
-        self.date = date
-        self.time = time
-        self.partySize = partySize
-        self.specialRequests = specialRequests
-        self.status = status
-    }
-}
+
 
 // MARK: - Models
 
