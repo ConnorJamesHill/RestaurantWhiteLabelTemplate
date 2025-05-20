@@ -228,24 +228,9 @@ struct CustomerView: View {
             // Theme Selector
             ThemeSelector()
                 .padding(.horizontal, 15)
-                .padding(.bottom, 20)
+                .padding(.bottom, safeArea.bottom + 15)
             
-            // Reviews Button
-            NavigationLink(destination: ReviewsView()) {
-                HStack(spacing: 12) {
-                    Image(systemName: "star.fill")
-                        .font(.title3)
-                        .frame(width: 30)
-                    
-                    Text("Reviews")
-                        .font(.headline)
-                }
-                .foregroundColor(themeManager.textColor)
-                .padding(.vertical, 12)
-                .padding(.horizontal, 15)
-            }
-            .padding(.horizontal, 15)
-            .padding(.bottom, safeArea.bottom + 15)
+            // Reviews Button removed
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
     }

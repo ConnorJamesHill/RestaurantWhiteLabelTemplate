@@ -28,7 +28,6 @@ struct MenuView: View {
 
     @State private var selectedCategory: MenuCategory? = nil
     @State private var selectedItem: MenuItem? = nil
-    @State private var showingItemDetail = false
     @State private var showingFullMenu = true
 
     @Namespace private var menuAnimation
@@ -76,12 +75,10 @@ struct MenuView: View {
             .toolbarBackground(.visible, for: .navigationBar)
             .toolbarBackground(themeManager.tabBarColor, for: .navigationBar)
             .toolbarColorScheme(themeManager.currentTheme == .light ? .dark : .light, for: .navigationBar)
-            .sheet(isPresented: $showingItemDetail) {
-                if let item = selectedItem {
-                    MenuItemDetailView(item: item)
-                        .environmentObject(themeManager)
-                        .presentationDetents([.medium, .large])
-                }
+            .sheet(item: $selectedItem) { item in
+                MenuItemDetailView(item: item)
+                    .environmentObject(themeManager)
+                    .presentationDetents([.medium, .large])
             }
         }
         .onAppear {
@@ -157,9 +154,6 @@ struct MenuView: View {
                         .environmentObject(themeManager)
                         .onTapGesture {
                             selectedItem = item
-                            withAnimation {
-                                showingItemDetail = true
-                            }
                         }
                 }
             }
@@ -184,13 +178,12 @@ struct MenuView: View {
                                     .environmentObject(themeManager)
                                     .onTapGesture {
                                         selectedItem = item
-                                        showingItemDetail = true
                                     }
                             }
                         }
                         .padding(.bottom, 8)
                     }
-                    .background(.ultraThinMaterial)
+                    .background(Color.clear)
                     .clipShape(RoundedRectangle(cornerRadius: 16))
                     .overlay(
                         RoundedRectangle(cornerRadius: 16)
@@ -213,39 +206,71 @@ struct MenuView: View {
     }
 
     private var viewToggleButton: some View {
-        Button {
-            withAnimation(.spring(response: 0.35)) {
+        Button(action: {
+            withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
                 showingFullMenu.toggle()
             }
-        } label: {
-            HStack {
-                Image(systemName: showingFullMenu ? "square.grid.2x2" : "list.bullet")
-                Text(showingFullMenu ? "Grid View" : "Full Menu")
-            }
-            .font(.subheadline.bold())
-            .foregroundColor(themeManager.textColor)
-            .padding(.vertical, 8)
-            .padding(.horizontal, 16)
-            .background(.ultraThinMaterial)
-            .cornerRadius(12)
-            .overlay(
-                RoundedRectangle(cornerRadius: 12)
-                    .stroke(
-                        LinearGradient(
-                            colors: [.black.opacity(0.7), .clear, .black.opacity(0.3)],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        ),
-                        lineWidth: 0.15
-                    )
-            )
-            .shadow(color: Color.black.opacity(0.15), radius: 6, x: 0, y: 3)
+        }) {
+            Text(showingFullMenu ? "Grid View" : "Full Menu")
+                .foregroundColor(themeManager.textColor)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 8)
+                .background(
+                    Capsule()
+                        .fill(.ultraThinMaterial)
+                        .shadow(color: Color.black.opacity(0.15), radius: 4, x: 0, y: 2)
+                )
+                .overlay(
+                    Capsule()
+                        .stroke(
+                            LinearGradient(
+                                colors: [.black.opacity(0.7), .clear, .black.opacity(0.3)],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            ),
+                            lineWidth: 0.15
+                        )
+                )
         }
-        .padding(.bottom, 8)
+        .padding(.top, 16)
     }
 }
 
-// MARK: - Supporting Views
+struct CategoryButton: View {
+    let category: MenuCategory
+    let isSelected: Bool
+    let namespace: Namespace.ID
+    let action: () -> Void
+    @EnvironmentObject private var themeManager: ThemeManager
+
+    var body: some View {
+        Button(action: action) {
+            Text(category.name)
+                .font(.subheadline)
+                .fontWeight(isSelected ? .bold : .medium)
+                .foregroundColor(isSelected ? themeManager.primaryColor : themeManager.textColor)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 8)
+                .background(
+                    ZStack {
+                        if isSelected {
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(themeManager.primaryColor.opacity(0.2))
+                                .matchedGeometryEffect(id: "background", in: namespace)
+                        }
+                    }
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(
+                            isSelected ? themeManager.primaryColor : Color.clear,
+                            lineWidth: 1.5
+                        )
+                )
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+        }
+    }
+}
 
 struct FullMenuItemRow: View {
     let item: MenuItem
@@ -296,39 +321,6 @@ struct FullMenuItemRow: View {
         )
         .shadow(color: Color.black.opacity(0.15), radius: 6, x: 0, y: 3)
         .padding(.horizontal, 4)
-    }
-}
-
-struct CategoryButton: View {
-    let category: MenuCategory
-    let isSelected: Bool
-    let namespace: Namespace.ID
-    let action: () -> Void
-    @EnvironmentObject private var themeManager: ThemeManager
-
-    var body: some View {
-        Button(action: action) {
-            VStack(spacing: 6) {
-                Text(category.name)
-                    .fontWeight(isSelected ? .bold : .medium)
-                    .foregroundColor(isSelected ? themeManager.textColor : themeManager.textColor.opacity(0.7))
-                if isSelected {
-                    Rectangle()
-                        .fill(themeManager.primaryColor)
-                        .frame(height: 3)
-                        .matchedGeometryEffect(id: "categoryIndicator", in: namespace)
-                } else {
-                    Rectangle()
-                        .fill(Color.clear)
-                        .frame(height: 3)
-                }
-            }
-            .padding(.vertical, 8)
-            .padding(.horizontal, 2)
-        }
-        .background(.ultraThinMaterial)
-        .cornerRadius(8)
-        .shadow(color: Color.black.opacity(0.10), radius: 4, x: 0, y: 2)
     }
 }
 
@@ -526,6 +518,7 @@ struct MenuItemDetailView: View {
                         )
                         .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 5)
                     }
+                    .padding()
                 }
             }
             .navigationBarTitleDisplayMode(.inline)

@@ -107,12 +107,12 @@ class ThemeManager: ObservableObject {
     
     var tabBarColor: Color {
         switch currentTheme {
-        case .blue: return Color(hex: "0d47a1").opacity(0.7)
-        case .dark: return Color(hex: "212121").opacity(0.7)
-        case .light: return Color(hex: "E0E0E0").opacity(0.7)
-        case .red: return Color(hex: "C62828").opacity(0.7)
-        case .brown: return Color(hex: "6D4C41").opacity(0.7)
-        case .green: return Color(hex: "2E7D32").opacity(0.7)
+        case .blue: return Color(hex: "0d47a1").opacity(0.9)
+        case .dark: return Color(hex: "212121").opacity(0.9)
+        case .light: return Color(hex: "E0E0E0").opacity(0.9)
+        case .red: return Color(hex: "C62828").opacity(0.9)
+        case .brown: return Color(hex: "6D4C41").opacity(0.9)
+        case .green: return Color(hex: "2E7D32").opacity(0.9)
         }
     }
     

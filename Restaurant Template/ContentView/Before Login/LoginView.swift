@@ -63,16 +63,40 @@ struct LoginView: View {
                                 .padding(.horizontal)
                         }
                         
-                        TextField("Email Address", text: $viewModel.email)
-                            .textFieldStyle(RoundedBorderTextFieldStyle())
-                            .autocapitalization(.none)
-                            .foregroundColor(themeManager.currentTheme == .light ? .black : themeManager.textColor)
-                            .padding(.horizontal)
+                        ZStack(alignment: .leading) {
+                            TextField("", text: $viewModel.email)
+                                .padding(10)
+                                .background(themeManager.primaryColor.opacity(0.1))
+                                .cornerRadius(8)
+                                .foregroundColor(themeManager.textColor)
+                                .autocapitalization(.none)
+                            
+                            if viewModel.email.isEmpty {
+                                Text("Email Address")
+                                    .foregroundColor(themeManager.textColor.opacity(0.6))
+                                    .padding(.horizontal, 16)
+                                    .padding(.vertical, 10)
+                                    .allowsHitTesting(false)
+                            }
+                        }
+                        .padding(.horizontal)
                         
-                        SecureField("Password", text: $viewModel.password)
-                            .textFieldStyle(RoundedBorderTextFieldStyle())
-                            .foregroundColor(themeManager.currentTheme == .light ? .black : themeManager.textColor)
-                            .padding(.horizontal)
+                        ZStack(alignment: .leading) {
+                            SecureField("", text: $viewModel.password)
+                                .padding(10)
+                                .background(themeManager.primaryColor.opacity(0.1))
+                                .cornerRadius(8)
+                                .foregroundColor(themeManager.textColor)
+                            
+                            if viewModel.password.isEmpty {
+                                Text("Password")
+                                    .foregroundColor(themeManager.textColor.opacity(0.6))
+                                    .padding(.horizontal, 16)
+                                    .padding(.vertical, 10)
+                                    .allowsHitTesting(false)
+                            }
+                        }
+                        .padding(.horizontal)
                         
                         Button(action: {
                             viewModel.login()
@@ -113,7 +137,6 @@ struct LoginView: View {
                                 lineWidth: 0.15
                             )
                     )
-                    .shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: 5)
                     .padding(.horizontal)
                     
                     // Register Link
@@ -153,5 +176,13 @@ struct LoginView: View {
                     .environmentObject(themeManager)
             }
         }
+    }
+}
+
+struct LoginView_Previews: PreviewProvider {
+    static var previews: some View {
+        LoginView()
+            .environmentObject(RestaurantConfiguration.shared)
+            .environmentObject(ThemeManager())
     }
 }
