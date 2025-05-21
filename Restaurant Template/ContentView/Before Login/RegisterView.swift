@@ -75,7 +75,7 @@ struct RegisterView: View {
                             ZStack(alignment: .leading) {
                                 TextField("", text: $viewModel.email)
                                     .padding(10)
-                                    .background(themeManager.primaryColor.opacity(0.1))
+                                    .background(themeManager.primaryColor.opacity(0.8))
                                     .cornerRadius(8)
                                     .foregroundColor(themeManager.textColor)
                                     .autocapitalization(.none)
@@ -94,7 +94,7 @@ struct RegisterView: View {
                             ZStack(alignment: .leading) {
                                 SecureField("", text: $viewModel.password)
                                     .padding(10)
-                                    .background(themeManager.primaryColor.opacity(0.1))
+                                    .background(themeManager.primaryColor.opacity(0.8))
                                     .cornerRadius(8)
                                     .foregroundColor(themeManager.textColor)
                                 
@@ -159,7 +159,7 @@ struct RegisterView: View {
                             .foregroundColor(themeManager.textColor)
                             .frame(maxWidth: .infinity)
                             .padding()
-                            .background(themeManager.secondaryColor.opacity(0.2))
+                            .background(themeManager.secondaryColor.opacity(0.8))
                             .cornerRadius(10)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 10)
@@ -211,13 +211,5 @@ struct RegisterView: View {
                 }
             }
         }
-    }
-}
-
-struct RegisterView_Previews: PreviewProvider {
-    static var previews: some View {
-        RegisterView()
-            .environmentObject(RestaurantConfiguration.shared)
-            .environmentObject(ThemeManager())
     }
 }

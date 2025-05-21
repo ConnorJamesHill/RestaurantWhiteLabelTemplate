@@ -66,7 +66,7 @@ struct LoginView: View {
                         ZStack(alignment: .leading) {
                             TextField("", text: $viewModel.email)
                                 .padding(10)
-                                .background(themeManager.primaryColor.opacity(0.1))
+                                .background(themeManager.primaryColor.opacity(0.8))
                                 .cornerRadius(8)
                                 .foregroundColor(themeManager.textColor)
                                 .autocapitalization(.none)
@@ -84,7 +84,7 @@ struct LoginView: View {
                         ZStack(alignment: .leading) {
                             SecureField("", text: $viewModel.password)
                                 .padding(10)
-                                .background(themeManager.primaryColor.opacity(0.1))
+                                .background(themeManager.primaryColor.opacity(0.8))
                                 .cornerRadius(8)
                                 .foregroundColor(themeManager.textColor)
                             
@@ -106,7 +106,7 @@ struct LoginView: View {
                                 .foregroundColor(themeManager.textColor)
                                 .frame(maxWidth: .infinity)
                                 .padding()
-                                .background(themeManager.primaryColor.opacity(0.2))
+                                .background(themeManager.primaryColor.opacity(0.8))
                                 .cornerRadius(10)
                                 .overlay(
                                     RoundedRectangle(cornerRadius: 10)
@@ -151,7 +151,7 @@ struct LoginView: View {
                         .foregroundColor(themeManager.textColor)
                         .padding(.vertical, 12)
                         .padding(.horizontal, 24)
-                        .background(themeManager.primaryColor.opacity(0.2))
+                        .background(themeManager.primaryColor.opacity(0.8))
                         .cornerRadius(10)
                         .overlay(
                             RoundedRectangle(cornerRadius: 10)
@@ -176,13 +176,5 @@ struct LoginView: View {
                     .environmentObject(themeManager)
             }
         }
-    }
-}
-
-struct LoginView_Previews: PreviewProvider {
-    static var previews: some View {
-        LoginView()
-            .environmentObject(RestaurantConfiguration.shared)
-            .environmentObject(ThemeManager())
     }
 }

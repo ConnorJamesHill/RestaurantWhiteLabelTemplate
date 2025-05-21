@@ -246,23 +246,31 @@ struct HomeView: View {
                 .foregroundColor(themeManager.textColor)
                 .padding(.horizontal)
             
-            HStack {
+            HStack(alignment: .center, spacing: 4) { // Minimal spacing
                 Image(systemName: "clock")
                     .foregroundColor(themeManager.textColor)
+                    .frame(width: 14) // Even smaller fixed width
                 
-                Text("Open today: \(restaurant.todayHours)")
+                Text("Open today: \(restaurant.todayHours)") // Combined into one Text view
                     .font(.subheadline)
                     .foregroundColor(themeManager.textColor.opacity(0.9))
                 
-                Spacer()
+                Spacer(minLength: 4) // Minimal spacing
                 
                 NavigationLink(destination: InfoView()) {
-                    Text("Full Hours")
+                    Text("Full Hours") // Shortened text
                         .font(.subheadline)
-                        .foregroundColor(themeManager.primaryColor)
+                        .foregroundColor(.white)
+                        .padding(.vertical, 4) // Minimal padding
+                        .padding(.horizontal, 8) // Minimal padding
+                        .background(themeManager.primaryColor)
+                        .cornerRadius(8) // Smaller corner radius
                 }
+                .fixedSize(horizontal: true, vertical: false)
+                .shadow(color: Color.black.opacity(0.2), radius: 8, x: 0, y: 4)
             }
-            .padding()
+            .padding(.horizontal, 12)
+            .padding(.vertical, 10)
             .background(.ultraThinMaterial)
             .cornerRadius(16)
             .overlay(
