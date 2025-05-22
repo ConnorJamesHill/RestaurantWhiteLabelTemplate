@@ -16,6 +16,37 @@ class RegisterViewViewModel: ObservableObject {
     @Published var errorMessage = ""
     @Published var isOwner = false
     
+    var isFormValid: Bool {
+        // Trim whitespace
+        let trimmedName = name.trimmingCharacters(in: .whitespaces)
+        let trimmedEmail = email.trimmingCharacters(in: .whitespaces)
+        let trimmedPassword = password.trimmingCharacters(in: .whitespaces)
+        
+        // Check if fields are empty
+        guard !trimmedName.isEmpty,
+              !trimmedEmail.isEmpty,
+              !trimmedPassword.isEmpty else {
+            return false
+        }
+        
+        // Validate name length
+        guard trimmedName.count >= 3 else {
+            return false
+        }
+        
+        // Validate email format
+        guard trimmedEmail.contains("@") && trimmedEmail.contains(".") else {
+            return false
+        }
+        
+        // Validate password length
+        guard trimmedPassword.count >= 6 else {
+            return false
+        }
+        
+        return true
+    }
+    
     init() {}
     
     func register() {

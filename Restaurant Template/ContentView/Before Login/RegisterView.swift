@@ -57,7 +57,7 @@ struct RegisterView: View {
                             ZStack(alignment: .leading) {
                                 TextField("", text: $viewModel.name)
                                     .padding(10)
-                                    .background(themeManager.primaryColor.opacity(0.1))
+                                    .background(themeManager.primaryColor.opacity(0.8))
                                     .cornerRadius(8)
                                     .foregroundColor(themeManager.textColor)
                                     .autocapitalization(.words)
@@ -123,7 +123,7 @@ struct RegisterView: View {
                             .foregroundColor(themeManager.textColor)
                             .frame(maxWidth: .infinity)
                             .padding()
-                            .background(themeManager.primaryColor.opacity(0.2))
+                            .background(themeManager.primaryColor.opacity(viewModel.isFormValid ? 0.9 : 0.2))
                             .cornerRadius(10)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 10)
@@ -137,7 +137,7 @@ struct RegisterView: View {
                                     )
                             )
                             .shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: 5)
-                            .disabled(isLoading)
+                            .disabled(isLoading || !viewModel.isFormValid)
                             .padding(.horizontal)
                             
                             Text("Or")
