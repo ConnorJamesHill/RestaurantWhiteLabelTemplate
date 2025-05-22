@@ -83,7 +83,7 @@ struct ReservationView: View {
                                     }
                                 }
                                 .pickerStyle(.menu)
-                                .accentColor(themeManager.primaryColor)
+                                .accentColor(themeManager.textColor)
                                 .foregroundColor(themeManager.textColor)
                             }
                             
@@ -117,25 +117,63 @@ struct ReservationView: View {
                         VStack(alignment: .leading, spacing: 16) {
                             sectionHeader("Contact Information")
                             
-                            TextField("Name", text: $name)
-                                .textContentType(.name)
-                                .textFieldStyle(RoundedBorderTextFieldStyle())
-                                .foregroundColor(themeManager.currentTheme == .light ? .black : themeManager.textColor)
+                            ZStack(alignment: .leading) {
+                                TextField("", text: $name)
+                                    .padding(10)
+                                    .background(themeManager.primaryColor.opacity(0.85)) // Darker background
+                                    .cornerRadius(8)
+                                    .foregroundColor(themeManager.textColor)
+                                    .textContentType(.name)
+                                    .autocapitalization(.words)
+                                
+                                if name.isEmpty {
+                                    Text("Full Name")
+                                        .foregroundColor(themeManager.textColor.opacity(0.6))
+                                        .padding(.horizontal, 16)
+                                        .padding(.vertical, 10)
+                                        .allowsHitTesting(false)
+                                }
+                            }
                             
-                            TextField("Email", text: $email)
-                                .textContentType(.emailAddress)
-                                .keyboardType(.emailAddress)
-                                .autocapitalization(.none)
-                                .textFieldStyle(RoundedBorderTextFieldStyle())
-                                .foregroundColor(themeManager.currentTheme == .light ? .black : themeManager.textColor)
+                            ZStack(alignment: .leading) {
+                                TextField("", text: $email)
+                                    .padding(10)
+                                    .background(themeManager.primaryColor.opacity(0.85)) // Darker background
+                                    .cornerRadius(8)
+                                    .foregroundColor(themeManager.textColor)
+                                    .textContentType(.emailAddress)
+                                    .keyboardType(.emailAddress)
+                                    .autocapitalization(.none)
+                                
+                                if email.isEmpty {
+                                    Text("Email Address")
+                                        .foregroundColor(themeManager.textColor.opacity(0.6))
+                                        .padding(.horizontal, 16)
+                                        .padding(.vertical, 10)
+                                        .allowsHitTesting(false)
+                                }
+                            }
                             
-                            TextField("Phone Number", text: $phoneNumber)
-                                .textContentType(.telephoneNumber)
-                                .keyboardType(.phonePad)
-                                .textFieldStyle(RoundedBorderTextFieldStyle())
-                                .foregroundColor(themeManager.currentTheme == .light ? .black : themeManager.textColor)
+                            ZStack(alignment: .leading) {
+                                TextField("", text: $phoneNumber)
+                                    .padding(10)
+                                    .background(themeManager.primaryColor.opacity(0.85)) // Darker background
+                                    .cornerRadius(8)
+                                    .foregroundColor(themeManager.textColor)
+                                    .textContentType(.telephoneNumber)
+                                    .keyboardType(.phonePad)
+                                
+                                if phoneNumber.isEmpty {
+                                    Text("Phone Number")
+                                        .foregroundColor(themeManager.textColor.opacity(0.6))
+                                        .padding(.horizontal, 16)
+                                        .padding(.vertical, 10)
+                                        .allowsHitTesting(false)
+                                }
+                            }
                         }
-                        .padding()
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 12)
                         .background(.ultraThinMaterial)
                         .clipShape(RoundedRectangle(cornerRadius: 16))
                         .overlay(
@@ -150,7 +188,7 @@ struct ReservationView: View {
                                 )
                         )
                         .shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: 5)
-                        
+
                         // Special Requests Section
                         VStack(alignment: .leading, spacing: 16) {
                             sectionHeader("Special Requests (Optional)")
@@ -158,20 +196,23 @@ struct ReservationView: View {
                             ZStack(alignment: .topLeading) {
                                 TextEditor(text: $specialRequests)
                                     .frame(minHeight: 100)
-                                    .background(Color.white.opacity(0.8))
+                                    .padding(10)
+                                    .background(themeManager.primaryColor.opacity(0.85)) // Darker background
                                     .cornerRadius(8)
-                                    .foregroundColor(.black)
+                                    .foregroundColor(themeManager.textColor)
+                                    .scrollContentBackground(.hidden) // Remove default background
                                 
                                 if specialRequests.isEmpty {
                                     Text("Ex. Dietary restrictions, seating preferences, or special occasions...")
-                                        .foregroundColor(Color.gray.opacity(0.8))
-                                        .padding(.horizontal, 5)
-                                        .padding(.vertical, 8)
+                                        .foregroundColor(themeManager.textColor.opacity(0.6))
+                                        .padding(.horizontal, 16)
+                                        .padding(.vertical, 10)
                                         .allowsHitTesting(false)
                                 }
                             }
                         }
-                        .padding()
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 12)
                         .background(.ultraThinMaterial)
                         .clipShape(RoundedRectangle(cornerRadius: 16))
                         .overlay(

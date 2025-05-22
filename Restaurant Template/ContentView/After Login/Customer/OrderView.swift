@@ -29,7 +29,6 @@ struct OrderView: View {
     @State private var cart: [OrderItem] = []
     @State private var orderMode: OrderMode = .shop
     @State private var showingCheckout = false
-    @State private var showingPaymentSheet = false
     @State private var selectedItem: MenuItem? = nil
     @Environment(\.colorScheme) private var colorScheme
     
@@ -54,6 +53,16 @@ struct OrderView: View {
             imageName: "subscription_premium"
         )
     ]
+    
+    // Add this function to OrderView
+    private func handleSubscription(_ plan: SubscriptionPlan) {
+        // Here you would typically:
+        // 1. Show a confirmation alert
+        // 2. Process the subscription
+        // 3. Handle success/failure
+        print("Subscribing to plan: \(plan.name)")
+        // Add your subscription logic here
+    }
     
     var body: some View {
         NavigationStack {
@@ -104,15 +113,11 @@ struct OrderView: View {
                 CheckoutView(
                     cart: $cart,
                     onDismiss: { showingCheckout = false },
-                    onPayment: { showingPaymentSheet = true }
-                )
-                .environmentObject(themeManager)
-            }
-            .sheet(isPresented: $showingPaymentSheet) {
-                PaymentView(
-                    amount: cartTotal,
-                    onDismiss: { showingPaymentSheet = false },
-                    onSuccess: handlePaymentSuccess
+                    onPayment: {
+                        // Handle successful payment
+                        cart.removeAll()
+                        showingCheckout = false
+                    }
                 )
                 .environmentObject(themeManager)
             }
@@ -155,7 +160,7 @@ struct OrderView: View {
     
     private var menuContent: some View {
         ScrollView {
-            LazyVStack(spacing: 20) {
+            LazyVStack(spacing: 16) {
                 ForEach(restaurant.menuCategories) { category in
                     VStack(alignment: .leading, spacing: 12) {
                         Text(category.name)
@@ -171,7 +176,6 @@ struct OrderView: View {
                             .environmentObject(themeManager)
                         }
                     }
-                    .padding(.vertical, 8)
                 }
             }
             .padding(.vertical)
@@ -180,10 +184,11 @@ struct OrderView: View {
     
     private var subscriptionContent: some View {
         ScrollView {
-            VStack(spacing: 20) {
+            VStack(spacing: 24) {
                 ForEach(subscriptionPlans) { plan in
                     SubscriptionPlanCard(plan: plan) {
-                        showingCheckout = true
+                        // Handle subscription action
+                        handleSubscription(plan)
                     }
                     .environmentObject(themeManager)
                 }
@@ -205,7 +210,17 @@ struct OrderView: View {
                     
                     Text("$\(String(format: "%.2f", cartTotal))")
                         .font(.headline)
-                        .foregroundColor(themeManager.textColor)
+                        .fontWeight(.bold)
+                        .foregroundColor(.white)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 6)
+                        .background(themeManager.primaryColor.opacity(0.9))
+                        .cornerRadius(8)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 8)
+                                .stroke(Color.white.opacity(0.3), lineWidth: 0.15)
+                        )
+                        .shadow(color: Color.black.opacity(0.15), radius: 2, x: 0, y: 1)
                 }
                 
                 Spacer()
@@ -215,28 +230,21 @@ struct OrderView: View {
                 } label: {
                     Text("Checkout")
                         .font(.headline)
-                        .foregroundColor(themeManager.textColor)
+                        .fontWeight(.bold)
+                        .foregroundColor(.white)
                         .padding(.horizontal, 24)
                         .padding(.vertical, 12)
-                        .background(themeManager.primaryColor.opacity(0.2))
-                        .cornerRadius(8)
+                        .background(themeManager.primaryColor)
+                        .cornerRadius(12)
                         .overlay(
-                            RoundedRectangle(cornerRadius: 8)
-                                .stroke(
-                                    LinearGradient(
-                                        colors: [.black.opacity(0.7), .clear, .black.opacity(0.3)],
-                                        startPoint: .topLeading,
-                                        endPoint: .bottomTrailing
-                                    ),
-                                    lineWidth: 0.15
-                                )
+                            RoundedRectangle(cornerRadius: 12)
+                                .stroke(Color.white.opacity(0.3), lineWidth: 0.15)
                         )
+                        .shadow(color: Color.black.opacity(0.15), radius: 6, x: 0, y: 3)
                 }
-                .shadow(color: Color.black.opacity(0.15), radius: 4, x: 0, y: 2)
             }
             .padding()
             .background(.ultraThinMaterial)
-            .shadow(color: Color.black.opacity(0.1), radius: 8, x: 0, y: -4)
         }
     }
     
@@ -251,68 +259,71 @@ struct OrderView: View {
             return total + (itemTotal + customizationsTotal) * Double(item.quantity)
         }
     }
-    
-    private func handlePaymentSuccess() {
-        cart = []
-        showingPaymentSheet = false
-    }
 }
 
 struct MenuItemRow: View {
     let item: MenuItem
-    let onAdd: () -> Void
+    let onTap: () -> Void
     @EnvironmentObject private var themeManager: ThemeManager
     
     var body: some View {
-        HStack(spacing: 16) {
-            Image(item.imageName)
-                .resizable()
-                .scaledToFill()
-                .frame(width: 80, height: 80)
-                .clipShape(RoundedRectangle(cornerRadius: 8))
-                .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
-            
-            VStack(alignment: .leading, spacing: 4) {
-                Text(item.name)
-                    .font(.headline)
-                    .foregroundColor(themeManager.textColor)
+        Button(action: onTap) {
+            HStack(spacing: 16) {
+                Image(item.imageName)
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: 80, height: 80)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                    .shadow(color: Color.black.opacity(0.15), radius: 4, x: 0, y: 2)
                 
-                Text(item.description)
-                    .font(.subheadline)
-                    .foregroundColor(themeManager.textColor.opacity(0.7))
-                    .lineLimit(2)
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(item.name)
+                        .font(.headline)
+                        .foregroundColor(themeManager.textColor)
+                    
+                    Text(item.description)
+                        .font(.subheadline)
+                        .foregroundColor(themeManager.textColor.opacity(0.7))
+                        .lineLimit(2)
+                    
+                    Text("$\(String(format: "%.2f", item.price))")
+                        .font(.subheadline)
+                        .fontWeight(.bold)
+                        .foregroundColor(.white)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 6)
+                        .background(themeManager.primaryColor.opacity(0.9))
+                        .cornerRadius(8)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 8)
+                                .stroke(Color.white.opacity(0.3), lineWidth: 0.15)
+                        )
+                        .shadow(color: Color.black.opacity(0.15), radius: 2, x: 0, y: 1)
+                }
                 
-                Text("$\(String(format: "%.2f", item.price))")
+                Spacer()
+                
+                Image(systemName: "chevron.right")
                     .font(.subheadline)
-                    .fontWeight(.semibold)
-                    .foregroundColor(themeManager.primaryColor)
+                    .foregroundColor(themeManager.textColor.opacity(0.5))
             }
-            
-            Spacer()
-            
-            Button(action: onAdd) {
-                Image(systemName: "plus.circle.fill")
-                    .font(.title2)
-                    .foregroundColor(themeManager.primaryColor)
-            }
+            .padding()
+            .background(.ultraThinMaterial)
+            .clipShape(RoundedRectangle(cornerRadius: 16))
+            .overlay(
+                RoundedRectangle(cornerRadius: 16)
+                    .stroke(
+                        LinearGradient(
+                            colors: [.black.opacity(0.7), .clear, .black.opacity(0.3)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        ),
+                        lineWidth: 0.15
+                    )
+            )
+            .shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: 5)
+            .padding(.horizontal)
         }
-        .padding(.horizontal)
-        .padding(.vertical, 8)
-        .background(.ultraThinMaterial)
-        .cornerRadius(12)
-        .overlay(
-            RoundedRectangle(cornerRadius: 12)
-                .stroke(
-                    LinearGradient(
-                        colors: [.black.opacity(0.7), .clear, .black.opacity(0.3)],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    ),
-                    lineWidth: 0.15
-                )
-        )
-        .shadow(color: Color.black.opacity(0.15), radius: 6, x: 0, y: 3)
-        .padding(.horizontal)
     }
 }
 
@@ -352,7 +363,7 @@ struct SubscriptionPlanCard: View {
                 Text("$\(String(format: "%.2f", plan.price))")
                     .font(.title2)
                     .fontWeight(.bold)
-                    .foregroundColor(themeManager.primaryColor)
+                    .foregroundColor(themeManager.textColor)
                 
                 Text(plan.frequency)
                     .font(.subheadline)
@@ -385,7 +396,7 @@ struct SubscriptionPlanCard: View {
                     .foregroundColor(themeManager.textColor)
                     .frame(maxWidth: .infinity)
                     .padding()
-                    .background(themeManager.primaryColor.opacity(0.2))
+                    .background(themeManager.primaryColor.opacity(0.85))
                     .cornerRadius(12)
                     .overlay(
                         RoundedRectangle(cornerRadius: 12)
@@ -437,163 +448,223 @@ struct OrderItemDetailView: View {
                     .ignoresSafeArea()
                 
                 // Decorative elements
-                Circle()
-                    .fill(Color.black.opacity(0.05))
-                    .frame(width: 300, height: 300)
-                    .blur(radius: 30)
-                    .offset(x: -150, y: -100)
-                
-                Circle()
-                    .fill(Color.black.opacity(0.08))
-                    .frame(width: 250, height: 250)
-                    .blur(radius: 20)
-                    .offset(x: 180, y: 400)
+                decorativeCircles
                 
                 ScrollView {
                     VStack(alignment: .leading, spacing: 20) {
-                        // Item image
-                        Image(item.imageName)
-                            .resizable()
-                            .scaledToFill()
-                            .frame(height: 200)
-                            .clipped()
-                            .shadow(color: Color.black.opacity(0.15), radius: 8, x: 0, y: 4)
-                        VStack(alignment: .leading, spacing: 12) {
-                            // Item details
-                            Text(item.name)
-                                .font(.title2)
-                                .fontWeight(.bold)
-                                .foregroundColor(themeManager.textColor)
-                            
-                            Text(item.description)
-                                .font(.body)
-                                .foregroundColor(themeManager.textColor.opacity(0.8))
-                            
-                            Text("$\(String(format: "%.2f", item.price))")
-                                .font(.headline)
-                                .foregroundColor(themeManager.primaryColor)
-                        }
-                        .padding(.horizontal)
-                        
-                        // Quantity selector
-                        VStack(alignment: .leading, spacing: 12) {
-                            Text("Quantity")
-                                .font(.headline)
-                                .foregroundColor(themeManager.textColor)
-                            
-                            HStack(spacing: 20) {
-                                Button {
-                                    if quantity > 1 {
-                                        quantity -= 1
-                                    }
-                                } label: {
-                                    Image(systemName: "minus.circle.fill")
-                                        .font(.title2)
-                                        .foregroundColor(themeManager.primaryColor)
-                                }
-                                
-                                Text("\(quantity)")
-                                    .font(.title3)
-                                    .fontWeight(.semibold)
-                                    .foregroundColor(themeManager.textColor)
-                                    .frame(minWidth: 30)
-                                
-                                Button {
-                                    quantity += 1
-                                } label: {
-                                    Image(systemName: "plus.circle.fill")
-                                        .font(.title2)
-                                        .foregroundColor(themeManager.primaryColor)
-                                }
-                            }
-                        }
-                        .padding()
-                        .background(.ultraThinMaterial)
-                        .clipShape(RoundedRectangle(cornerRadius: 16))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 16)
-                                .stroke(
-                                    LinearGradient(
-                                        colors: [.black.opacity(0.7), .clear, .black.opacity(0.3)],
-                                        startPoint: .topLeading,
-                                        endPoint: .bottomTrailing
-                                    ),
-                                    lineWidth: 0.15
-                                )
-                        )
-                        .shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: 5)
-                        .padding(.horizontal)
-                        
-                        // Special instructions
-                        VStack(alignment: .leading, spacing: 12) {
-                            Text("Special Instructions")
-                                .font(.headline)
-                                .foregroundColor(themeManager.textColor)
-                            
-                            ZStack(alignment: .topLeading) {
-                                TextField("Add note (optional)", text: $specialInstructions, axis: .vertical)
-                                    .padding(10)
-                                    .background(themeManager.primaryColor.opacity(0.1))
-                                    .cornerRadius(8)
-                                    .foregroundColor(themeManager.textColor)
-                                    .lineLimit(3)
-                                
-                                if specialInstructions.isEmpty {
-                                    Text("Add note (optional)")
-                                        .foregroundColor(themeManager.textColor.opacity(0.6))
-                                        .padding(.horizontal, 16)
-                                        .padding(.vertical, 10)
-                                        .allowsHitTesting(false)
-                                }
-                            }
-                        }
-                        .padding()
-                        .background(.ultraThinMaterial)
-                        .clipShape(RoundedRectangle(cornerRadius: 16))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 16)
-                                .stroke(
-                                    LinearGradient(
-                                        colors: [.black.opacity(0.7), .clear, .black.opacity(0.3)],
-                                        startPoint: .topLeading,
-                                        endPoint: .bottomTrailing
-                                    ),
-                                    lineWidth: 0.15
-                                )
-                        )
-                        .shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: 5)
-                        .padding(.horizontal)
+                        itemImageSection
+                        itemDetailsSection
+                        quantitySelectorSection
+                        specialInstructionsSection
+                        addToCartButton
                     }
-                    .padding(.bottom, 20)
+                    .padding(.vertical)
                 }
             }
+            .navigationTitle("Item Details")
             .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                toolbarContent
+            }
             .toolbarBackground(.visible, for: .navigationBar)
             .toolbarBackground(themeManager.tabBarColor, for: .navigationBar)
             .toolbarColorScheme(themeManager.currentTheme == .light ? .dark : .light, for: .navigationBar)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Add to Cart") {
-                        let orderItem = OrderItem(
-                            id: UUID(),
-                            menuItem: item,
-                            quantity: quantity,
-                            customizations: selectedCustomizations,
-                            specialInstructions: specialInstructions
-                        )
-                        onAdd(orderItem)
-                        dismiss()
+        }
+    }
+    
+    // MARK: - Subviews
+    
+    private var decorativeCircles: some View {
+        ZStack {
+            Circle()
+                .fill(Color.black.opacity(0.05))
+                .frame(width: 300, height: 300)
+                .blur(radius: 30)
+                .offset(x: -150, y: -100)
+            
+            Circle()
+                .fill(Color.black.opacity(0.08))
+                .frame(width: 250, height: 250)
+                .blur(radius: 20)
+                .offset(x: 180, y: 400)
+        }
+    }
+    
+    private var itemImageSection: some View {
+        Image(item.imageName)
+            .resizable()
+            .scaledToFill()
+            .frame(height: 200)
+            .clipped()
+            .shadow(color: Color.black.opacity(0.15), radius: 8, x: 0, y: 4)
+    }
+    
+    private var itemDetailsSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text(item.name)
+                .font(.title2)
+                .fontWeight(.bold)
+                .foregroundColor(themeManager.textColor)
+            
+            Text(item.description)
+                .font(.body)
+                .foregroundColor(themeManager.textColor.opacity(0.8))
+            
+            priceTag
+        }
+        .padding(.horizontal)
+    }
+    
+    private var priceTag: some View {
+        Text("$\(String(format: "%.2f", item.price))")
+            .font(.headline)
+            .foregroundColor(themeManager.textColor)
+            .fontWeight(.bold)
+            .padding(.horizontal)
+            .padding(.vertical, 6)
+            .background(themeManager.primaryColor.opacity(0.9))
+            .cornerRadius(8)
+            .overlay(
+                RoundedRectangle(cornerRadius: 8)
+                    .stroke(Color.white.opacity(0.3), lineWidth: 0.15)
+            )
+            .shadow(color: Color.black.opacity(0.15), radius: 2, x: 0, y: 1)
+    }
+    
+    private var quantitySelectorSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Quantity")
+                .font(.headline)
+                .foregroundColor(themeManager.textColor)
+            
+            HStack {
+                Button {
+                    if quantity > 1 {
+                        quantity -= 1
                     }
-                    .foregroundColor(themeManager.currentTheme == .light ? .black : .white)
-                    .fontWeight(.semibold)
+                } label: {
+                    Image(systemName: "minus.circle.fill")
+                        .font(.title2)
+                        .foregroundColor(themeManager.primaryColor)
                 }
                 
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Cancel") {
-                        dismiss()
-                    }
-                    .foregroundColor(themeManager.currentTheme == .light ? .black : .white)
+                Text("\(quantity)")
+                    .font(.title3)
+                    .fontWeight(.semibold)
+                    .foregroundColor(themeManager.textColor)
+                    .frame(minWidth: 40)
+                
+                Button {
+                    quantity += 1
+                } label: {
+                    Image(systemName: "plus.circle.fill")
+                        .font(.title2)
+                        .foregroundColor(themeManager.primaryColor)
                 }
+            }
+        }
+        .padding()
+        .background(.ultraThinMaterial)
+        .cornerRadius(16)
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .stroke(
+                    LinearGradient(
+                        colors: [.black.opacity(0.7), .clear, .black.opacity(0.3)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    lineWidth: 0.15
+                )
+        )
+        .shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: 5)
+        .padding(.horizontal)
+    }
+    
+    private var specialInstructionsSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Special Instructions")
+                .font(.headline)
+                .foregroundColor(themeManager.textColor)
+            
+            ZStack(alignment: .topLeading) {
+                TextEditor(text: $specialInstructions)
+                    .frame(minHeight: 100)
+                    .padding(10)
+                    .background(themeManager.primaryColor.opacity(0.85))
+                    .cornerRadius(8)
+                    .foregroundColor(themeManager.textColor)
+                    .scrollContentBackground(.hidden)
+                
+                if specialInstructions.isEmpty {
+                    Text("Add any special requests or dietary restrictions...")
+                        .foregroundColor(themeManager.textColor.opacity(0.6))
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 10)
+                        .allowsHitTesting(false)
+                }
+            }
+        }
+        .padding()
+        .background(.ultraThinMaterial)
+        .cornerRadius(16)
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .stroke(
+                    LinearGradient(
+                        colors: [.black.opacity(0.7), .clear, .black.opacity(0.3)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    lineWidth: 0.15
+                )
+        )
+        .shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: 5)
+        .padding(.horizontal)
+    }
+    
+    private var addToCartButton: some View {
+        Button {
+            let orderItem = OrderItem(
+                id: UUID(),
+                menuItem: item,
+                quantity: quantity,
+                customizations: selectedCustomizations,
+                specialInstructions: specialInstructions
+            )
+            onAdd(orderItem)
+            dismiss()
+        } label: {
+            Text("Add to Order - $\(String(format: "%.2f", item.price * Double(quantity)))")
+                .font(.headline)
+                .fontWeight(.bold)
+                .foregroundColor(.white)
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(themeManager.primaryColor.opacity(0.9))
+                .cornerRadius(12)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(Color.white.opacity(0.3), lineWidth: 0.15)
+                )
+                .shadow(color: Color.black.opacity(0.15), radius: 6, x: 0, y: 3)
+        }
+        .padding(.horizontal)
+        .padding(.top, 16)
+    }
+    
+    private var toolbarContent: some ToolbarContent {
+        Group {
+            ToolbarItem(placement: .principal) {
+                Text("Item Details")
+                    .font(.headline)
+                    .foregroundColor(themeManager.currentTheme == .light ? .black : .white)
+            }
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button("Cancel") {
+                    dismiss()
+                }
+                .foregroundColor(themeManager.textColor)
             }
         }
     }
@@ -604,6 +675,12 @@ struct CheckoutView: View {
     let onDismiss: () -> Void
     let onPayment: () -> Void
     @EnvironmentObject private var themeManager: ThemeManager
+    
+    // Add payment processing states
+    @State private var isProcessingPayment = false
+    @State private var showingPaymentError = false
+    @State private var showingPaymentSuccess = false
+    @State private var paymentErrorMessage = ""
     
     @State private var deliveryAddress = ""
     @State private var deliveryInstructions = ""
@@ -652,7 +729,7 @@ struct CheckoutView: View {
                                 .padding(.horizontal, 16)
                             
                             VStack(spacing: 16) {
-                                ForEach(cart) { item in
+                                ForEach(cart, id: \.id) { item in
                                     OrderItemRow(item: item) {
                                         if let index = cart.firstIndex(where: { $0.id == item.id }) {
                                             cart.remove(at: index)
@@ -668,7 +745,18 @@ struct CheckoutView: View {
                                             .foregroundColor(themeManager.textColor.opacity(0.8))
                                         Spacer()
                                         Text("$\(String(format: "%.2f", subtotal))")
-                                            .foregroundColor(themeManager.textColor)
+                                            .font(.subheadline)
+                                            .fontWeight(.bold)
+                                            .foregroundColor(.white)
+                                            .padding(.horizontal, 12)
+                                            .padding(.vertical, 6)
+                                            .background(themeManager.primaryColor.opacity(0.9))
+                                            .cornerRadius(8)
+                                            .overlay(
+                                                RoundedRectangle(cornerRadius: 8)
+                                                    .stroke(Color.white.opacity(0.3), lineWidth: 0.15)
+                                            )
+                                            .shadow(color: Color.black.opacity(0.15), radius: 2, x: 0, y: 1)
                                     }
                                     
                                     HStack {
@@ -676,7 +764,18 @@ struct CheckoutView: View {
                                             .foregroundColor(themeManager.textColor.opacity(0.8))
                                         Spacer()
                                         Text("$\(String(format: "%.2f", tax))")
-                                            .foregroundColor(themeManager.textColor)
+                                            .font(.subheadline)
+                                            .fontWeight(.bold)
+                                            .foregroundColor(.white)
+                                            .padding(.horizontal, 12)
+                                            .padding(.vertical, 6)
+                                            .background(themeManager.primaryColor.opacity(0.9))
+                                            .cornerRadius(8)
+                                            .overlay(
+                                                RoundedRectangle(cornerRadius: 8)
+                                                    .stroke(Color.white.opacity(0.3), lineWidth: 0.15)
+                                            )
+                                            .shadow(color: Color.black.opacity(0.15), radius: 2, x: 0, y: 1)
                                     }
                                     
                                     if orderType == .delivery {
@@ -685,7 +784,18 @@ struct CheckoutView: View {
                                                 .foregroundColor(themeManager.textColor.opacity(0.8))
                                             Spacer()
                                             Text("$\(String(format: "%.2f", deliveryFee))")
-                                                .foregroundColor(themeManager.textColor)
+                                                .font(.subheadline)
+                                                .fontWeight(.bold)
+                                                .foregroundColor(.white)
+                                                .padding(.horizontal, 12)
+                                                .padding(.vertical, 6)
+                                                .background(themeManager.primaryColor.opacity(0.9))
+                                                .cornerRadius(8)
+                                                .overlay(
+                                                    RoundedRectangle(cornerRadius: 8)
+                                                        .stroke(Color.white.opacity(0.3), lineWidth: 0.15)
+                                                )
+                                                .shadow(color: Color.black.opacity(0.15), radius: 2, x: 0, y: 1)
                                         }
                                     }
                                     
@@ -698,26 +808,36 @@ struct CheckoutView: View {
                                         Spacer()
                                         Text("$\(String(format: "%.2f", total))")
                                             .font(.headline)
-                                            .foregroundColor(themeManager.primaryColor)
+                                            .fontWeight(.bold)
+                                            .foregroundColor(.white)
+                                            .padding(.horizontal, 12)
+                                            .padding(.vertical, 6)
+                                            .background(themeManager.primaryColor.opacity(0.9))
+                                            .cornerRadius(8)
+                                            .overlay(
+                                                RoundedRectangle(cornerRadius: 8)
+                                                    .stroke(Color.white.opacity(0.3), lineWidth: 0.15)
+                                            )
+                                            .shadow(color: Color.black.opacity(0.15), radius: 2, x: 0, y: 1)
                                     }
                                 }
-                                .padding()
-                                .background(.ultraThinMaterial)
-                                .cornerRadius(12)
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 12)
-                                        .stroke(
-                                            LinearGradient(
-                                                colors: [.black.opacity(0.7), .clear, .black.opacity(0.3)],
-                                                startPoint: .topLeading,
-                                                endPoint: .bottomTrailing
-                                            ),
-                                            lineWidth: 0.15
-                                        )
-                                )
-                                .shadow(color: Color.black.opacity(0.15), radius: 6, x: 0, y: 3)
-                                .padding(.horizontal)
                             }
+                            .padding()
+                            .background(.ultraThinMaterial)
+                            .clipShape(RoundedRectangle(cornerRadius: 16))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 16)
+                                    .stroke(
+                                        LinearGradient(
+                                            colors: [.black.opacity(0.7), .clear, .black.opacity(0.3)],
+                                            startPoint: .topLeading,
+                                            endPoint: .bottomTrailing
+                                        ),
+                                        lineWidth: 0.15
+                                    )
+                            )
+                            .shadow(color: Color.black.opacity(0.15), radius: 6, x: 0, y: 3)
+                            .padding(.horizontal)
                         }
                         .padding(.top, 16)
                         
@@ -744,24 +864,57 @@ struct CheckoutView: View {
                                     .padding(.horizontal)
                             } else {
                                 VStack(spacing: 12) {
-                                    TextField("Delivery Address", text: $deliveryAddress)
-                                        .padding(10)
-                                        .background(themeManager.primaryColor.opacity(0.1))
-                                        .cornerRadius(8)
-                                        .foregroundColor(themeManager.textColor)
+                                    ZStack(alignment: .leading) {
+                                        TextField("", text: $deliveryAddress)
+                                            .padding(10)
+                                            .background(themeManager.primaryColor.opacity(0.85))
+                                            .cornerRadius(8)
+                                            .foregroundColor(themeManager.textColor)
+                                        
+                                        if deliveryAddress.isEmpty {
+                                            Text("Delivery Address")
+                                                .foregroundColor(themeManager.textColor.opacity(0.6))
+                                                .padding(.horizontal, 16)
+                                                .padding(.vertical, 10)
+                                                .allowsHitTesting(false)
+                                        }
+                                    }
                                     
-                                    TextField("Delivery Instructions (Optional)", text: $deliveryInstructions)
-                                        .padding(10)
-                                        .background(themeManager.primaryColor.opacity(0.1))
-                                        .cornerRadius(8)
-                                        .foregroundColor(themeManager.textColor)
+                                    ZStack(alignment: .leading) {
+                                        TextField("", text: $deliveryInstructions)
+                                            .padding(10)
+                                            .background(themeManager.primaryColor.opacity(0.85))
+                                            .cornerRadius(8)
+                                            .foregroundColor(themeManager.textColor)
+                                        
+                                        if deliveryInstructions.isEmpty {
+                                            Text("Delivery Instructions (Optional)")
+                                                .foregroundColor(themeManager.textColor.opacity(0.6))
+                                                .padding(.horizontal, 16)
+                                                .padding(.vertical, 10)
+                                                .allowsHitTesting(false)
+                                        }
+                                    }
                                 }
-                                .padding()
-                                .background(.ultraThinMaterial)
-                                .cornerRadius(12)
                                 .padding(.horizontal)
                             }
                         }
+                        .padding(.vertical, 12)
+                        .background(.ultraThinMaterial)
+                        .clipShape(RoundedRectangle(cornerRadius: 16))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 16)
+                                .stroke(
+                                    LinearGradient(
+                                        colors: [.black.opacity(0.7), .clear, .black.opacity(0.3)],
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing
+                                    ),
+                                    lineWidth: 0.15
+                                )
+                        )
+                        .shadow(color: Color.black.opacity(0.15), radius: 6, x: 0, y: 3)
+                        .padding(.horizontal)
                         
                         // Contact Information
                         VStack(alignment: .leading, spacing: 16) {
@@ -771,88 +924,184 @@ struct CheckoutView: View {
                                 .padding(.horizontal, 16)
                             
                             VStack(spacing: 12) {
-                                TextField("Full Name", text: $customerName)
-                                    .padding(10)
-                                    .background(themeManager.primaryColor.opacity(0.1))
-                                    .cornerRadius(8)
-                                    .foregroundColor(themeManager.textColor)
+                                ZStack(alignment: .leading) {
+                                    TextField("", text: $customerName)
+                                        .padding(10)
+                                        .background(themeManager.primaryColor.opacity(0.85))
+                                        .cornerRadius(8)
+                                        .foregroundColor(themeManager.textColor)
+                                        .textContentType(.name)
+                                    
+                                    if customerName.isEmpty {
+                                        Text("Full Name")
+                                            .foregroundColor(themeManager.textColor.opacity(0.6))
+                                            .padding(.horizontal, 16)
+                                            .padding(.vertical, 10)
+                                            .allowsHitTesting(false)
+                                    }
+                                }
                                 
-                                TextField("Phone Number", text: $customerPhone)
-                                    .padding(10)
-                                    .background(themeManager.primaryColor.opacity(0.1))
-                                    .cornerRadius(8)
-                                    .foregroundColor(themeManager.textColor)
-                                    .keyboardType(.phonePad)
+                                ZStack(alignment: .leading) {
+                                    TextField("", text: $customerPhone)
+                                        .padding(10)
+                                        .background(themeManager.primaryColor.opacity(0.85))
+                                        .cornerRadius(8)
+                                        .foregroundColor(themeManager.textColor)
+                                        .textContentType(.telephoneNumber)
+                                        .keyboardType(.phonePad)
+                                    
+                                    if customerPhone.isEmpty {
+                                        Text("Phone Number")
+                                            .foregroundColor(themeManager.textColor.opacity(0.6))
+                                            .padding(.horizontal, 16)
+                                            .padding(.vertical, 10)
+                                            .allowsHitTesting(false)
+                                    }
+                                }
                                 
-                                TextField("Email Address", text: $customerEmail)
-                                    .padding(10)
-                                    .background(themeManager.primaryColor.opacity(0.1))
-                                    .cornerRadius(8)
-                                    .foregroundColor(themeManager.textColor)
-                                    .keyboardType(.emailAddress)
-                                    .autocapitalization(.none)
-                                    .autocorrectionDisabled()
+                                ZStack(alignment: .leading) {
+                                    TextField("", text: $customerEmail)
+                                        .padding(10)
+                                        .background(themeManager.primaryColor.opacity(0.85))
+                                        .cornerRadius(8)
+                                        .foregroundColor(themeManager.textColor)
+                                        .textContentType(.emailAddress)
+                                        .keyboardType(.emailAddress)
+                                        .autocapitalization(.none)
+                                    
+                                    if customerEmail.isEmpty {
+                                        Text("Email Address")
+                                            .foregroundColor(themeManager.textColor.opacity(0.6))
+                                            .padding(.horizontal, 16)
+                                            .padding(.vertical, 10)
+                                            .allowsHitTesting(false)
+                                    }
+                                }
                             }
-                            .padding()
-                            .background(.ultraThinMaterial)
-                            .cornerRadius(12)
                             .padding(.horizontal)
                         }
-                        
-                        // Payment Button
-                        Button {
-                            onPayment()
-                        } label: {
-                            Text("Proceed to Payment - $\(String(format: "%.2f", total))")
-                                .font(.headline)
-                                .foregroundColor(themeManager.textColor)
-                                .frame(maxWidth: .infinity)
-                                .padding()
-                                .background(isFormValid ? themeManager.primaryColor.opacity(0.2) : Color.gray.opacity(0.2))
-                                .cornerRadius(12)
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 12)
-                                        .stroke(
-                                            LinearGradient(
-                                                colors: [.black.opacity(0.7), .clear, .black.opacity(0.3)],
-                                                startPoint: .topLeading,
-                                                endPoint: .bottomTrailing
-                                            ),
-                                            lineWidth: 0.15
-                                        )
+                        .padding(.vertical, 12)
+                        .background(.ultraThinMaterial)
+                        .clipShape(RoundedRectangle(cornerRadius: 16))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 16)
+                                .stroke(
+                                    LinearGradient(
+                                        colors: [.black.opacity(0.7), .clear, .black.opacity(0.3)],
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing
+                                    ),
+                                    lineWidth: 0.15
                                 )
-                                .shadow(color: Color.black.opacity(0.15), radius: 6, x: 0, y: 3)
-                        }
-                        .disabled(!isFormValid)
+                        )
+                        .shadow(color: Color.black.opacity(0.15), radius: 6, x: 0, y: 3)
                         .padding(.horizontal)
-                        .padding(.top, 8)
-                        .padding(.bottom, 32)
+                        
+                        // Payment Section
+                        if isProcessingPayment {
+                            VStack(spacing: 16) {
+                                ProgressView()
+                                    .progressViewStyle(CircularProgressViewStyle(tint: themeManager.primaryColor))
+                                    .scaleEffect(1.5)
+                                
+                                Text("Processing Payment...")
+                                    .font(.headline)
+                                    .foregroundColor(themeManager.textColor)
+                            }
+                            .padding()
+                            .frame(maxWidth: .infinity)
+                            .background(.ultraThinMaterial)
+                            .cornerRadius(12)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .stroke(
+                                        LinearGradient(
+                                            colors: [.black.opacity(0.7), .clear, .black.opacity(0.3)],
+                                            startPoint: .topLeading,
+                                            endPoint: .bottomTrailing
+                                        ),
+                                        lineWidth: 0.15
+                                    )
+                            )
+                            .shadow(color: Color.black.opacity(0.15), radius: 6, x: 0, y: 3)
+                            .padding(.horizontal)
+                        } else {
+                            VStack(spacing: 12) {
+                                PaymentButton(paymentButtonType: .buy, paymentButtonStyle: .black) {
+                                    processPayment()
+                                }
+                                .frame(height: 50)
+                                
+                                Button {
+                                    processPayment()
+                                } label: {
+                                    Text("Pay with Card")
+                                        .font(.headline)
+                                        .foregroundColor(themeManager.textColor)
+                                        .frame(maxWidth: .infinity)
+                                        .padding()
+                                        .background(themeManager.primaryColor.opacity(0.2))
+                                        .cornerRadius(12)
+                                        .overlay(
+                                            RoundedRectangle(cornerRadius: 12)
+                                                .stroke(
+                                                    LinearGradient(
+                                                        colors: [.black.opacity(0.7), .clear, .black.opacity(0.3)],
+                                                        startPoint: .topLeading,
+                                                        endPoint: .bottomTrailing
+                                                    ),
+                                                    lineWidth: 0.15
+                                                )
+                                        )
+                                }
+                                .shadow(color: Color.black.opacity(0.15), radius: 6, x: 0, y: 3)
+                            }
+                            .padding(.horizontal)
+                        }
                     }
+                    .padding(.bottom, 32)
                 }
             }
             .navigationTitle("Checkout")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
+                ToolbarItem(placement: .principal) {
+                    Text("Checkout")
+                        .font(.headline)
+                        .foregroundColor(themeManager.currentTheme == .light ? .black : .white)
+                }
                 ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Back") {
+                    Button("Cancel") {
                         onDismiss()
                     }
-                    .foregroundColor(themeManager.currentTheme == .light ? .black : .white)
+                    .foregroundColor(themeManager.textColor)
                 }
             }
-            .toolbarBackground(themeManager.tabBarColor, for: .navigationBar)
             .toolbarBackground(.visible, for: .navigationBar)
+            .toolbarBackground(themeManager.tabBarColor, for: .navigationBar)
             .toolbarColorScheme(themeManager.currentTheme == .light ? .dark : .light, for: .navigationBar)
+            .alert("Payment Error", isPresented: $showingPaymentError) {
+                Button("OK", role: .cancel) { }
+            } message: {
+                Text(paymentErrorMessage)
+            }
+            .alert("Payment Successful", isPresented: $showingPaymentSuccess) {
+                Button("OK") {
+                    onPayment() // This will trigger the success handler in OrderView
+                }
+            } message: {
+                Text("Your order has been placed successfully! You will receive a confirmation email shortly.")
+            }
         }
     }
     
-    private var isFormValid: Bool {
-        let hasValidContactInfo = !customerName.isEmpty && !customerPhone.isEmpty && !customerEmail.isEmpty
+    private func processPayment() {
+        isProcessingPayment = true
         
-        if orderType == .delivery {
-            return hasValidContactInfo && !deliveryAddress.isEmpty
-        } else {
-            return hasValidContactInfo
+        // Simulate payment processing
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+            isProcessingPayment = false
+            showingPaymentSuccess = true // Show success alert instead of immediately dismissing
         }
     }
 }
@@ -872,8 +1121,18 @@ struct OrderItemRow: View {
                     .foregroundColor(themeManager.textColor)
                 Spacer()
                 Text("$\(String(format: "%.2f", item.menuItem.price * Double(item.quantity)))")
-                    .fontWeight(.semibold)
-                    .foregroundColor(themeManager.primaryColor)
+                    .font(.subheadline)
+                    .fontWeight(.bold)
+                    .foregroundColor(.white)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
+                    .background(themeManager.primaryColor.opacity(0.9))
+                    .cornerRadius(8)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(Color.white.opacity(0.3), lineWidth: 0.15)
+                    )
+                    .shadow(color: Color.black.opacity(0.15), radius: 2, x: 0, y: 1)
                 
                 Button(action: onDelete) {
                     Image(systemName: "trash")
@@ -891,7 +1150,17 @@ struct OrderItemRow: View {
                             Spacer()
                             Text("+$\(String(format: "%.2f", option.price))")
                                 .font(.caption)
-                                .foregroundColor(themeManager.textColor.opacity(0.7))
+                                .fontWeight(.bold)
+                                .foregroundColor(.white)
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 4)
+                                .background(themeManager.primaryColor.opacity(0.9))
+                                .cornerRadius(6)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 6)
+                                        .stroke(Color.white.opacity(0.3), lineWidth: 0.15)
+                                )
+                                .shadow(color: Color.black.opacity(0.15), radius: 2, x: 0, y: 1)
                         }
                     }
                 }
@@ -907,211 +1176,36 @@ struct OrderItemRow: View {
         .padding(.horizontal)
         .background(.ultraThinMaterial)
         .clipShape(RoundedRectangle(cornerRadius: 12))
-        .overlay(
-            RoundedRectangle(cornerRadius: 12)
-                .stroke(
-                    LinearGradient(
-                        colors: [.black.opacity(0.7), .clear, .black.opacity(0.3)],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    ),
-                    lineWidth: 0.15
-                )
-        )
-        .shadow(color: Color.black.opacity(0.15), radius: 6, x: 0, y: 3)
-        .padding(.horizontal)
     }
 }
 
-struct PaymentView: View {
-    let amount: Double
-    let onDismiss: () -> Void
-    let onSuccess: () -> Void
-    @EnvironmentObject private var themeManager: ThemeManager
-    @State private var isProcessing = false
-    @State private var paymentSuccess = false
-    
-    var body: some View {
-        NavigationStack {
-            ZStack {
-                themeManager.backgroundGradient.ignoresSafeArea()
-                
-                VStack(spacing: 30) {
-                    if isProcessing {
-                        processingView
-                    } else if paymentSuccess {
-                        successView
-                    } else {
-                        paymentMethodsView
-                    }
-                }
-                .padding()
-            }
-            .navigationTitle("Payment")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    if !paymentSuccess {
-                        Button("Cancel") {
-                            onDismiss()
-                        }
-                        .foregroundColor(themeManager.currentTheme == .light ? .black : .white)
-                    }
-                }
-            }
-            .toolbarBackground(themeManager.tabBarColor, for: .navigationBar)
-            .toolbarBackground(.visible, for: .navigationBar)
-            .toolbarColorScheme(themeManager.currentTheme == .light ? .dark : .light, for: .navigationBar)
-        }
-    }
-    
-    private var paymentMethodsView: some View {
-        VStack(spacing: 40) {
-            Text("Total Amount: $\(String(format: "%.2f", amount))")
-                .font(.title2)
-                .fontWeight(.bold)
-                .foregroundColor(themeManager.textColor)
-            
-            VStack(spacing: 16) {
-                PaymentMethodButton(title: "Credit / Debit Card", icon: "creditcard.fill") {
-                    processPayment()
-                }
-                .environmentObject(themeManager)
-                
-                PaymentMethodButton(title: "Apple Pay", icon: "apple.logo") {
-                    processPayment()
-                }
-                .environmentObject(themeManager)
-                
-                PaymentMethodButton(title: "PayPal", icon: "p.circle.fill") {
-                    processPayment()
-                }
-                .environmentObject(themeManager)
-            }
-            
-            VStack(spacing: 8) {
-                HStack {
-                    Image(systemName: "shield.checkerboard")
-                        .foregroundColor(themeManager.primaryColor)
-                    Text("Secure Payment")
-                        .font(.footnote)
-                        .foregroundColor(themeManager.textColor.opacity(0.7))
-                }
-                
-                Text("Your payment information is encrypted and secure")
-                    .font(.caption)
-                    .multilineTextAlignment(.center)
-                    .foregroundColor(themeManager.textColor.opacity(0.5))
-            }
-            .padding(.top, 20)
-        }
-    }
-    
-    private var processingView: some View {
-        VStack(spacing: 40) {
-            ProgressView()
-                .scaleEffect(1.5)
-                .tint(themeManager.primaryColor)
-            
-            Text("Processing Payment...")
-                .font(.title3)
-                .fontWeight(.medium)
-                .foregroundColor(themeManager.textColor)
-        }
-        .onAppear {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                isProcessing = false
-                paymentSuccess = true
-            }
-        }
-    }
-    
-    private var successView: some View {
-        VStack(spacing: 30) {
-            Image(systemName: "checkmark.circle.fill")
-                .font(.system(size: 80))
-                .foregroundColor(themeManager.primaryColor)
-            
-            Text("Payment Successful!")
-                .font(.title2)
-                .fontWeight(.bold)
-                .foregroundColor(themeManager.textColor)
-            
-            Text("Thank you for your order!")
-                .font(.headline)
-                .foregroundColor(themeManager.textColor.opacity(0.7))
-            
-            Text("Your order has been placed and is being prepared.")
-                .font(.subheadline)
-                .multilineTextAlignment(.center)
-                .foregroundColor(themeManager.textColor.opacity(0.7))
-            
-            Button {
-                onSuccess()
-            } label: {
-                Text("Return to Menu")
-                    .font(.headline)
-                    .foregroundColor(themeManager.textColor)
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(themeManager.primaryColor.opacity(0.2))
-                    .cornerRadius(12)
-                    .shadow(color: Color.black.opacity(0.15), radius: 6, x: 0, y: 3)
-            }
-            .padding(.top, 20)
-        }
-    }
-    
-    private func processPayment() {
-        isProcessing = true
-    }
-}
-
-struct PaymentMethodButton: View {
-    let title: String
-    let icon: String
+// Payment Button from PassKit
+struct PaymentButton: UIViewRepresentable {
+    let paymentButtonType: PKPaymentButtonType
+    let paymentButtonStyle: PKPaymentButtonStyle
     let action: () -> Void
-    @EnvironmentObject private var themeManager: ThemeManager
     
-    var body: some View {
-        Button(action: action) {
-            HStack {
-                Image(systemName: icon)
-                    .font(.title3)
-                    .foregroundColor(themeManager.primaryColor)
-                
-                Text(title)
-                    .font(.headline)
-                    .foregroundColor(themeManager.textColor)
-                
-                Spacer()
-                
-                Image(systemName: "chevron.right")
-                    .foregroundColor(themeManager.textColor.opacity(0.5))
-            }
-            .padding()
-            .background(.ultraThinMaterial)
-            .cornerRadius(12)
-            .overlay(
-                RoundedRectangle(cornerRadius: 12)
-                    .stroke(
-                        LinearGradient(
-                            colors: [.black.opacity(0.7), .clear, .black.opacity(0.3)],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        ),
-                        lineWidth: 0.15
-                    )
-            )
-            .shadow(color: Color.black.opacity(0.15), radius: 6, x: 0, y: 3)
-        }
+    func makeUIView(context: Context) -> PKPaymentButton {
+        let button = PKPaymentButton(paymentButtonType: paymentButtonType, paymentButtonStyle: paymentButtonStyle)
+        button.addTarget(context.coordinator, action: #selector(Coordinator.buttonTapped), for: .touchUpInside)
+        return button
     }
-}
-
-struct OrderView_Previews: PreviewProvider {
-    static var previews: some View {
-        OrderView()
-            .environmentObject(RestaurantConfiguration.shared)
-            .environmentObject(ThemeManager())
+    
+    func updateUIView(_ uiView: PKPaymentButton, context: Context) {}
+    
+    func makeCoordinator() -> Coordinator {
+        Coordinator(action: action)
+    }
+    
+    class Coordinator: NSObject {
+        let action: () -> Void
+        
+        init(action: @escaping () -> Void) {
+            self.action = action
+        }
+        
+        @objc func buttonTapped() {
+            action()
+        }
     }
 }

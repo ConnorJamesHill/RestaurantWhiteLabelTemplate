@@ -272,6 +272,7 @@ struct CategoryButton: View {
     }
 }
 
+// For FullMenuItemRow (list view)
 struct FullMenuItemRow: View {
     let item: MenuItem
     @EnvironmentObject private var themeManager: ThemeManager
@@ -301,8 +302,16 @@ struct FullMenuItemRow: View {
             Text("$\(String(format: "%.2f", item.price))")
                 .font(.subheadline)
                 .fontWeight(.bold)
-                .foregroundColor(themeManager.primaryColor)
-                .padding(.leading, 4)
+                .foregroundColor(.white)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 6)
+                .background(themeManager.primaryColor.opacity(0.9)) // Changed to primary color with high opacity
+                .cornerRadius(8)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 8)
+                        .stroke(Color.white.opacity(0.3), lineWidth: 0.15)
+                )
+                .shadow(color: Color.black.opacity(0.15), radius: 2, x: 0, y: 1)
         }
         .padding(.horizontal, 4)
         .padding(.vertical, 8)
@@ -361,21 +370,21 @@ struct MenuItemCard: View {
             HStack(spacing: 2) {
                 Text("$")
                     .font(.caption.bold())
-                    .foregroundColor(themeManager.textColor.opacity(0.7))
+                    .foregroundColor(.white)
                 Text(String(format: "%.2f", item.price))
                     .font(.system(.body, design: .rounded).bold())
-                    .foregroundColor(themeManager.textColor)
+                    .foregroundColor(.white)
             }
             .padding(.horizontal, 10)
             .padding(.vertical, 6)
-            .background(.ultraThinMaterial)
+            .background(themeManager.primaryColor.opacity(0.9)) // Changed to primary color with high opacity
             .cornerRadius(16)
             .overlay(
                 RoundedRectangle(cornerRadius: 16)
-                    .stroke(themeManager.textColor.opacity(0.3), lineWidth: 0.15)
+                    .stroke(Color.white.opacity(0.3), lineWidth: 0.15)
             )
             .padding(10)
-            .shadow(color: Color.black.opacity(0.15), radius: 4, x: 0, y: 2)
+            .shadow(color: Color.black.opacity(0.2), radius: 4, x: 0, y: 2)
         }
     }
 
