@@ -46,35 +46,6 @@ struct OwnerMenuView: View {
                     .padding()
                 }
             }
-//            .navigationTitle("Menu Management")
-//            .navigationBarTitleDisplayMode(.inline)
-//            .toolbarBackground(.visible, for: .navigationBar)
-//            .toolbarBackground(.ultraThinMaterial, for: .navigationBar)
-//            .toolbar {
-//                ToolbarItem(placement: .principal) {
-//                    Text("Menu Management")
-//                        .font(.headline)
-//                        .foregroundColor(themeManager.textColor)
-//                }
-//                
-//                ToolbarItem(placement: .navigationBarTrailing) {
-//                    Button {
-//                        // Publish menu changes
-//                    } label: {
-//                        Text("Publish")
-//                            .fontWeight(.semibold)
-//                            .padding(.horizontal, 16)
-//                            .padding(.vertical, 8)
-//                            .background(.ultraThinMaterial)
-//                            .cornerRadius(8)
-//                            .foregroundColor(themeManager.textColor)
-//                            .overlay(
-//                                RoundedRectangle(cornerRadius: 8)
-//                                    .stroke(Color.black.opacity(0.3), lineWidth: 0.15)
-//                            )
-//                    }
-//                }
-//            }
         }
     }
     
@@ -191,7 +162,7 @@ struct OwnerMenuView: View {
                             .overlay(
                                 Image(systemName: ["fork.knife", "wineglass"][index % 2])
                                     .font(.title)
-                                    .foregroundColor(themeManager.primaryColor)
+                                    .foregroundColor(themeManager.textColor)
                             )
                         
                         VStack(alignment: .leading, spacing: 4) {
@@ -206,8 +177,17 @@ struct OwnerMenuView: View {
                             
                             Text(["$24.99", "$19.99"][index % 2])
                                 .font(.subheadline)
-                                .fontWeight(.semibold)
-                                .foregroundColor(themeManager.primaryColor)
+                                .fontWeight(.bold)
+                                .foregroundColor(.white)
+                                .padding(.horizontal, 12)
+                                .padding(.vertical, 6)
+                                .background(themeManager.primaryColor.opacity(0.9))
+                                .cornerRadius(8)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 8)
+                                        .stroke(Color.white.opacity(0.3), lineWidth: 0.15)
+                                )
+                                .shadow(color: Color.black.opacity(0.15), radius: 2, x: 0, y: 1)
                         }
                         
                         Spacer()
@@ -241,7 +221,7 @@ struct OwnerMenuView: View {
                     HStack {
                         Image(systemName: "star.fill")
                             .font(.title3)
-                            .foregroundColor(themeManager.primaryColor)
+                            .foregroundColor(themeManager.textColor)
                         
                         Text("Add Featured Item")
                             .font(.headline)
@@ -286,7 +266,7 @@ struct OwnerMenuView: View {
                         // Each dietary option
                         HStack(spacing: 8) {
                             Image(systemName: ["leaf", "leaf.fill", "wheat", "cup.and.saucer"][["Vegetarian", "Vegan", "Gluten Free", "Dairy Free"].firstIndex(of: option)! % 4])
-                                .foregroundColor(themeManager.primaryColor)
+                                .foregroundColor(themeManager.textColor)
                             
                             Text(option)
                                 .font(.subheadline)
