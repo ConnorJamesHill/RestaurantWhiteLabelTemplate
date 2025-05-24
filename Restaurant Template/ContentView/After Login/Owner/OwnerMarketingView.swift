@@ -432,6 +432,15 @@ struct OwnerMarketingView: View {
                             .font(.caption2)
                             .foregroundColor(trendUp ? .green : .red)
                     }
+                    .padding(.horizontal, 6)
+                    .padding(.vertical, 2)
+                    .background(.white.opacity(0.6))
+                    .clipShape(Capsule())
+                    .overlay(
+                        Capsule()
+                            .stroke(Color.white.opacity(0.3), lineWidth: 0.15)
+                    )
+                    .shadow(color: Color.black.opacity(0.1), radius: 2, x: 0, y: 1)
                 }
                 
                 Text(value)

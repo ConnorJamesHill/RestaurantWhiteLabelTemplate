@@ -44,7 +44,7 @@ struct LoginView: View {
                             .frame(width: 120, height: 120)
                             .padding(.top, 50)
                         
-                        Text(restaurant.name)
+                        Text("\(restaurant.name)!")
                             .font(.title)
                             .fontWeight(.bold)
                             .foregroundColor(themeManager.textColor)

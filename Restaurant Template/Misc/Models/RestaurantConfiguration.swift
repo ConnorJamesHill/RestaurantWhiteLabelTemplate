@@ -13,27 +13,27 @@ class RestaurantConfiguration: ObservableObject {
     @EnvironmentObject private var restaurant: RestaurantConfiguration
     
     // Restaurant Identity
-    @Published var name: String = "Bistro Deluxe"
+    @Published var name: String = "Table Tap"
     @Published var tagline: String = "Fine Dining & Culinary Excellence"
-    @Published var welcomeMessage = "Welcome to Bistro Deluxe, where culinary artistry meets exceptional service. Experience our chef-driven menu featuring locally-sourced ingredients and seasonal specialties."
-    @Published var description: String = "Established in 2010, Bistro Deluxe offers a modern take on classic cuisine. Our chef-driven menu features locally sourced ingredients and changes seasonally to showcase the freshest flavors."
+    @Published var welcomeMessage = "Welcome to Table Tap, where culinary artistry meets exceptional service. Experience our chef-driven menu featuring locally-sourced ingredients and seasonal specialties."
+    @Published var description: String = "Established in 2010, Table Tap offers a modern take on classic cuisine. Our chef-driven menu features locally sourced ingredients and changes seasonally to showcase the freshest flavors."
     @Published var logoImageName: String = "restaurant_logo"
     @Published var heroImageName: String = "restaurant_hero"
     
     // Contact Information
     @Published var phoneNumber: String = "(555) 123-4567"
-    @Published var emailAddress: String = "info@bistrodeluxe.com"
-    @Published var websiteURL: String = "www.bistrodeluxe.com"
+    @Published var emailAddress: String = "info@tabletap.com"
+    @Published var websiteURL: String = "www.tabletap.com"
     @Published var address: String = "123 Main Street, Anytown, CA 94000"
     @Published var location: CLLocationCoordinate2D = CLLocationCoordinate2D(latitude: 37.7749, longitude: -122.4194)
     
     // In RestaurantConfiguration class
     let socialMedia: [(String, String)] = [
-        ("Instagram", "@bistrodeluxe"),
-        ("Facebook", "BistroDeluxe"),
-        ("Twitter", "@bistrodeluxe"),
-        ("TikTok", "@bistrodeluxe"),
-        ("YouTube", "BistroDeluxe")
+        ("Instagram", "@tabletap"),
+        ("Facebook", "TableTap"),
+        ("Twitter", "@tabletap"),
+        ("TikTok", "@tabletap"),
+        ("YouTube", "TableTap")
     ]
     
     // Hours

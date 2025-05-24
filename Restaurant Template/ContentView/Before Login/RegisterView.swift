@@ -159,7 +159,7 @@ struct RegisterView: View {
                             .foregroundColor(themeManager.textColor)
                             .frame(maxWidth: .infinity)
                             .padding()
-                            .background(themeManager.secondaryColor.opacity(0.8))
+                            .background(themeManager.primaryColor.opacity(0.8))
                             .cornerRadius(10)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 10)
