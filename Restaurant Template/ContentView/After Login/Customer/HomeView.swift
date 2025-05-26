@@ -359,11 +359,20 @@ struct FeaturedItemCard: View {
                 .lineLimit(2)
                 .frame(height: 36)
             
-            // Price
+            // Price - Updated to match menu style
             Text("$\(String(format: "%.2f", item.price))")
                 .font(.subheadline)
-                .fontWeight(.semibold)
-                .foregroundColor(themeManager.primaryColor)
+                .fontWeight(.bold)
+                .foregroundColor(.white)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 6)
+                .background(themeManager.primaryColor.opacity(0.9))
+                .cornerRadius(8)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 8)
+                        .stroke(Color.white.opacity(0.3), lineWidth: 0.15)
+                )
+                .shadow(color: Color.black.opacity(0.15), radius: 2, x: 0, y: 1)
         }
         .frame(width: 200)
         .padding(12)

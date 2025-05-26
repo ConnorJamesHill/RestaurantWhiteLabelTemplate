@@ -461,7 +461,7 @@ struct OrderItemDetailView: View {
                     .padding(.vertical)
                 }
             }
-            .navigationTitle("Item Details")
+            .navigationTitle(item.name)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 toolbarContent
@@ -656,7 +656,7 @@ struct OrderItemDetailView: View {
     private var toolbarContent: some ToolbarContent {
         Group {
             ToolbarItem(placement: .principal) {
-                Text("Item Details")
+                Text(item.name)
                     .font(.headline)
                     .foregroundColor(themeManager.currentTheme == .light ? .black : .white)
             }
