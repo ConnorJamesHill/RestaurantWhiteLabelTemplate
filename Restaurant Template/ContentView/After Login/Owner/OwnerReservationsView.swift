@@ -329,7 +329,7 @@ struct OwnerReservationsView: View {
                     RoundedRectangle(cornerRadius: 16)
                         .stroke(
                             LinearGradient(
-                                colors: [.white.opacity(0.5), .clear, .white.opacity(0.2)],
+                                colors: [.black.opacity(0.5), .clear, .black.opacity(0.2)],
                                 startPoint: .topLeading,
                                 endPoint: .bottomTrailing
                             ),
@@ -374,7 +374,7 @@ struct OwnerReservationsView: View {
                 RoundedRectangle(cornerRadius: 16)
                     .stroke(
                         LinearGradient(
-                            colors: [.white.opacity(0.5), .clear, .white.opacity(0.2)],
+                            colors: [.black.opacity(0.5), .clear, .black.opacity(0.2)],
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
                         ),
@@ -550,7 +550,7 @@ struct OwnerReservationsView: View {
                 RoundedRectangle(cornerRadius: 20)
                     .stroke(
                         LinearGradient(
-                            colors: [.white.opacity(0.5), .clear, .white.opacity(0.2)],
+                            colors: [.black.opacity(0.5), .clear, .black.opacity(0.2)],
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
                         ),

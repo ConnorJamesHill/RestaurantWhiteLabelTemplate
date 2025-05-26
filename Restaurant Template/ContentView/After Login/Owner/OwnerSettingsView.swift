@@ -76,7 +76,7 @@ struct OwnerSettingsView: View {
             RoundedRectangle(cornerRadius: 16)
                 .stroke(
                     LinearGradient(
-                        colors: [.white.opacity(0.5), .clear, .white.opacity(0.2)],
+                        colors: [.black.opacity(0.5), .clear, .black.opacity(0.2)],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     ),
@@ -105,7 +105,7 @@ struct OwnerSettingsView: View {
                 RoundedRectangle(cornerRadius: 16)
                     .stroke(
                         LinearGradient(
-                            colors: [.white.opacity(0.5), .clear, .white.opacity(0.2)],
+                            colors: [.black.opacity(0.5), .clear, .black.opacity(0.2)],
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
                         ),
@@ -143,7 +143,7 @@ struct OwnerSettingsView: View {
                 RoundedRectangle(cornerRadius: 16)
                     .stroke(
                         LinearGradient(
-                            colors: [.white.opacity(0.5), .clear, .white.opacity(0.2)],
+                            colors: [.black.opacity(0.5), .clear, .black.opacity(0.2)],
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
                         ),
@@ -191,7 +191,7 @@ struct OwnerSettingsView: View {
                 RoundedRectangle(cornerRadius: 16)
                     .stroke(
                         LinearGradient(
-                            colors: [.white.opacity(0.5), .clear, .white.opacity(0.2)],
+                            colors: [.black.opacity(0.5), .clear, .black.opacity(0.2)],
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
                         ),
@@ -233,7 +233,7 @@ struct OwnerSettingsView: View {
                 RoundedRectangle(cornerRadius: 16)
                     .stroke(
                         LinearGradient(
-                            colors: [.white.opacity(0.5), .clear, .white.opacity(0.2)],
+                            colors: [.black.opacity(0.5), .clear, .black.opacity(0.2)],
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
                         ),
@@ -284,7 +284,7 @@ struct OwnerSettingsView: View {
                 RoundedRectangle(cornerRadius: 16)
                     .stroke(
                         LinearGradient(
-                            colors: [.white.opacity(0.5), .clear, .white.opacity(0.2)],
+                            colors: [.black.opacity(0.5), .clear, .black.opacity(0.2)],
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
                         ),
@@ -574,15 +574,4 @@ struct StaffMember: Identifiable {
     let name: String
     let role: String
     let isActive: Bool
-}
-
-// MARK: - Preview Provider
-
-struct OwnerSettingsView_Previews: PreviewProvider {
-    static var previews: some View {
-        OwnerSettingsView()
-            .environmentObject(RestaurantConfiguration.shared)
-            .environmentObject(ThemeManager.shared)
-            .background(ThemeManager.shared.backgroundGradient)
-    }
 }

@@ -129,8 +129,7 @@ struct ReservationView: View {
                                 if name.isEmpty {
                                     Text("Full Name")
                                         .foregroundColor(themeManager.textColor.opacity(0.6))
-                                        .padding(.horizontal, 16)
-                                        .padding(.vertical, 10)
+                                        .padding(10)
                                         .allowsHitTesting(false)
                                 }
                             }
@@ -148,8 +147,7 @@ struct ReservationView: View {
                                 if email.isEmpty {
                                     Text("Email Address")
                                         .foregroundColor(themeManager.textColor.opacity(0.6))
-                                        .padding(.horizontal, 16)
-                                        .padding(.vertical, 10)
+                                        .padding(10)
                                         .allowsHitTesting(false)
                                 }
                             }
@@ -166,8 +164,7 @@ struct ReservationView: View {
                                 if phoneNumber.isEmpty {
                                     Text("Phone Number")
                                         .foregroundColor(themeManager.textColor.opacity(0.6))
-                                        .padding(.horizontal, 16)
-                                        .padding(.vertical, 10)
+                                        .padding(10)
                                         .allowsHitTesting(false)
                                 }
                             }
@@ -205,8 +202,8 @@ struct ReservationView: View {
                                 if specialRequests.isEmpty {
                                     Text("Ex. Dietary restrictions, seating preferences, or special occasions...")
                                         .foregroundColor(themeManager.textColor.opacity(0.6))
-                                        .padding(.horizontal, 16)
-                                        .padding(.vertical, 10)
+                                        .padding(.horizontal, 15)
+                                        .padding(.vertical, 18)
                                         .allowsHitTesting(false)
                                 }
                             }

@@ -74,8 +74,7 @@ struct LoginView: View {
                             if viewModel.email.isEmpty {
                                 Text("Email Address")
                                     .foregroundColor(themeManager.textColor.opacity(0.6))
-                                    .padding(.horizontal, 16)
-                                    .padding(.vertical, 10)
+                                    .padding(10)
                                     .allowsHitTesting(false)
                             }
                         }
@@ -91,8 +90,7 @@ struct LoginView: View {
                             if viewModel.password.isEmpty {
                                 Text("Password")
                                     .foregroundColor(themeManager.textColor.opacity(0.6))
-                                    .padding(.horizontal, 16)
-                                    .padding(.vertical, 10)
+                                    .padding(10)
                                     .allowsHitTesting(false)
                             }
                         }

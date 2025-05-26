@@ -259,9 +259,9 @@ struct OwnerAnalyticsView: View {
                         .stroke(
                             LinearGradient(
                                 colors: [
-                                    .white.opacity(0.5),
+                                    .black.opacity(0.5),
                                     .clear,
-                                    .white.opacity(0.2)
+                                    .black.opacity(0.2)
                                 ],
                                 startPoint: .topLeading,
                                 endPoint: .bottomTrailing
@@ -301,11 +301,11 @@ struct OwnerAnalyticsView: View {
                         }
                         .padding(.horizontal, 6)
                         .padding(.vertical, 2)
-                        .background(.white.opacity(0.6))
+                        .background(.white.opacity(0.8))
                         .clipShape(Capsule())
                         .overlay(
                             Capsule()
-                                .stroke(Color.white.opacity(0.3), lineWidth: 0.15)
+                                .stroke(Color.black.opacity(0.3), lineWidth: 0.15)
                         )
                         .shadow(color: Color.black.opacity(0.1), radius: 2, x: 0, y: 1)
                     }
@@ -332,9 +332,9 @@ struct OwnerAnalyticsView: View {
                     .stroke(
                         LinearGradient(
                             colors: [
-                                .white.opacity(0.5),
+                                .black.opacity(0.5),
                                 .clear,
-                                .white.opacity(0.2)
+                                .black.opacity(0.2)
                             ],
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing

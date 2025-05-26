@@ -599,8 +599,8 @@ struct OrderItemDetailView: View {
                 if specialInstructions.isEmpty {
                     Text("Add any special requests or dietary restrictions...")
                         .foregroundColor(themeManager.textColor.opacity(0.6))
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 10)
+                        .padding(.horizontal, 15)
+                        .padding(.vertical, 18)
                         .allowsHitTesting(false)
                 }
             }
@@ -858,6 +858,9 @@ struct CheckoutView: View {
                             if orderType == .pickup {
                                 DatePicker("Pickup Time", selection: $selectedPickupTime, displayedComponents: [.date, .hourAndMinute])
                                     .foregroundColor(themeManager.textColor)
+                                    .tint(themeManager.textColor)
+                                    .colorScheme(themeManager.currentTheme == .light ? .light : .dark)
+                                    .accentColor(themeManager.textColor)
                                     .padding()
                                     .background(.ultraThinMaterial)
                                     .cornerRadius(12)
@@ -874,8 +877,7 @@ struct CheckoutView: View {
                                         if deliveryAddress.isEmpty {
                                             Text("Delivery Address")
                                                 .foregroundColor(themeManager.textColor.opacity(0.6))
-                                                .padding(.horizontal, 16)
-                                                .padding(.vertical, 10)
+                                                .padding(10)
                                                 .allowsHitTesting(false)
                                         }
                                     }
@@ -890,8 +892,7 @@ struct CheckoutView: View {
                                         if deliveryInstructions.isEmpty {
                                             Text("Delivery Instructions (Optional)")
                                                 .foregroundColor(themeManager.textColor.opacity(0.6))
-                                                .padding(.horizontal, 16)
-                                                .padding(.vertical, 10)
+                                                .padding(10)
                                                 .allowsHitTesting(false)
                                         }
                                     }
@@ -935,8 +936,7 @@ struct CheckoutView: View {
                                     if customerName.isEmpty {
                                         Text("Full Name")
                                             .foregroundColor(themeManager.textColor.opacity(0.6))
-                                            .padding(.horizontal, 16)
-                                            .padding(.vertical, 10)
+                                            .padding(10)
                                             .allowsHitTesting(false)
                                     }
                                 }
@@ -953,8 +953,7 @@ struct CheckoutView: View {
                                     if customerPhone.isEmpty {
                                         Text("Phone Number")
                                             .foregroundColor(themeManager.textColor.opacity(0.6))
-                                            .padding(.horizontal, 16)
-                                            .padding(.vertical, 10)
+                                            .padding(10)
                                             .allowsHitTesting(false)
                                     }
                                 }
@@ -972,8 +971,7 @@ struct CheckoutView: View {
                                     if customerEmail.isEmpty {
                                         Text("Email Address")
                                             .foregroundColor(themeManager.textColor.opacity(0.6))
-                                            .padding(.horizontal, 16)
-                                            .padding(.vertical, 10)
+                                            .padding(10)
                                             .allowsHitTesting(false)
                                     }
                                 }
