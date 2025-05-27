@@ -301,7 +301,7 @@ struct OwnerAnalyticsView: View {
                         }
                         .padding(.horizontal, 6)
                         .padding(.vertical, 2)
-                        .background(.white.opacity(0.8))
+                        .background(.white.opacity(0.81034))
                         .clipShape(Capsule())
                         .overlay(
                             Capsule()
