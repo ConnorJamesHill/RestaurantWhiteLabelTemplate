@@ -139,7 +139,7 @@ struct HomeView: View {
                 .clipped()
                 .overlay(
                     LinearGradient(
-                        gradient: Gradient(colors: [.clear, .black.opacity(0.7)]),
+                        gradient: Gradient(colors: [.clear, .black.opacity(0.5)]),
                         startPoint: .top,
                         endPoint: .bottom
                     )
