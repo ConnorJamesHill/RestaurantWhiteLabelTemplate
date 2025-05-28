@@ -54,14 +54,8 @@ struct OrderView: View {
         )
     ]
     
-    // Add this function to OrderView
     private func handleSubscription(_ plan: SubscriptionPlan) {
-        // Here you would typically:
-        // 1. Show a confirmation alert
-        // 2. Process the subscription
-        // 3. Handle success/failure
         print("Subscribing to plan: \(plan.name)")
-        // Add your subscription logic here
     }
     
     var body: some View {
@@ -114,7 +108,6 @@ struct OrderView: View {
                     cart: $cart,
                     onDismiss: { showingCheckout = false },
                     onPayment: {
-                        // Handle successful payment
                         cart.removeAll()
                         showingCheckout = false
                     }
@@ -139,7 +132,7 @@ struct OrderView: View {
             Text("Subscribe").tag(OrderMode.subscription)
         }
         .pickerStyle(.segmented)
-        .padding()
+        .padding(16)
         .background(.ultraThinMaterial)
         .clipShape(RoundedRectangle(cornerRadius: 16))
         .overlay(
@@ -154,31 +147,33 @@ struct OrderView: View {
                 )
         )
         .shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: 5)
-        .padding(.horizontal)
-        .padding(.top)
+        .padding(.horizontal, 16)
+        .padding(.top, 16)
     }
     
     private var menuContent: some View {
         ScrollView {
-            LazyVStack(spacing: 16) {
+            LazyVStack(spacing: 24) {
                 ForEach(restaurant.menuCategories) { category in
-                    VStack(alignment: .leading, spacing: 12) {
+                    VStack(alignment: .leading, spacing: 16) {
                         Text(category.name)
                             .font(.title2)
                             .fontWeight(.bold)
                             .foregroundColor(themeManager.textColor)
-                            .padding(.horizontal)
+                            .padding(.horizontal, 16)
                         
-                        ForEach(category.items) { item in
-                            MenuItemRow(item: item) {
-                                selectedItem = item
+                        VStack(spacing: 16) {
+                            ForEach(category.items) { item in
+                                MenuItemRow(item: item) {
+                                    selectedItem = item
+                                }
+                                .environmentObject(themeManager)
                             }
-                            .environmentObject(themeManager)
                         }
                     }
                 }
             }
-            .padding(.vertical)
+            .padding(.vertical, 16)
         }
     }
     
@@ -187,13 +182,12 @@ struct OrderView: View {
             VStack(spacing: 24) {
                 ForEach(subscriptionPlans) { plan in
                     SubscriptionPlanCard(plan: plan) {
-                        // Handle subscription action
                         handleSubscription(plan)
                     }
                     .environmentObject(themeManager)
                 }
             }
-            .padding()
+            .padding(16)
         }
     }
     
@@ -202,8 +196,8 @@ struct OrderView: View {
             Divider()
                 .background(themeManager.textColor.opacity(0.2))
             
-            HStack {
-                VStack(alignment: .leading) {
+            HStack(spacing: 16) {
+                VStack(alignment: .leading, spacing: 8) {
                     Text("\(totalItems) \(totalItems == 1 ? "item" : "items")")
                         .font(.subheadline)
                         .foregroundColor(themeManager.textColor.opacity(0.8))
@@ -212,8 +206,8 @@ struct OrderView: View {
                         .font(.headline)
                         .fontWeight(.bold)
                         .foregroundColor(.white)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 6)
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 8)
                         .background(themeManager.primaryColor.opacity(0.9))
                         .cornerRadius(8)
                         .overlay(
@@ -233,7 +227,7 @@ struct OrderView: View {
                         .fontWeight(.bold)
                         .foregroundColor(.white)
                         .padding(.horizontal, 24)
-                        .padding(.vertical, 12)
+                        .padding(.vertical, 16)
                         .background(themeManager.primaryColor)
                         .cornerRadius(12)
                         .overlay(
@@ -243,7 +237,7 @@ struct OrderView: View {
                         .shadow(color: Color.black.opacity(0.15), radius: 6, x: 0, y: 3)
                 }
             }
-            .padding()
+            .padding(16)
             .background(.ultraThinMaterial)
         }
     }
@@ -276,7 +270,7 @@ struct MenuItemRow: View {
                     .clipShape(RoundedRectangle(cornerRadius: 12))
                     .shadow(color: Color.black.opacity(0.15), radius: 4, x: 0, y: 2)
                 
-                VStack(alignment: .leading, spacing: 4) {
+                VStack(alignment: .leading, spacing: 8) {
                     Text(item.name)
                         .font(.headline)
                         .foregroundColor(themeManager.textColor)
@@ -290,8 +284,8 @@ struct MenuItemRow: View {
                         .font(.subheadline)
                         .fontWeight(.bold)
                         .foregroundColor(.white)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 6)
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 8)
                         .background(themeManager.primaryColor.opacity(0.9))
                         .cornerRadius(8)
                         .overlay(
@@ -307,7 +301,7 @@ struct MenuItemRow: View {
                     .font(.subheadline)
                     .foregroundColor(themeManager.textColor.opacity(0.5))
             }
-            .padding()
+            .padding(16)
             .background(.ultraThinMaterial)
             .clipShape(RoundedRectangle(cornerRadius: 16))
             .overlay(
@@ -322,7 +316,7 @@ struct MenuItemRow: View {
                     )
             )
             .shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: 5)
-            .padding(.horizontal)
+            .padding(.horizontal, 16)
         }
     }
 }
@@ -335,8 +329,8 @@ struct SubscriptionPlanCard: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             // Header
-            HStack {
-                VStack(alignment: .leading, spacing: 4) {
+            HStack(spacing: 16) {
+                VStack(alignment: .leading, spacing: 8) {
                     Text(plan.name)
                         .font(.title3)
                         .fontWeight(.bold)
@@ -359,7 +353,7 @@ struct SubscriptionPlanCard: View {
             }
             
             // Price
-            HStack(alignment: .firstTextBaseline) {
+            HStack(alignment: .firstTextBaseline, spacing: 8) {
                 Text("$\(String(format: "%.2f", plan.price))")
                     .font(.title2)
                     .fontWeight(.bold)
@@ -371,20 +365,22 @@ struct SubscriptionPlanCard: View {
             }
             
             // Benefits
-            VStack(alignment: .leading, spacing: 8) {
+            VStack(alignment: .leading, spacing: 16) {
                 Text("Benefits:")
                     .font(.headline)
                     .foregroundColor(themeManager.textColor)
                 
-                ForEach(plan.benefits, id: \.self) { benefit in
-                    HStack(alignment: .top, spacing: 10) {
-                        Image(systemName: "checkmark.circle.fill")
-                            .foregroundColor(themeManager.primaryColor)
-                            .font(.subheadline)
-                        
-                        Text(benefit)
-                            .font(.subheadline)
-                            .foregroundColor(themeManager.textColor.opacity(0.8))
+                VStack(alignment: .leading, spacing: 8) {
+                    ForEach(plan.benefits, id: \.self) { benefit in
+                        HStack(alignment: .top, spacing: 16) {
+                            Image(systemName: "checkmark.circle.fill")
+                                .foregroundColor(themeManager.primaryColor)
+                                .font(.subheadline)
+                            
+                            Text(benefit)
+                                .font(.subheadline)
+                                .foregroundColor(themeManager.textColor.opacity(0.8))
+                        }
                     }
                 }
             }
@@ -395,7 +391,7 @@ struct SubscriptionPlanCard: View {
                     .font(.headline)
                     .foregroundColor(themeManager.textColor)
                     .frame(maxWidth: .infinity)
-                    .padding()
+                    .padding(16)
                     .background(themeManager.primaryColor.opacity(0.85))
                     .cornerRadius(12)
                     .overlay(
@@ -412,7 +408,7 @@ struct SubscriptionPlanCard: View {
                     .shadow(color: Color.black.opacity(0.15), radius: 6, x: 0, y: 3)
             }
         }
-        .padding()
+        .padding(16)
         .background(.ultraThinMaterial)
         .cornerRadius(16)
         .overlay(
@@ -451,14 +447,14 @@ struct OrderItemDetailView: View {
                 decorativeCircles
                 
                 ScrollView {
-                    VStack(alignment: .leading, spacing: 20) {
+                    VStack(alignment: .leading, spacing: 24) {
                         itemImageSection
                         itemDetailsSection
                         quantitySelectorSection
                         specialInstructionsSection
                         addToCartButton
                     }
-                    .padding(.vertical)
+                    .padding(.vertical, 16)
                 }
             }
             .navigationTitle(item.name)
@@ -500,7 +496,7 @@ struct OrderItemDetailView: View {
     }
     
     private var itemDetailsSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 16) {
             Text(item.name)
                 .font(.title2)
                 .fontWeight(.bold)
@@ -512,7 +508,7 @@ struct OrderItemDetailView: View {
             
             priceTag
         }
-        .padding(.horizontal)
+        .padding(.horizontal, 16)
     }
     
     private var priceTag: some View {
@@ -520,8 +516,8 @@ struct OrderItemDetailView: View {
             .font(.headline)
             .foregroundColor(themeManager.textColor)
             .fontWeight(.bold)
-            .padding(.horizontal)
-            .padding(.vertical, 6)
+            .padding(.horizontal, 16)
+            .padding(.vertical, 8)
             .background(themeManager.primaryColor.opacity(0.9))
             .cornerRadius(8)
             .overlay(
@@ -532,12 +528,12 @@ struct OrderItemDetailView: View {
     }
     
     private var quantitySelectorSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 16) {
             Text("Quantity")
                 .font(.headline)
                 .foregroundColor(themeManager.textColor)
             
-            HStack {
+            HStack(spacing: 24) {
                 Button {
                     if quantity > 1 {
                         quantity -= 1
@@ -563,7 +559,7 @@ struct OrderItemDetailView: View {
                 }
             }
         }
-        .padding()
+        .padding(16)
         .background(.ultraThinMaterial)
         .cornerRadius(16)
         .overlay(
@@ -578,11 +574,11 @@ struct OrderItemDetailView: View {
                 )
         )
         .shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: 5)
-        .padding(.horizontal)
+        .padding(.horizontal, 16)
     }
     
     private var specialInstructionsSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 16) {
             Text("Special Instructions")
                 .font(.headline)
                 .foregroundColor(themeManager.textColor)
@@ -590,7 +586,7 @@ struct OrderItemDetailView: View {
             ZStack(alignment: .topLeading) {
                 TextEditor(text: $specialInstructions)
                     .frame(minHeight: 100)
-                    .padding(10)
+                    .padding(16)
                     .background(themeManager.primaryColor.opacity(0.85))
                     .cornerRadius(8)
                     .foregroundColor(themeManager.textColor)
@@ -599,13 +595,13 @@ struct OrderItemDetailView: View {
                 if specialInstructions.isEmpty {
                     Text("Add any special requests or dietary restrictions...")
                         .foregroundColor(themeManager.textColor.opacity(0.6))
-                        .padding(.horizontal, 15)
-                        .padding(.vertical, 18)
+                        .padding(.horizontal, 24)
+                        .padding(.vertical, 24)
                         .allowsHitTesting(false)
                 }
             }
         }
-        .padding()
+        .padding(16)
         .background(.ultraThinMaterial)
         .cornerRadius(16)
         .overlay(
@@ -620,7 +616,7 @@ struct OrderItemDetailView: View {
                 )
         )
         .shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: 5)
-        .padding(.horizontal)
+        .padding(.horizontal, 16)
     }
     
     private var addToCartButton: some View {
@@ -640,7 +636,7 @@ struct OrderItemDetailView: View {
                 .fontWeight(.bold)
                 .foregroundColor(.white)
                 .frame(maxWidth: .infinity)
-                .padding()
+                .padding(16)
                 .background(themeManager.primaryColor.opacity(0.9))
                 .cornerRadius(12)
                 .overlay(
@@ -649,7 +645,7 @@ struct OrderItemDetailView: View {
                 )
                 .shadow(color: Color.black.opacity(0.15), radius: 6, x: 0, y: 3)
         }
-        .padding(.horizontal)
+        .padding(.horizontal, 16)
         .padding(.top, 16)
     }
     
@@ -676,7 +672,6 @@ struct CheckoutView: View {
     let onPayment: () -> Void
     @EnvironmentObject private var themeManager: ThemeManager
     
-    // Add payment processing states
     @State private var isProcessingPayment = false
     @State private var showingPaymentError = false
     @State private var showingPaymentSuccess = false
@@ -699,7 +694,7 @@ struct CheckoutView: View {
     }
     
     private var tax: Double {
-        subtotal * 0.08 // 8% tax rate
+        subtotal * 0.08
     }
     
     private var deliveryFee: Double {
@@ -740,7 +735,7 @@ struct CheckoutView: View {
                                 
                                 // Price breakdown
                                 VStack(spacing: 8) {
-                                    HStack {
+                                    HStack(spacing: 16) {
                                         Text("Subtotal")
                                             .foregroundColor(themeManager.textColor.opacity(0.8))
                                         Spacer()
@@ -748,8 +743,8 @@ struct CheckoutView: View {
                                             .font(.subheadline)
                                             .fontWeight(.bold)
                                             .foregroundColor(.white)
-                                            .padding(.horizontal, 12)
-                                            .padding(.vertical, 6)
+                                            .padding(.horizontal, 16)
+                                            .padding(.vertical, 8)
                                             .background(themeManager.primaryColor.opacity(0.9))
                                             .cornerRadius(8)
                                             .overlay(
@@ -759,7 +754,7 @@ struct CheckoutView: View {
                                             .shadow(color: Color.black.opacity(0.15), radius: 2, x: 0, y: 1)
                                     }
                                     
-                                    HStack {
+                                    HStack(spacing: 16) {
                                         Text("Tax")
                                             .foregroundColor(themeManager.textColor.opacity(0.8))
                                         Spacer()
@@ -767,8 +762,8 @@ struct CheckoutView: View {
                                             .font(.subheadline)
                                             .fontWeight(.bold)
                                             .foregroundColor(.white)
-                                            .padding(.horizontal, 12)
-                                            .padding(.vertical, 6)
+                                            .padding(.horizontal, 16)
+                                            .padding(.vertical, 8)
                                             .background(themeManager.primaryColor.opacity(0.9))
                                             .cornerRadius(8)
                                             .overlay(
@@ -779,7 +774,7 @@ struct CheckoutView: View {
                                     }
                                     
                                     if orderType == .delivery {
-                                        HStack {
+                                        HStack(spacing: 16) {
                                             Text("Delivery Fee")
                                                 .foregroundColor(themeManager.textColor.opacity(0.8))
                                             Spacer()
@@ -787,8 +782,8 @@ struct CheckoutView: View {
                                                 .font(.subheadline)
                                                 .fontWeight(.bold)
                                                 .foregroundColor(.white)
-                                                .padding(.horizontal, 12)
-                                                .padding(.vertical, 6)
+                                                .padding(.horizontal, 16)
+                                                .padding(.vertical, 8)
                                                 .background(themeManager.primaryColor.opacity(0.9))
                                                 .cornerRadius(8)
                                                 .overlay(
@@ -801,7 +796,7 @@ struct CheckoutView: View {
                                     
                                     Divider().background(themeManager.textColor.opacity(0.2))
                                     
-                                    HStack {
+                                    HStack(spacing: 16) {
                                         Text("Total")
                                             .font(.headline)
                                             .foregroundColor(themeManager.textColor)
@@ -810,8 +805,8 @@ struct CheckoutView: View {
                                             .font(.headline)
                                             .fontWeight(.bold)
                                             .foregroundColor(.white)
-                                            .padding(.horizontal, 12)
-                                            .padding(.vertical, 6)
+                                            .padding(.horizontal, 16)
+                                            .padding(.vertical, 8)
                                             .background(themeManager.primaryColor.opacity(0.9))
                                             .cornerRadius(8)
                                             .overlay(
@@ -822,7 +817,7 @@ struct CheckoutView: View {
                                     }
                                 }
                             }
-                            .padding()
+                            .padding(16)
                             .background(.ultraThinMaterial)
                             .clipShape(RoundedRectangle(cornerRadius: 16))
                             .overlay(
@@ -837,7 +832,7 @@ struct CheckoutView: View {
                                     )
                             )
                             .shadow(color: Color.black.opacity(0.15), radius: 6, x: 0, y: 3)
-                            .padding(.horizontal)
+                            .padding(.horizontal, 16)
                         }
                         .padding(.top, 16)
                         
@@ -853,7 +848,7 @@ struct CheckoutView: View {
                                 Text("Delivery").tag(OrderType.delivery)
                             }
                             .pickerStyle(.segmented)
-                            .padding(.horizontal)
+                            .padding(.horizontal, 16)
                             
                             if orderType == .pickup {
                                 DatePicker("Pickup Time", selection: $selectedPickupTime, displayedComponents: [.date, .hourAndMinute])
@@ -861,15 +856,15 @@ struct CheckoutView: View {
                                     .tint(themeManager.textColor)
                                     .colorScheme(themeManager.currentTheme == .light ? .light : .dark)
                                     .accentColor(themeManager.textColor)
-                                    .padding()
+                                    .padding(16)
                                     .background(.ultraThinMaterial)
                                     .cornerRadius(12)
-                                    .padding(.horizontal)
+                                    .padding(.horizontal, 16)
                             } else {
-                                VStack(spacing: 12) {
+                                VStack(spacing: 16) {
                                     ZStack(alignment: .leading) {
                                         TextField("", text: $deliveryAddress)
-                                            .padding(10)
+                                            .padding(16)
                                             .background(themeManager.primaryColor.opacity(0.85))
                                             .cornerRadius(8)
                                             .foregroundColor(themeManager.textColor)
@@ -877,14 +872,14 @@ struct CheckoutView: View {
                                         if deliveryAddress.isEmpty {
                                             Text("Delivery Address")
                                                 .foregroundColor(themeManager.textColor.opacity(0.6))
-                                                .padding(10)
+                                                .padding(16)
                                                 .allowsHitTesting(false)
                                         }
                                     }
                                     
                                     ZStack(alignment: .leading) {
                                         TextField("", text: $deliveryInstructions)
-                                            .padding(10)
+                                            .padding(16)
                                             .background(themeManager.primaryColor.opacity(0.85))
                                             .cornerRadius(8)
                                             .foregroundColor(themeManager.textColor)
@@ -892,15 +887,15 @@ struct CheckoutView: View {
                                         if deliveryInstructions.isEmpty {
                                             Text("Delivery Instructions (Optional)")
                                                 .foregroundColor(themeManager.textColor.opacity(0.6))
-                                                .padding(10)
+                                                .padding(16)
                                                 .allowsHitTesting(false)
                                         }
                                     }
                                 }
-                                .padding(.horizontal)
+                                .padding(.horizontal, 16)
                             }
                         }
-                        .padding(.vertical, 12)
+                        .padding(.vertical, 16)
                         .background(.ultraThinMaterial)
                         .clipShape(RoundedRectangle(cornerRadius: 16))
                         .overlay(
@@ -915,7 +910,7 @@ struct CheckoutView: View {
                                 )
                         )
                         .shadow(color: Color.black.opacity(0.15), radius: 6, x: 0, y: 3)
-                        .padding(.horizontal)
+                        .padding(.horizontal, 16)
                         
                         // Contact Information
                         VStack(alignment: .leading, spacing: 16) {
@@ -924,10 +919,10 @@ struct CheckoutView: View {
                                 .foregroundColor(themeManager.textColor)
                                 .padding(.horizontal, 16)
                             
-                            VStack(spacing: 12) {
+                            VStack(spacing: 16) {
                                 ZStack(alignment: .leading) {
                                     TextField("", text: $customerName)
-                                        .padding(10)
+                                        .padding(16)
                                         .background(themeManager.primaryColor.opacity(0.85))
                                         .cornerRadius(8)
                                         .foregroundColor(themeManager.textColor)
@@ -936,14 +931,14 @@ struct CheckoutView: View {
                                     if customerName.isEmpty {
                                         Text("Full Name")
                                             .foregroundColor(themeManager.textColor.opacity(0.6))
-                                            .padding(10)
+                                            .padding(16)
                                             .allowsHitTesting(false)
                                     }
                                 }
                                 
                                 ZStack(alignment: .leading) {
                                     TextField("", text: $customerPhone)
-                                        .padding(10)
+                                        .padding(16)
                                         .background(themeManager.primaryColor.opacity(0.85))
                                         .cornerRadius(8)
                                         .foregroundColor(themeManager.textColor)
@@ -953,14 +948,14 @@ struct CheckoutView: View {
                                     if customerPhone.isEmpty {
                                         Text("Phone Number")
                                             .foregroundColor(themeManager.textColor.opacity(0.6))
-                                            .padding(10)
+                                            .padding(16)
                                             .allowsHitTesting(false)
                                     }
                                 }
                                 
                                 ZStack(alignment: .leading) {
                                     TextField("", text: $customerEmail)
-                                        .padding(10)
+                                        .padding(16)
                                         .background(themeManager.primaryColor.opacity(0.85))
                                         .cornerRadius(8)
                                         .foregroundColor(themeManager.textColor)
@@ -971,14 +966,14 @@ struct CheckoutView: View {
                                     if customerEmail.isEmpty {
                                         Text("Email Address")
                                             .foregroundColor(themeManager.textColor.opacity(0.6))
-                                            .padding(10)
+                                            .padding(16)
                                             .allowsHitTesting(false)
                                     }
                                 }
                             }
-                            .padding(.horizontal)
+                            .padding(.horizontal, 16)
                         }
-                        .padding(.vertical, 12)
+                        .padding(.vertical, 16)
                         .background(.ultraThinMaterial)
                         .clipShape(RoundedRectangle(cornerRadius: 16))
                         .overlay(
@@ -993,7 +988,7 @@ struct CheckoutView: View {
                                 )
                         )
                         .shadow(color: Color.black.opacity(0.15), radius: 6, x: 0, y: 3)
-                        .padding(.horizontal)
+                        .padding(.horizontal, 16)
                         
                         // Payment Section
                         if isProcessingPayment {
@@ -1006,7 +1001,7 @@ struct CheckoutView: View {
                                     .font(.headline)
                                     .foregroundColor(themeManager.textColor)
                             }
-                            .padding()
+                            .padding(16)
                             .frame(maxWidth: .infinity)
                             .background(.ultraThinMaterial)
                             .cornerRadius(12)
@@ -1022,9 +1017,9 @@ struct CheckoutView: View {
                                     )
                             )
                             .shadow(color: Color.black.opacity(0.15), radius: 6, x: 0, y: 3)
-                            .padding(.horizontal)
+                            .padding(.horizontal, 16)
                         } else {
-                            VStack(spacing: 12) {
+                            VStack(spacing: 16) {
                                 PaymentButton(paymentButtonType: .buy, paymentButtonStyle: .black) {
                                     processPayment()
                                 }
@@ -1037,7 +1032,7 @@ struct CheckoutView: View {
                                         .font(.headline)
                                         .foregroundColor(themeManager.textColor)
                                         .frame(maxWidth: .infinity)
-                                        .padding()
+                                        .padding(16)
                                         .background(themeManager.primaryColor.opacity(0.2))
                                         .cornerRadius(12)
                                         .overlay(
@@ -1054,7 +1049,7 @@ struct CheckoutView: View {
                                 }
                                 .shadow(color: Color.black.opacity(0.15), radius: 6, x: 0, y: 3)
                             }
-                            .padding(.horizontal)
+                            .padding(.horizontal, 16)
                         }
                     }
                     .padding(.bottom, 32)
@@ -1085,7 +1080,7 @@ struct CheckoutView: View {
             }
             .alert("Payment Successful", isPresented: $showingPaymentSuccess) {
                 Button("OK") {
-                    onPayment() // This will trigger the success handler in OrderView
+                    onPayment()
                 }
             } message: {
                 Text("Your order has been placed successfully! You will receive a confirmation email shortly.")
@@ -1096,10 +1091,9 @@ struct CheckoutView: View {
     private func processPayment() {
         isProcessingPayment = true
         
-        // Simulate payment processing
         DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
             isProcessingPayment = false
-            showingPaymentSuccess = true // Show success alert instead of immediately dismissing
+            showingPaymentSuccess = true
         }
     }
 }
@@ -1110,8 +1104,8 @@ struct OrderItemRow: View {
     @EnvironmentObject private var themeManager: ThemeManager
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            HStack {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 16) {
                 Text("\(item.quantity)x")
                     .foregroundColor(themeManager.textColor.opacity(0.7))
                 Text(item.menuItem.name)
@@ -1122,8 +1116,8 @@ struct OrderItemRow: View {
                     .font(.subheadline)
                     .fontWeight(.bold)
                     .foregroundColor(.white)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 6)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 8)
                     .background(themeManager.primaryColor.opacity(0.9))
                     .cornerRadius(8)
                     .overlay(
@@ -1139,26 +1133,28 @@ struct OrderItemRow: View {
             }
             
             if !item.customizations.isEmpty {
-                ForEach(item.customizations) { customization in
-                    if let option = customization.selectedOption {
-                        HStack {
-                            Text("• \(customization.name): \(option.name)")
-                                .font(.caption)
-                                .foregroundColor(themeManager.textColor.opacity(0.7))
-                            Spacer()
-                            Text("+$\(String(format: "%.2f", option.price))")
-                                .font(.caption)
-                                .fontWeight(.bold)
-                                .foregroundColor(.white)
-                                .padding(.horizontal, 8)
-                                .padding(.vertical, 4)
-                                .background(themeManager.primaryColor.opacity(0.9))
-                                .cornerRadius(6)
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 6)
-                                        .stroke(Color.white.opacity(0.3), lineWidth: 0.15)
-                                )
-                                .shadow(color: Color.black.opacity(0.15), radius: 2, x: 0, y: 1)
+                VStack(spacing: 8) {
+                    ForEach(item.customizations) { customization in
+                        if let option = customization.selectedOption {
+                            HStack(spacing: 16) {
+                                Text("• \(customization.name): \(option.name)")
+                                    .font(.caption)
+                                    .foregroundColor(themeManager.textColor.opacity(0.7))
+                                Spacer()
+                                Text("+$\(String(format: "%.2f", option.price))")
+                                    .font(.caption)
+                                    .fontWeight(.bold)
+                                    .foregroundColor(.white)
+                                    .padding(.horizontal, 8)
+                                    .padding(.vertical, 4)
+                                    .background(themeManager.primaryColor.opacity(0.9))
+                                    .cornerRadius(6)
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 6)
+                                            .stroke(Color.white.opacity(0.3), lineWidth: 0.15)
+                                    )
+                                    .shadow(color: Color.black.opacity(0.15), radius: 2, x: 0, y: 1)
+                            }
                         }
                     }
                 }
@@ -1168,16 +1164,27 @@ struct OrderItemRow: View {
                 Text("Note: \(item.specialInstructions)")
                     .font(.caption)
                     .foregroundColor(themeManager.textColor.opacity(0.7))
+                    .italic()
             }
         }
-        .padding(.vertical, 8)
-        .padding(.horizontal)
+        .padding(16)
         .background(.ultraThinMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .cornerRadius(12)
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(
+                    LinearGradient(
+                        colors: [.black.opacity(0.7), .clear, .black.opacity(0.3)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    lineWidth: 0.15
+                )
+        )
+        .shadow(color: Color.black.opacity(0.15), radius: 4, x: 0, y: 2)
     }
 }
 
-// Payment Button from PassKit
 struct PaymentButton: UIViewRepresentable {
     let paymentButtonType: PKPaymentButtonType
     let paymentButtonStyle: PKPaymentButtonStyle
@@ -1185,11 +1192,13 @@ struct PaymentButton: UIViewRepresentable {
     
     func makeUIView(context: Context) -> PKPaymentButton {
         let button = PKPaymentButton(paymentButtonType: paymentButtonType, paymentButtonStyle: paymentButtonStyle)
-        button.addTarget(context.coordinator, action: #selector(Coordinator.buttonTapped), for: .touchUpInside)
+        button.addTarget(context.coordinator, action: #selector(Coordinator.paymentButtonTapped), for: .touchUpInside)
         return button
     }
     
-    func updateUIView(_ uiView: PKPaymentButton, context: Context) {}
+    func updateUIView(_ uiView: PKPaymentButton, context: Context) {
+        // No updates needed
+    }
     
     func makeCoordinator() -> Coordinator {
         Coordinator(action: action)
@@ -1202,7 +1211,7 @@ struct PaymentButton: UIViewRepresentable {
             self.action = action
         }
         
-        @objc func buttonTapped() {
+        @objc func paymentButtonTapped() {
             action()
         }
     }
