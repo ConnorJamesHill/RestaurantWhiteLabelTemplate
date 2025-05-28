@@ -228,9 +228,26 @@ struct CustomerView: View {
             // Theme Selector
             ThemeSelector()
                 .padding(.horizontal, 15)
-                .padding(.bottom, safeArea.bottom + 15)
+                .padding(.bottom, 20)
             
-            // Reviews Button removed
+            // Sign Out Button
+            Button {
+                MainViewViewModel.shared.signOut()
+            } label: {
+                HStack(spacing: 12) {
+                    Image(systemName: "rectangle.portrait.and.arrow.right")
+                        .font(.title3)
+                        .frame(width: 30)
+                    
+                    Text("Sign Out")
+                        .font(.headline)
+                }
+                .foregroundColor(themeManager.textColor)
+                .padding(.vertical, 12)
+                .padding(.horizontal, 15)
+            }
+            .padding(.horizontal, 15)
+            .padding(.bottom, safeArea.bottom + 15)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
     }

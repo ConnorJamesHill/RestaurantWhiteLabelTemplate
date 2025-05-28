@@ -119,12 +119,12 @@ class ThemeManager: ObservableObject {
     // MARK: - Initialization
     
     init() {
-        // Load saved theme or use default blue
+        // Load saved theme or use default brown
         if let savedTheme = UserDefaults.standard.string(forKey: "appTheme"),
            let theme = AppTheme(rawValue: savedTheme) {
             self.currentTheme = theme
         } else {
-            self.currentTheme = .blue
+            self.currentTheme = .brown
         }
         
         // Apply theme on launch

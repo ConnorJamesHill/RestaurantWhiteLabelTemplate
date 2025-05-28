@@ -158,7 +158,7 @@ struct MenuView: View {
                 }
             }
             .padding(16)
-            .animation(.spring(response: 0.35), value: categoryId)
+            .animation(.bouncy(), value: categoryId)
         }
     }
 
@@ -171,8 +171,8 @@ struct MenuView: View {
                             .font(.headline)
                             .foregroundColor(themeManager.textColor)
                             .padding(.horizontal)
-                            .padding(.top, 8)
-                        VStack(spacing: 12) {
+                            .padding(.vertical, 8)
+                        VStack(spacing: 16) {
                             ForEach(category.items) { item in
                                 FullMenuItemRow(item: item)
                                     .environmentObject(themeManager)
@@ -209,11 +209,15 @@ struct MenuView: View {
         Button(action: {
             withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
                 showingFullMenu.toggle()
+                // Ensure a category is selected when switching to grid view
+                if !showingFullMenu && selectedCategory == nil {
+                    selectedCategory = categories.first
+                }
             }
         }) {
             Text(showingFullMenu ? "Grid View" : "Full Menu")
                 .foregroundColor(themeManager.textColor)
-                .padding(.horizontal, 16)
+                .padding(.horizontal, 8)
                 .padding(.vertical, 8)
                 .background(
                     Capsule()
@@ -233,6 +237,7 @@ struct MenuView: View {
                 )
         }
         .padding(.top, 16)
+        .padding(.bottom, 8)
     }
 }
 
@@ -248,14 +253,14 @@ struct CategoryButton: View {
             Text(category.name)
                 .font(.subheadline)
                 .fontWeight(isSelected ? .bold : .medium)
-                .foregroundColor(isSelected ? themeManager.primaryColor : themeManager.textColor)
+                .foregroundColor(isSelected ? .white : .gray)
                 .padding(.horizontal, 16)
                 .padding(.vertical, 8)
                 .background(
                     ZStack {
                         if isSelected {
                             RoundedRectangle(cornerRadius: 12)
-                                .fill(themeManager.primaryColor.opacity(0.2))
+                                .fill(themeManager.primaryColor.opacity(0.9))
                                 .matchedGeometryEffect(id: "background", in: namespace)
                         }
                     }
@@ -265,7 +270,7 @@ struct CategoryButton: View {
                         .stroke(
                             isSelected ? themeManager.primaryColor : Color.clear,
                             lineWidth: 1.5
-                        )
+                        ).opacity(0.2)
                 )
                 .clipShape(RoundedRectangle(cornerRadius: 12))
         }
@@ -278,7 +283,7 @@ struct FullMenuItemRow: View {
     @EnvironmentObject private var themeManager: ThemeManager
 
     var body: some View {
-        HStack(spacing: 24) {
+        HStack(spacing: 8) {
             Image(item.imageName)
                 .resizable()
                 .scaledToFill()
@@ -286,14 +291,14 @@ struct FullMenuItemRow: View {
                 .clipShape(RoundedRectangle(cornerRadius: 8))
                 .shadow(color: Color.black.opacity(0.15), radius: 4, x: 0, y: 2)
 
-            VStack(alignment: .leading, spacing: 4) {
+            VStack(alignment: .leading, spacing: 8) {
                 Text(item.name)
                     .font(.headline)
                     .foregroundColor(themeManager.textColor)
                 Text(item.description)
                     .font(.caption)
                     .foregroundColor(themeManager.textColor.opacity(0.7))
-                    .lineLimit(2)
+                    .lineLimit(4)
                     .fixedSize(horizontal: false, vertical: true)
             }
 
@@ -303,8 +308,7 @@ struct FullMenuItemRow: View {
                 .font(.subheadline)
                 .fontWeight(.bold)
                 .foregroundColor(.white)
-                .padding(.horizontal, 12)
-                .padding(.vertical, 6)
+                .padding(8)
                 .background(themeManager.primaryColor.opacity(0.9)) // Changed to primary color with high opacity
                 .cornerRadius(8)
                 .overlay(
@@ -313,8 +317,7 @@ struct FullMenuItemRow: View {
                 )
                 .shadow(color: Color.black.opacity(0.15), radius: 2, x: 0, y: 1)
         }
-        .padding(.horizontal, 4)
-        .padding(.vertical, 8)
+        .padding(8)
         .background(.ultraThinMaterial)
         .cornerRadius(12)
         .overlay(
@@ -329,7 +332,7 @@ struct FullMenuItemRow: View {
                 )
         )
         .shadow(color: Color.black.opacity(0.15), radius: 6, x: 0, y: 3)
-        .padding(.horizontal, 4)
+        .padding(.horizontal, 8)
     }
 }
 
@@ -365,7 +368,14 @@ struct MenuItemCard: View {
                 .scaledToFill()
                 .frame(height: 140)
                 .clipped()
-                .cornerRadius(16)
+                .clipShape(
+                    UnevenRoundedRectangle(
+                        topLeadingRadius: 16,
+                        bottomLeadingRadius: 0,
+                        bottomTrailingRadius: 0,
+                        topTrailingRadius: 16
+                    )
+                )
 
             HStack(spacing: 2) {
                 Text("$")
@@ -381,7 +391,7 @@ struct MenuItemCard: View {
             .cornerRadius(16)
             .overlay(
                 RoundedRectangle(cornerRadius: 16)
-                    .stroke(Color.white.opacity(0.3), lineWidth: 0.15)
+                    .stroke(Color.black.opacity(0.3), lineWidth: 0.15)
             )
             .padding(10)
             .shadow(color: Color.black.opacity(0.2), radius: 4, x: 0, y: 2)
@@ -457,59 +467,6 @@ struct MenuItemDetailView: View {
                                 .foregroundColor(themeManager.textColor.opacity(0.8))
                                 .fixedSize(horizontal: false, vertical: true)
                             Divider().background(themeManager.textColor.opacity(0.2))
-                            HStack {
-                                Text("Quantity")
-                                    .font(.headline)
-                                    .foregroundColor(themeManager.textColor)
-                                Spacer()
-                                HStack(spacing: 18) {
-                                    Button {
-                                        if quantity > 1 { quantity -= 1 }
-                                    } label: {
-                                        Image(systemName: "minus.circle.fill")
-                                            .font(.title3)
-                                            .foregroundColor(quantity > 1 ? themeManager.primaryColor : .gray)
-                                    }
-                                    .shadow(color: Color.black.opacity(0.1), radius: 2, x: 0, y: 1)
-                                    Text("\(quantity)")
-                                        .font(.title3)
-                                        .fontWeight(.semibold)
-                                        .foregroundColor(themeManager.textColor)
-                                        .frame(minWidth: 30)
-                                    Button {
-                                        if quantity < 10 { quantity += 1 }
-                                    } label: {
-                                        Image(systemName: "plus.circle.fill")
-                                            .font(.title3)
-                                            .foregroundColor(themeManager.primaryColor)
-                                    }
-                                    .shadow(color: Color.black.opacity(0.1), radius: 2, x: 0, y: 1)
-                                }
-                            }
-                            Button {
-                                dismiss()
-                            } label: {
-                                Text("Add to Order - $\(String(format: "%.2f", item.price * Double(quantity)))")
-                                    .font(.headline)
-                                    .foregroundColor(themeManager.textColor)
-                                    .frame(maxWidth: .infinity)
-                                    .padding()
-                                    .background(.ultraThinMaterial)
-                                    .cornerRadius(12)
-                                    .overlay(
-                                        RoundedRectangle(cornerRadius: 12)
-                                            .stroke(
-                                                LinearGradient(
-                                                    colors: [.black.opacity(0.7), .clear, .black.opacity(0.3)],
-                                                    startPoint: .topLeading,
-                                                    endPoint: .bottomTrailing
-                                                ),
-                                                lineWidth: 0.15
-                                            )
-                                    )
-                                    .shadow(color: Color.black.opacity(0.15), radius: 6, x: 0, y: 3)
-                            }
-                            .padding(.top, 16)
                         }
                         .padding()
                         .background(.ultraThinMaterial)

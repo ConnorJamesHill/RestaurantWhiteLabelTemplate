@@ -229,13 +229,13 @@ struct HomeView: View {
                 Text("Learn More")
                     .font(.subheadline)
                     .foregroundColor(.white)
-                    .padding(.vertical, 12)
-                    .padding(.horizontal, 24)
+                    .padding(.vertical, 8)
+                    .padding(.horizontal, 16)
                     .background(themeManager.primaryColor)
                     .cornerRadius(12)
                     .shadow(color: Color.black.opacity(0.2), radius: 8, x: 0, y: 4)
             }
-            .padding(.leading)
+            .padding(.horizontal)
         }
     }
     

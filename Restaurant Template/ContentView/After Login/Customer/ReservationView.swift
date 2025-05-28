@@ -188,7 +188,7 @@ struct ReservationView: View {
 
                         // Special Requests Section
                         VStack(alignment: .leading, spacing: 16) {
-                            sectionHeader("Special Requests (Optional)")
+                            sectionHeader("Special Requests? (Optional)")
                             
                             ZStack(alignment: .topLeading) {
                                 TextEditor(text: $specialRequests)
