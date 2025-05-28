@@ -109,7 +109,7 @@ struct MenuView: View {
                 }
             }
             .padding(.horizontal)
-            .padding(.vertical, 12)
+            .padding(.vertical, 8)
         }
         .background(.ultraThinMaterial)
         .clipShape(RoundedRectangle(cornerRadius: 16))
@@ -125,7 +125,7 @@ struct MenuView: View {
                 )
         )
         .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 5)
-        .padding(.horizontal)
+        .padding(.horizontal, 24)
         .padding(.top, 8)
     }
 
