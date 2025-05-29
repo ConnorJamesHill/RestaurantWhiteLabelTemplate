@@ -110,7 +110,6 @@ struct OwnerAnalyticsView: View {
                         .font(.subheadline)
                         .fontWeight(.medium)
                         .foregroundColor(themeManager.textColor)
-                    
                     // The chart
                     Chart {
                         ForEach(viewModel.revenueData) { data in
@@ -119,7 +118,11 @@ struct OwnerAnalyticsView: View {
                                 y: .value("Revenue", data.amount)
                             )
                             .foregroundStyle(themeManager.primaryColor.gradient)
-                            .cornerRadius(8)
+                            .cornerRadius(10)
+                            .shadow(color: themeManager.primaryColor.opacity(0.8), radius: 0, x: 0.5, y: 0)
+                            .shadow(color: themeManager.primaryColor.opacity(0.8), radius: 0, x: -0.5, y: 0)
+                            .shadow(color: themeManager.primaryColor.opacity(0.8), radius: 0, x: 0, y: 0.5)
+                            .shadow(color: themeManager.primaryColor.opacity(0.8), radius: 0, x: 0, y: -0.5)
                         }
                     }
                     .frame(height: 180)

@@ -12,7 +12,8 @@ struct ReservationView: View {
     @State private var name = ""
     @State private var email = ""
     @State private var phoneNumber = ""
-    @State private var date = Date().addingTimeInterval(60 * 60 * 24) // Tomorrow
+    @State private var selectedDate: Date
+    @State private var calendarDisplayDate: Date
     @State private var time = Date().noon
     @State private var partySize = 2
     @State private var specialRequests = ""
@@ -29,7 +30,80 @@ struct ReservationView: View {
         return Calendar.current.date(from: components)!
     }
     
-    // Then in init(), set the default time to one of these values
+    // Calendar helper properties
+    private var calendarDays: [Int] {
+        let calendar = Calendar.current
+        guard let range = calendar.range(of: .day, in: .month, for: calendarDisplayDate) else {
+            return Array(1...31)
+        }
+        return Array(range)
+    }
+    
+    // Sample busy days (in a real app, this would come from your backend)
+    private let busyDays = [5, 12, 19, 25, 28]
+    private let fullyBookedDays = [15, 22]
+    
+    private var dateFormatter: DateFormatter {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MMMM yyyy"
+        return formatter
+    }
+    
+    // Calendar helper functions
+    private func isSelectedDay(_ day: Int) -> Bool {
+        let calendar = Calendar.current
+        let selectedDay = calendar.component(.day, from: selectedDate)
+        let selectedMonth = calendar.component(.month, from: selectedDate)
+        let selectedYear = calendar.component(.year, from: selectedDate)
+        let displayMonth = calendar.component(.month, from: calendarDisplayDate)
+        let displayYear = calendar.component(.year, from: calendarDisplayDate)
+        
+        // Check if the day matches and we're viewing the same month/year as the selected date
+        let isMatch = day == selectedDay && selectedMonth == displayMonth && selectedYear == displayYear
+        return isMatch
+    }
+    
+    private func isPastDay(_ day: Int) -> Bool {
+        let calendar = Calendar.current
+        let today = Date()
+        let dayDate = calendar.date(bySetting: .day, value: day, of: calendarDisplayDate) ?? calendarDisplayDate
+        return dayDate < calendar.startOfDay(for: today)
+    }
+    
+    private func getAvailabilityColor(for day: Int) -> Color {
+        if isPastDay(day) {
+            return Color.clear // No indicator for past days
+        } else if fullyBookedDays.contains(day) {
+            return .red // Fully booked
+        } else if busyDays.contains(day) {
+            return .orange // Busy but available
+        } else {
+            return themeManager.primaryColor // Available
+        }
+    }
+    
+    private func selectDay(_ day: Int) {
+        let calendar = Calendar.current
+        
+        // Get the year and month from calendarDisplayDate
+        let displayYear = calendar.component(.year, from: calendarDisplayDate)
+        let displayMonth = calendar.component(.month, from: calendarDisplayDate)
+        
+        // Create a new date with the selected day in the correct month/year
+        var components = DateComponents()
+        components.year = displayYear
+        components.month = displayMonth
+        components.day = day
+        
+        if let newDate = calendar.date(from: components) {
+            selectedDate = newDate
+            print("Selected date: \(selectedDate)")
+            print("Selected day: \(calendar.component(.day, from: selectedDate)), month: \(calendar.component(.month, from: selectedDate))")
+            print("Display month: \(calendar.component(.month, from: calendarDisplayDate))")
+        }
+    }
+    
+    // Initialize with proper date synchronization
     init() {
         // Set default time to 12:00 PM
         let defaultTime = availableTimes.first { time in
@@ -39,6 +113,11 @@ struct ReservationView: View {
         
         // Use _time because we need to initialize the State property wrapper
         _time = State(initialValue: defaultTime)
+        
+        // Initialize both dates to the same starting point
+        let startDate = Date()
+        _selectedDate = State(initialValue: startDate)
+        _calendarDisplayDate = State(initialValue: startDate)
     }
     
     var body: some View {
@@ -67,11 +146,94 @@ struct ReservationView: View {
                         VStack(alignment: .leading, spacing: 16) {
                             sectionHeader("Date & Time")
                             
-                            DatePicker("Date", selection: $date, in: Date()..., displayedComponents: .date)
-                                .datePickerStyle(GraphicalDatePickerStyle())
+                            // Custom Calendar
+                            VStack {
+                                // Date selector with month and year
+                                HStack {
+                                    Button {
+                                        // Previous month
+                                        calendarDisplayDate = Calendar.current.date(byAdding: .month, value: -1, to: calendarDisplayDate) ?? Date()
+                                    } label: {
+                                        Image(systemName: "chevron.left")
+                                            .foregroundColor(themeManager.textColor)
+                                    }
+                                    
+                                    Spacer()
+                                    
+                                    Text(dateFormatter.string(from: calendarDisplayDate))
+                                        .font(.headline)
+                                        .foregroundColor(themeManager.textColor)
+                                    
+                                    Spacer()
+                                    
+                                    Button {
+                                        // Next month
+                                        calendarDisplayDate = Calendar.current.date(byAdding: .month, value: 1, to: calendarDisplayDate) ?? Date()
+                                    } label: {
+                                        Image(systemName: "chevron.right")
+                                            .foregroundColor(themeManager.textColor)
+                                    }
+                                }
+                                .padding(.horizontal)
+                                .padding(.vertical, 12)
+                                
+                                Divider()
+                                    .background(themeManager.textColor)
+                                
+                                // Calendar view
+                                VStack(spacing: 12) {
+                                    // Days of week header
+                                    HStack(spacing: 0) {
+                                        ForEach(["S", "M", "T", "W", "T", "F", "S"], id: \.self) { day in
+                                            Text(day)
+                                                .font(.caption)
+                                                .fontWeight(.medium)
+                                                .foregroundColor(themeManager.textColor.opacity(0.7))
+                                                .frame(maxWidth: .infinity)
+                                        }
+                                    }
+                                    
+                                    // Calendar days grid
+                                    LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 0), count: 7), spacing: 8) {
+                                        ForEach(calendarDays, id: \.self) { day in
+                                            ZStack {
+                                                // Background circle for selected day
+                                                if isSelectedDay(day) {
+                                                    Circle()
+                                                        .fill(themeManager.textColor.opacity(0.5))
+                                                        .frame(width: 32, height: 32)
+                                                }
+                                                
+                                                // Day content
+                                                VStack(spacing: 4) {
+                                                    Text("\(day)")
+                                                        .font(.caption)
+                                                        .fontWeight(isSelectedDay(day) ? .bold : .regular)
+                                                        .foregroundColor(
+                                                            isPastDay(day) ?
+                                                            themeManager.textColor.opacity(0.3) :
+                                                            (isSelectedDay(day) ? .white : themeManager.textColor)
+                                                        )
+                                                    
+                                                    // Availability indicator
+                                                    Circle()
+                                                        .fill(getAvailabilityColor(for: day))
+                                                        .frame(width: 6, height: 6)
+                                                }
+                                            }
+                                            .frame(width: 36, height: 36)
+                                            .contentShape(Rectangle()) // Makes entire area tappable
+                                            .onTapGesture {
+                                                if !isPastDay(day) && !fullyBookedDays.contains(day) {
+                                                    selectDay(day)
+                                                }
+                                            }
+                                            .disabled(isPastDay(day) || fullyBookedDays.contains(day))
+                                        }
+                                    }
+                                }
                                 .padding()
-                                .colorScheme(themeManager.currentTheme == .light ? .light : .dark)
-                                .accentColor(themeManager.primaryColor)
+                            }
                             
                             HStack {
                                 Text("Time")
@@ -276,6 +438,12 @@ struct ReservationView: View {
                 reservationConfirmationView
             }
         }
+        .onAppear {
+            // Ensure both dates are synchronized when the view appears
+            let today = Date()
+            selectedDate = today
+            calendarDisplayDate = today
+        }
     }
     
     private func sectionHeader(_ title: String) -> some View {
@@ -304,7 +472,7 @@ struct ReservationView: View {
             
             VStack(alignment: .leading, spacing: 16) {
                 reservationDetailRow(icon: "person.fill", label: "Name", value: name)
-                reservationDetailRow(icon: "calendar", label: "Date", value: date.formatted(date: .long, time: .omitted))
+                reservationDetailRow(icon: "calendar", label: "Date", value: selectedDate.formatted(date: .long, time: .omitted))
                 reservationDetailRow(icon: "clock.fill", label: "Time", value: time.formatted())
                 reservationDetailRow(icon: "person.3.fill", label: "Party", value: "\(partySize) \(partySize == 1 ? "person" : "people")")
             }
@@ -377,7 +545,7 @@ struct ReservationView: View {
                 name: name,
                 email: email,
                 phoneNumber: phoneNumber,
-                date: combineDateTime(date: date, time: time),
+                date: combineDateTime(date: selectedDate, time: time),
                 time: time,
                 partySize: partySize,
                 specialRequests: specialRequests
@@ -390,7 +558,9 @@ struct ReservationView: View {
         name = ""
         email = ""
         phoneNumber = ""
-        date = Date().addingTimeInterval(60 * 60 * 24)
+        let today = Date()
+        selectedDate = today
+        calendarDisplayDate = today
         time = Date().noon
         partySize = 2
         specialRequests = ""

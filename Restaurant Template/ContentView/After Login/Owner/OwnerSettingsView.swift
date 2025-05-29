@@ -254,7 +254,7 @@ struct OwnerSettingsView: View {
                     // Change password action
                 }
                 
-                ActionButton(title: "Export Data", icon: "square.and.arrow.up", color: themeManager.secondaryColor) {
+                ActionButton(title: "Export Data", icon: "square.and.arrow.up", color: themeManager.primaryColor) {
                     // Export data action
                 }
                 

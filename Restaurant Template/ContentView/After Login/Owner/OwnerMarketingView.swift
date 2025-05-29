@@ -221,7 +221,11 @@ struct OwnerMarketingView: View {
                                 y: .value("Engagement", data.value)
                             )
                             .foregroundStyle(themeManager.primaryColor.gradient)
-                            .cornerRadius(6)
+                            .cornerRadius(10)
+                            .shadow(color: themeManager.primaryColor.opacity(0.6), radius: 0, x: 0.5, y: 0)
+                            .shadow(color: themeManager.primaryColor.opacity(0.6), radius: 0, x: -0.5, y: 0)
+                            .shadow(color: themeManager.primaryColor.opacity(0.6), radius: 0, x: 0, y: 0.5)
+                            .shadow(color: themeManager.primaryColor.opacity(0.6), radius: 0, x: 0, y: -0.5)
                         }
                     }
                     .frame(height: 180)
@@ -729,7 +733,7 @@ enum PromotionType: String {
     var color: Color {
         switch self {
         case .discount: return .blue
-        case .event: return .purple
+        case .event: return .red
         case .seasonal: return .green
         case .loyalty: return .pink
         case .happyHour: return .orange

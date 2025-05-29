@@ -128,7 +128,7 @@ struct OwnerReservationsView: View {
                             selectedDate = Calendar.current.date(byAdding: .day, value: -1, to: selectedDate) ?? Date()
                         } label: {
                             Image(systemName: "chevron.left")
-                                .foregroundColor(themeManager.primaryColor)
+                                .foregroundColor(themeManager.textColor)
                         }
                         
                         Spacer()
@@ -144,14 +144,14 @@ struct OwnerReservationsView: View {
                             selectedDate = Calendar.current.date(byAdding: .day, value: 1, to: selectedDate) ?? Date()
                         } label: {
                             Image(systemName: "chevron.right")
-                                .foregroundColor(themeManager.primaryColor)
+                                .foregroundColor(themeManager.textColor)
                         }
                     }
                     .padding(.horizontal)
                     .padding(.vertical, 12)
                     
                     Divider()
-                        .background(themeManager.textColor.opacity(0.2))
+                        .background(themeManager.textColor)
                     
                     // Weekly calendar view
                     VStack(spacing: 12) {
@@ -167,17 +167,14 @@ struct OwnerReservationsView: View {
                         }
                         
                         // Calendar days grid
+                        // Calendar days grid
                         LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 0), count: 7), spacing: 8) {
-                            ForEach(-3..<32) { day in
+                            ForEach(1...31, id: \.self) { day in
                                 VStack {
-                                    Text("\(day + 1)")
+                                    Text("\(day)")
                                         .font(.caption)
-                                        .fontWeight(day == Calendar.current.component(.day, from: Date()) - 1 ? .bold : .regular)
-                                        .foregroundColor(
-                                            day < 0 || day >= 30 ?
-                                            themeManager.textColor.opacity(0.3) :
-                                            themeManager.textColor
-                                        )
+                                        .fontWeight(day == Calendar.current.component(.day, from: Date()) ? .bold : .regular)
+                                        .foregroundColor(themeManager.textColor)
                                     
                                     // Indicator for reservations
                                     if [1, 4, 7, 10, 15, 22, 28].contains(day) {
@@ -192,7 +189,7 @@ struct OwnerReservationsView: View {
                                 }
                                 .frame(height: 36)
                                 .background(
-                                    day == 15 ?
+                                    day == Calendar.current.component(.day, from: Date()) ?
                                     Circle().fill(themeManager.primaryColor.opacity(0.2)) :
                                     Circle().fill(Color.clear)
                                 )
