@@ -93,7 +93,6 @@ struct HomeView: View {
                         // Today's hours
                         todayHoursSection
                     }
-                    .padding()
                 }
             }
             .navigationTitle("")
@@ -146,25 +145,26 @@ struct HomeView: View {
                 )
                 .cornerRadius(16)
                 .shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: 5)
+                .padding(.horizontal, 4)
         }
-        .padding(.horizontal)
+        .padding(.horizontal, 8)
     }
     
     private var actionButtonsSection: some View {
-        HStack(spacing: 12) {
+        HStack(spacing: 8) {
             ActionButton(title: "Menu", iconName: "menucard", destination: AnyView(MenuView()))
             ActionButton(title: "Order", iconName: "bag", destination: AnyView(OrderView()))
             ActionButton(title: "Reserve", iconName: "calendar", destination: AnyView(ReservationView()))
         }
-        .padding(.horizontal)
+        .padding(.horizontal, 12)
     }
     
     private var featuredItemsSection: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: 8) {
             Text("Featured Items")
                 .font(.headline)
                 .foregroundColor(themeManager.textColor)
-                .padding(.horizontal)
+                .padding(.horizontal, 12)
             
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 16) {
@@ -175,17 +175,18 @@ struct HomeView: View {
                         .buttonStyle(PlainButtonStyle())
                     }
                 }
-                .padding(.horizontal)
+                .padding(.horizontal, 8)
             }
         }
+        .padding(.horizontal, 4)
     }
     
     private var eventsSection: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: 8) {
             Text("Upcoming Events")
                 .font(.headline)
                 .foregroundColor(themeManager.textColor)
-                .padding(.horizontal)
+                .padding(.horizontal, 12)
             
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 16) {
@@ -193,17 +194,18 @@ struct HomeView: View {
                         EventCard(event: event)
                     }
                 }
-                .padding(.horizontal)
+                .padding(.horizontal, 8)
             }
         }
+        .padding(.horizontal, 4)
     }
     
     private var welcomeSection: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: 8) {
             Text("About Us")
                 .font(.headline)
                 .foregroundColor(themeManager.textColor)
-                .padding(.horizontal)
+                .padding(.horizontal, 4)
             
             Text(restaurant.welcomeMessage)
                 .font(.body)
@@ -235,16 +237,17 @@ struct HomeView: View {
                     .cornerRadius(12)
                     .shadow(color: Color.black.opacity(0.2), radius: 8, x: 0, y: 4)
             }
-            .padding(.horizontal)
+            .padding(.horizontal, 4)
         }
+        .padding(.horizontal, 4)
     }
     
     private var todayHoursSection: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: 8) {
             Text("Today's Hours")
                 .font(.headline)
                 .foregroundColor(themeManager.textColor)
-                .padding(.horizontal)
+                .padding(.horizontal, 4)
             
             HStack(alignment: .center, spacing: 4) { // Minimal spacing
                 Image(systemName: "clock")
@@ -270,7 +273,7 @@ struct HomeView: View {
                 .shadow(color: Color.black.opacity(0.2), radius: 8, x: 0, y: 4)
             }
             .padding(.horizontal, 12)
-            .padding(.vertical, 10)
+            .padding(.vertical, 16)
             .background(.ultraThinMaterial)
             .cornerRadius(16)
             .overlay(
@@ -286,6 +289,7 @@ struct HomeView: View {
             )
             .shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: 5)
         }
+        .padding(.horizontal, 12)
     }
 }
 

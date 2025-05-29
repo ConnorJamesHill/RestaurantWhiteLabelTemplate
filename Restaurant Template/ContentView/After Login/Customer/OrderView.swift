@@ -147,7 +147,7 @@ struct OrderView: View {
                 )
         )
         .shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: 5)
-        .padding(.horizontal, 16)
+        .padding(.horizontal, 8)
         .padding(.top, 16)
     }
     
@@ -262,46 +262,73 @@ struct MenuItemRow: View {
     
     var body: some View {
         Button(action: onTap) {
-            HStack(spacing: 16) {
+            HStack(spacing: 4) {
+                // Item Image - 1:1 ratio
                 Image(item.imageName)
                     .resizable()
                     .scaledToFill()
-                    .frame(width: 80, height: 80)
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                    .frame(width: 100, height: 100)
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
                     .shadow(color: Color.black.opacity(0.15), radius: 4, x: 0, y: 2)
+                    .padding(4)
                 
-                VStack(alignment: .leading, spacing: 8) {
-                    Text(item.name)
-                        .font(.headline)
-                        .foregroundColor(themeManager.textColor)
+                // Text content with exact image height and matching top padding
+                VStack(alignment: .leading, spacing: 6) {
+                    // Top row - Title and Price
+                    HStack(spacing: 4) {
+                        Text(item.name)
+                            .font(.headline)
+                            .fontWeight(.semibold)
+                            .foregroundColor(themeManager.textColor)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.8)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                        
+                        Text("$\(String(format: "%.2f", item.price))")
+                            .font(.subheadline)
+                            .fontWeight(.bold)
+                            .padding(.horizontal)
+                            .padding(.vertical, 2)
+                            .foregroundColor(.white)
+                            .background(themeManager.primaryColor.opacity(0.9))
+                            .cornerRadius(6)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 6)
+                                    .stroke(Color.white.opacity(0.3), lineWidth: 0.15)
+                            )
+                            .shadow(color: Color.black.opacity(0.15), radius: 2, x: 0, y: 1)
+                            .fixedSize()
+                    }
+                    .padding(.horizontal, 2)
                     
-                    Text(item.description)
-                        .font(.subheadline)
-                        .foregroundColor(themeManager.textColor.opacity(0.7))
-                        .lineLimit(2)
-                    
-                    Text("$\(String(format: "%.2f", item.price))")
-                        .font(.subheadline)
-                        .fontWeight(.bold)
-                        .foregroundColor(.white)
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 8)
-                        .background(themeManager.primaryColor.opacity(0.9))
-                        .cornerRadius(8)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 8)
-                                .stroke(Color.white.opacity(0.3), lineWidth: 0.15)
-                        )
-                        .shadow(color: Color.black.opacity(0.15), radius: 2, x: 0, y: 1)
+                    // Bottom row - Description with centered chevron
+                    ZStack {
+                        // Description aligned to top-leading
+                        Text(item.description)
+                            .font(.subheadline)
+                            .foregroundColor(themeManager.textColor.opacity(0.7))
+                            .multilineTextAlignment(.leading)
+                            .lineLimit(4)
+                            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+                            .padding(.horizontal, 2)
+                        
+                        // Chevron centered vertically, aligned to trailing
+                        HStack {
+                            Spacer()
+                            Image(systemName: "chevron.right")
+                                .font(.caption)
+                                .foregroundColor(themeManager.textColor.opacity(0.5))
+                                .frame(width: 12, height: 12)
+                                .padding(.trailing, 2)
+                        }
+                        .frame(maxHeight: .infinity)
+                    }
+                    .frame(maxHeight: .infinity)
                 }
-                
-                Spacer()
-                
-                Image(systemName: "chevron.right")
-                    .font(.subheadline)
-                    .foregroundColor(themeManager.textColor.opacity(0.5))
+                .frame(height: 108, alignment: .top)
+                .padding(.top, 4)
             }
-            .padding(16)
+            .padding(8)
             .background(.ultraThinMaterial)
             .clipShape(RoundedRectangle(cornerRadius: 16))
             .overlay(
@@ -316,7 +343,7 @@ struct MenuItemRow: View {
                     )
             )
             .shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: 5)
-            .padding(.horizontal, 16)
+            .padding(.horizontal, 8)
         }
     }
 }

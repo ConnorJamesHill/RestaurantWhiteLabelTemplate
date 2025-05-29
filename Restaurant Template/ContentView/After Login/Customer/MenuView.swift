@@ -125,7 +125,7 @@ struct MenuView: View {
                 )
         )
         .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 5)
-        .padding(.horizontal, 24)
+        .padding(.horizontal, 8)
         .padding(.top, 8)
     }
 
@@ -170,8 +170,8 @@ struct MenuView: View {
                         Text(category.name)
                             .font(.headline)
                             .foregroundColor(themeManager.textColor)
-                            .padding(.horizontal)
                             .padding(.vertical, 8)
+                            .padding(.horizontal, 8)
                         VStack(spacing: 16) {
                             ForEach(category.items) { item in
                                 FullMenuItemRow(item: item)
@@ -181,7 +181,7 @@ struct MenuView: View {
                                     }
                             }
                         }
-                        .padding(.bottom, 8)
+                        .padding(.bottom, 4)
                     }
                     .background(Color.clear)
                     .clipShape(RoundedRectangle(cornerRadius: 16))
@@ -197,7 +197,7 @@ struct MenuView: View {
                             )
                     )
                     .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 5)
-                    .padding(.horizontal)
+                    .padding(.horizontal, 2)
                 }
             }
             .padding(.top, 8)

@@ -256,7 +256,8 @@ struct ReservationView: View {
                         )
                         .shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: 5)
                     }
-                    .padding()
+                    .padding(.vertical)
+                    .padding(.horizontal, 12)
                 }
             }
             .navigationTitle("Reservation")
