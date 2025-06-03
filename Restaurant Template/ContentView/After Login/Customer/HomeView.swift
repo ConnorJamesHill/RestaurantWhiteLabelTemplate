@@ -178,6 +178,7 @@ struct HomeView: View {
                 .padding(.horizontal, 8)
             }
         }
+        .shadow(color: Color.black.opacity(0.2), radius: 6, x: 0, y: 3)
         .padding(.horizontal, 4)
     }
     
@@ -197,6 +198,7 @@ struct HomeView: View {
                 .padding(.horizontal, 8)
             }
         }
+        .shadow(color: Color.black.opacity(0.2), radius: 6, x: 0, y: 3)
         .padding(.horizontal, 4)
     }
     
@@ -250,9 +252,6 @@ struct HomeView: View {
                 .padding(.horizontal, 4)
             
             HStack(alignment: .center, spacing: 4) { // Minimal spacing
-                Image(systemName: "clock")
-                    .foregroundColor(themeManager.textColor)
-                    .frame(width: 14) // Even smaller fixed width
                 
                 Text("Open today: \(restaurant.todayHours)") // Combined into one Text view
                     .font(.subheadline)
@@ -349,7 +348,7 @@ struct FeaturedItemCard: View {
                     RoundedRectangle(cornerRadius: 12)
                         .stroke(Color.white.opacity(0.2), lineWidth: 0.15)
                 )
-                .shadow(color: Color.black.opacity(0.2), radius: 6, x: 0, y: 3)
+                .shadow(color: Color.black.opacity(0.2), radius: 2, x: 0, y: 3)
             
             // Title and description
             Text(item.name)
@@ -393,7 +392,7 @@ struct FeaturedItemCard: View {
                     lineWidth: 0.15
                 )
         )
-        .shadow(color: Color.black.opacity(0.2), radius: 8, x: 0, y: 4)
+        .shadow(color: Color.black.opacity(0.2), radius: 3, x: 2, y: 0)
     }
 }
 
@@ -466,6 +465,6 @@ struct EventCard: View {
                     lineWidth: 0.15
                 )
         )
-        .shadow(color: Color.black.opacity(0.2), radius: 8, x: 0, y: 4)
+        .shadow(color: Color.black.opacity(0.2), radius: 3, x: 2, y: 0)
     }
 }

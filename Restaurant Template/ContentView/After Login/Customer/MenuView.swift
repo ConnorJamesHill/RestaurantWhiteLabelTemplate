@@ -51,7 +51,9 @@ struct MenuView: View {
                     .offset(x: 180, y: 400)
 
                 VStack(spacing: 0) {
-                    categoriesScrollView
+                    if !showingFullMenu {
+                        categoriesScrollView
+                    }
                     if showingFullMenu {
                         fullMenuList
                     } else {
@@ -217,7 +219,7 @@ struct MenuView: View {
         }) {
             Text(showingFullMenu ? "Grid View" : "Full Menu")
                 .foregroundColor(themeManager.textColor)
-                .padding(.horizontal, 8)
+                .padding(.horizontal, 16)
                 .padding(.vertical, 8)
                 .background(
                     Capsule()

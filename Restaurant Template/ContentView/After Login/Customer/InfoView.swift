@@ -67,6 +67,7 @@ struct InfoView: View {
                         logoutSection
                     }
                     .padding()
+                    .padding(.horizontal)
                 }
             }
             .navigationTitle("About Us")

@@ -311,6 +311,7 @@ struct MenuItemRow: View {
                             .lineLimit(4)
                             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
                             .padding(.horizontal, 2)
+                            .padding(.trailing, 6)
                         
                         // Chevron centered vertically, aligned to trailing
                         HStack {
