@@ -1,6 +1,6 @@
 # Restaurant Template
 
-A full-featured iOS restaurant app template built with SwiftUI. This template provides everything a restaurant needs to offer customers a modern ordering, reservation, and discovery experience—plus a complete owner dashboard for managing the business. Designed for easy customization: add your client's branding, menu, and information, publish to the App Store, and hand over a ready-to-use app.
+A full featured iOS restaurant app template built with SwiftUI. This template provides everything a restaurant needs to offer customers a modern ordering, reservation, and discovery experience, plus a complete owner dashboard for managing the business. Designed for easy customization: add your client's branding, menu, and information, publish to the App Store, and hand over a ready to use app.
 
 ## Table of Contents
 
@@ -43,12 +43,12 @@ A full-featured iOS restaurant app template built with SwiftUI. This template pr
 ### Technical Highlights
 
 - **100% SwiftUI** — Native iOS with modern declarative UI
-- **MVVM architecture** — Feature-based organization with clear separation of concerns
+- **MVVM architecture** — Feature based organization with clear separation of concerns
 - **Firebase backend** — Auth, Firestore, and App Check for secure, scalable data
-- **Role-based access** — Customer vs Owner flows via Firebase custom claims
+- **Role based access** — Customer vs Owner flows via Firebase custom claims
 - **Theme system** — Six themes (Blue, Dark, Light, Red, Brown, Green) with glassmorphism design
 - **Custom components** — Animated sidebar navigation, glass cards, gradient backgrounds
-- **Apple Pay** — Ready for in-app payments
+- **Apple Pay** — Ready for in app payments
 - **MapKit & CoreLocation** — Location and directions
 - **Light and dark mode** — Full system appearance support
 
@@ -75,7 +75,7 @@ The app is built around a central `RestaurantConfiguration` model. Customizing f
 - Menu categories and items
 - Theme colors
 
-This makes it straightforward to white-label the app for different restaurants while keeping a single, maintainable codebase.
+This makes it straightforward to white label the app for different restaurants while keeping a single, maintainable codebase.
 
 ## Architecture
 
@@ -132,7 +132,7 @@ Open `Restaurant Template.xcodeproj` in Xcode.
 ### Add required config
 
 1. **Firebase** — Add your `GoogleService-Info.plist` from the [Firebase Console](https://console.firebase.google.com/)
-2. **Firebase Auth** — Enable Email/Password sign-in in the Firebase Console
+2. **Firebase Auth** — Enable Email/Password sign in in the Firebase Console
 3. **Firestore** — Create a Firestore database and configure security rules
 4. **Custom claims** — Set the `owner` claim for owner accounts (e.g., via Admin SDK or Cloud Functions)
 
@@ -142,7 +142,7 @@ Build and run on a device or simulator.
 
 ---
 
-**For businesses:** This template can be customized with your restaurant's branding, menu, hours, and contact information, then published to the App Store under your business. Contact the maintainer for licensing and white-label options.
+**For businesses:** This template can be customized with your restaurant's branding, menu, hours, and contact information, then published to the App Store under your business. Contact the maintainer for licensing and white label options.
 
 ## Acknowledgements
 
