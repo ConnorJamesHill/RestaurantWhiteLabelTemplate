@@ -4,21 +4,10 @@ A full featured iOS restaurant app template built with SwiftUI. This template pr
 
 ## Table of Contents
 
-- [Screenshots](#screenshots)
 - [Description](#description)
 - [Architecture](#architecture)
 - [How To Use](#how-to-use)
 - [Acknowledgements](#acknowledgements)
-
-## Screenshots
-
-*Add screenshots of the app here (customer home, menu, order flow, owner dashboard, etc.)*
-
-<!-- Example format:
-| Customer Home | Menu | Order | Owner Dashboard |
-|:---:|:---:|:---:|:---:|
-| ![Home](Screenshots/home.png) | ![Menu](Screenshots/menu.png) | ![Order](Screenshots/order.png) | ![Dashboard](Screenshots/dashboard.png) |
--->
 
 ## Description
 
