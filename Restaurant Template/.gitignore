@@ -67,3 +67,11 @@ node_modules/
 
 # dataconnect generated files
 .dataconnect
+
+# Sensitive / per-developer files - do not commit
+**/GoogleService-Info.plist
+**/serviceAccountKey.json
+
+# Xcode user-specific data
+xcuserdata/
+*.xcuserstate
